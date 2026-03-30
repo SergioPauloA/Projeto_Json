@@ -31,6 +31,9 @@ var CONFIG = {
   PROP_LAST_SQL: 'LAST_SQL',
   PROP_LAST_RECIPIENTS: 'LAST_RECIPIENTS',
   PROP_LAST_STATUS: 'LAST_STATUS',
+
+  // Limite seguro de caracteres por propriedade do PropertiesService (~9 000 max)
+  MAX_PROPERTY_LENGTH: 8500,
 };
 
 // Mapeamento de risco para código numérico (regra FNDCLSRISC)
@@ -361,11 +364,11 @@ function registrarLog(agora, resultado, jsonStr, sqlStr) {
   props.setProperty(CONFIG.PROP_LAST_UPDATE, agora.toISOString());
   props.setProperty(
     CONFIG.PROP_LAST_JSON,
-    jsonStr.length > 8500 ? jsonStr.substring(0, 8500) + '\n...(truncado)' : jsonStr
+    jsonStr.length > CONFIG.MAX_PROPERTY_LENGTH ? jsonStr.substring(0, CONFIG.MAX_PROPERTY_LENGTH) + '\n...(truncado)' : jsonStr
   );
   props.setProperty(
     CONFIG.PROP_LAST_SQL,
-    sqlStr.length > 8500 ? sqlStr.substring(0, 8500) + '\n...(truncado)' : sqlStr
+    sqlStr.length > CONFIG.MAX_PROPERTY_LENGTH ? sqlStr.substring(0, CONFIG.MAX_PROPERTY_LENGTH) + '\n...(truncado)' : sqlStr
   );
   props.setProperty(CONFIG.PROP_LAST_RECIPIENTS, resultado.destinatarios.join(', '));
   props.setProperty(CONFIG.PROP_LAST_STATUS, 'Enviado com sucesso — ' + resultado.dataEnvio);

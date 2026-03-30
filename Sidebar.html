@@ -435,11 +435,11 @@
       return;
     }
 
-    var PERCENT = 100; // fator de conversão de decimal para percentual
+    var PERCENT_MULTIPLIER = 100; // fator de conversão de decimal para percentual
     var html = fundos.map(function (f) {
       var risco = (f.risco || '').replace(/\s/g, '-');
       var taxa = f.rentAnual > 0
-        ? (f.rentAnual * PERCENT).toFixed(2) + '% a.a.'
+        ? (f.rentAnual * PERCENT_MULTIPLIER).toFixed(2) + '% a.a.'
         : '—';
       return (
         '<div class="fund-item">' +
