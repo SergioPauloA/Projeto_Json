@@ -73,6 +73,17 @@ function abrirPainel() {
   SpreadsheetApp.getUi().showSidebar(html);
 }
 
+/**
+ * Ponto de entrada para implantação como aplicativo da web.
+ * Obrigatório para que o Apps Script consiga servir a interface via URL.
+ * @param {Object} e - Parâmetros da requisição HTTP GET.
+ * @returns {HtmlOutput} Página HTML do painel de gestão.
+ */
+function doGet(e) {
+  return HtmlService.createHtmlOutputFromFile('Sidebar')
+    .setTitle('Gerenciador de Fundos — Banestes');
+}
+
 // ============================================================
 // DADOS DOS FUNDOS
 // ============================================================
