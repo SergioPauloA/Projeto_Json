@@ -569,7 +569,78 @@ function obterListaFundosPainel() {
       tipo: f['FNDCTFND'],
       risco: f['FNDCLSRISC'],
       taxaSimulacao: Number(f['FNDTXSIMU']),
+      rentMensal: Number(f['RENT_MENSAL']),
       rentAnual: Number(f['RENT_ANUAL']),
     };
   });
+}
+
+/**
+ * Retorna métricas agregadas dos fundos para o painel de comparativos.
+ * @returns {Object} Objeto com estatísticas consolidadas.
+ */
+function obterMetricasPainel() {
+  var fundos = obterDadosFundos();
+  if (fundos.length === 0) {
+    return {
+      totalFundos: 0,
+      mediaRentAnual: 0,
+      melhorFundo: null,
+      distribuicaoRisco: {},
+      mediaRentPorRisco: {},
+      maxRentAnual: 0,
+    };
+  }
+
+  var riscoLabels = ['Muito Baixo', 'Baixo', 'Médio', 'Alto'];
+  var distribuicao = {};
+  var somaRentPorRisco = {};
+  var contPorRisco = {};
+  riscoLabels.forEach(function (r) {
+    distribuicao[r] = 0;
+    somaRentPorRisco[r] = 0;
+    contPorRisco[r] = 0;
+  });
+
+  var somaRent = 0;
+  var maxRent = 0;
+  var melhor = null;
+
+  fundos.forEach(function (f) {
+    var risco = String(f['FNDCLSRISC'] || 'Baixo');
+    var rent = Number(f['RENT_ANUAL'] || 0);
+
+    if (distribuicao[risco] !== undefined) {
+      distribuicao[risco]++;
+      somaRentPorRisco[risco] += rent;
+      contPorRisco[risco]++;
+    }
+
+    somaRent += rent;
+    if (rent > maxRent) {
+      maxRent = rent;
+      melhor = {
+        nome: String(f['NOME']),
+        codigo: Number(f['FNDCD']),
+        risco: risco,
+        rentAnual: rent,
+      };
+    }
+  });
+
+  var mediaRentPorRisco = {};
+  riscoLabels.forEach(function (r) {
+    mediaRentPorRisco[r] = contPorRisco[r] > 0
+      ? somaRentPorRisco[r] / contPorRisco[r]
+      : 0;
+  });
+
+  return {
+    totalFundos: fundos.length,
+    mediaRentAnual: somaRent / fundos.length,
+    melhorFundo: melhor,
+    distribuicaoRisco: distribuicao,
+    mediaRentPorRisco: mediaRentPorRisco,
+    maxRentAnual: maxRent,
+  };
 }

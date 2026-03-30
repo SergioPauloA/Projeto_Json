@@ -12,144 +12,312 @@
       font-family: 'Google Sans', Roboto, Arial, sans-serif;
       font-size: 13px;
       color: #202124;
-      background: #f8f9fa;
-      padding: 0;
+      background: #f1f3f4;
+      min-height: 100vh;
     }
 
     /* ---- Header ---- */
     .header {
-      background: linear-gradient(135deg, #1a3c5e 0%, #2d6a9f 100%);
+      background: linear-gradient(135deg, #0d2d4f 0%, #1a5276 50%, #2471a3 100%);
       color: #fff;
-      padding: 16px 14px 12px;
+      padding: 14px 16px 12px;
       display: flex;
       align-items: center;
       gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.20);
     }
-    .header-logo { font-size: 26px; }
-    .header-info { flex: 1; }
+    .header-logo {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .header-info { flex: 1; min-width: 0; }
     .header-title {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .header-subtitle {
-      font-size: 11px;
-      opacity: 0.8;
-      margin-top: 2px;
+      font-size: 10px;
+      opacity: 0.75;
+      margin-top: 1px;
+    }
+    .header-badge {
+      background: rgba(255,255,255,0.18);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
-    /* ---- Status cards ---- */
-    .section { padding: 12px 14px; }
-    .section-title {
-      font-size: 11px;
+    /* ---- Page sections ---- */
+    .page { padding: 0 0 60px; }
+    .section { padding: 12px 12px 4px; }
+    .section-label {
+      font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
-      color: #5f6368;
-      letter-spacing: 0.8px;
+      color: #80868b;
+      letter-spacing: 0.9px;
       margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
-    .status-grid {
+    /* ---- Card grid ---- */
+    .card-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 7px;
+      margin-bottom: 7px;
     }
-    .status-card {
+    .card-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .card {
       background: #fff;
-      border-radius: 8px;
-      border: 1px solid #e0e0e0;
-      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #e0e3e8;
+      padding: 10px 11px 9px;
+      position: relative;
+      overflow: hidden;
     }
-    .status-card.full { grid-column: 1 / -1; }
-    .status-card-label {
-      font-size: 10px;
+    .card.span-2 { grid-column: 1 / -1; }
+    .card-accent {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      border-radius: 3px 0 0 3px;
+    }
+    .accent-blue   { background: #1a73e8; }
+    .accent-green  { background: #1e8e3e; }
+    .accent-orange { background: #e37400; }
+    .accent-red    { background: #d93025; }
+    .accent-purple { background: #8430ce; }
+    .accent-teal   { background: #007b83; }
+    .card-lbl {
+      font-size: 9.5px;
+      font-weight: 600;
       color: #80868b;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-bottom: 4px;
     }
-    .status-card-value {
-      font-size: 13px;
-      font-weight: 600;
-      color: #1a3c5e;
+    .card-val {
+      font-size: 22px;
+      font-weight: 700;
+      color: #0d2d4f;
+      line-height: 1;
     }
-    .status-card-value.highlight { font-size: 22px; color: #2d6a9f; }
-    .status-card-value.ok  { color: #1e8e3e; }
-    .status-card-value.warn{ color: #e37400; }
-    .status-card-value.bad { color: #d93025; }
+    .card-val.md  { font-size: 14px; }
+    .card-val.sm  { font-size: 12px; font-weight: 600; }
+    .card-sub {
+      font-size: 10px;
+      color: #80868b;
+      margin-top: 3px;
+    }
+    .card-icon {
+      position: absolute;
+      right: 10px; top: 8px;
+      font-size: 18px;
+      opacity: 0.18;
+    }
 
-    /* ---- Pill badge ---- */
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 12px;
+    /* ---- Status chip ---- */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 20px;
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
     }
-    .badge-green  { background: #e6f4ea; color: #1e8e3e; }
-    .badge-orange { background: #fce8e6; color: #e37400; }
-    .badge-gray   { background: #f1f3f4; color: #5f6368; }
+    .chip-green  { background: #e6f4ea; color: #1e8e3e; }
+    .chip-amber  { background: #fef7e0; color: #b06000; }
+    .chip-gray   { background: #f1f3f4; color: #5f6368; }
 
     /* ---- Divider ---- */
-    .divider { height: 1px; background: #e8eaed; margin: 0 14px; }
+    .divider { height: 1px; background: #e0e3e8; margin: 4px 12px; }
+
+    /* ---- Risk distribution ---- */
+    .risk-dist-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .risk-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .risk-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .risk-label { font-size: 10px; color: #5f6368; flex: 1; }
+    .risk-count { font-size: 11px; font-weight: 700; color: #202124; }
+    .risk-bar-wrap {
+      flex: 1;
+      background: #f1f3f4;
+      border-radius: 4px;
+      height: 5px;
+      overflow: hidden;
+    }
+    .risk-bar {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.6s ease;
+    }
+    .rb-mb  { background: #34a853; }
+    .rb-b   { background: #fbbc04; }
+    .rb-m   { background: #ea8600; }
+    .rb-a   { background: #ea4335; }
+
+    /* ---- Return comparison section ---- */
+    .ret-compare-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .ret-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ret-lbl {
+      font-size: 10px;
+      color: #5f6368;
+      width: 76px;
+      flex-shrink: 0;
+    }
+    .ret-bar-wrap {
+      flex: 1;
+      background: #f1f3f4;
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+    }
+    .ret-bar {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #1a73e8, #34a853);
+      transition: width 0.7s ease;
+    }
+    .ret-val {
+      font-size: 10px;
+      font-weight: 700;
+      color: #1e8e3e;
+      width: 42px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ---- Best fund highlight ---- */
+    .best-fund-card {
+      background: linear-gradient(135deg, #e8f5e9 0%, #f0fdf4 100%);
+      border: 1px solid #c8e6c9;
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .best-fund-icon {
+      font-size: 22px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .best-fund-info { flex: 1; min-width: 0; }
+    .best-fund-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1a5276;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .best-fund-sub { font-size: 10px; color: #5f6368; margin-top: 1px; }
+    .best-fund-rate {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1e8e3e;
+      white-space: nowrap;
+    }
+    .best-fund-rate-lbl { font-size: 9px; color: #5f6368; text-align: right; }
 
     /* ---- Buttons ---- */
-    .btn-group { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; }
+    .btn-group { padding: 6px 12px 4px; display: flex; flex-direction: column; gap: 7px; }
     .btn {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      padding: 10px 14px;
+      padding: 9px 14px;
       border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      font-family: inherit;
-      transition: filter 0.15s, transform 0.1s;
-    }
-    .btn:hover  { filter: brightness(0.93); }
-    .btn:active { transform: scale(0.98); }
-    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #1a3c5e, #2d6a9f);
-      color: #fff;
-    }
-    .btn-secondary {
-      background: #fff;
-      color: #1a3c5e;
-      border: 1.5px solid #2d6a9f;
-    }
-    .btn-success {
-      background: linear-gradient(135deg, #1e7e34, #28a745);
-      color: #fff;
-    }
-    .btn-danger {
-      background: #fff;
-      color: #d93025;
-      border: 1.5px solid #d93025;
-    }
-    .btn-row { display: flex; gap: 8px; }
-    .btn-row .btn { flex: 1; }
-
-    /* ---- Preview box ---- */
-    .preview-section { padding: 0 14px 12px; }
-    .preview-box {
-      background: #fff;
-      border-radius: 8px;
-      border: 1px solid #e0e0e0;
-      overflow: hidden;
-    }
-    .preview-tabs { display: flex; border-bottom: 1px solid #e0e0e0; }
-    .preview-tab {
-      flex: 1;
-      padding: 8px;
-      background: none;
       border: none;
       cursor: pointer;
       font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      transition: filter 0.15s, transform 0.1s, box-shadow 0.15s;
+      letter-spacing: 0.2px;
+    }
+    .btn:hover  { filter: brightness(0.92); box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0d2d4f, #1a73e8);
+      color: #fff;
+      box-shadow: 0 1px 4px rgba(26,115,232,0.30);
+    }
+    .btn-secondary {
+      background: #fff;
+      color: #1a5276;
+      border: 1.5px solid #aac4e0;
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #1a7a34, #1e8e3e);
+      color: #fff;
+      box-shadow: 0 1px 4px rgba(30,142,62,0.28);
+    }
+    .btn-danger {
+      background: #fff;
+      color: #c5221f;
+      border: 1.5px solid #f4b8b7;
+    }
+    .btn-row { display: flex; gap: 7px; }
+    .btn-row .btn { flex: 1; }
+
+    /* ---- Preview box ---- */
+    .preview-section { padding: 4px 12px 4px; }
+    .preview-box {
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid #e0e3e8;
+      overflow: hidden;
+    }
+    .preview-tabs { display: flex; border-bottom: 1px solid #e0e3e8; }
+    .preview-tab {
+      flex: 1;
+      padding: 7px 6px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
       font-weight: 600;
       color: #80868b;
       font-family: inherit;
@@ -157,120 +325,178 @@
       border-bottom: 2px solid transparent;
     }
     .preview-tab.active {
-      color: #1a3c5e;
-      border-bottom-color: #2d6a9f;
+      color: #1a5276;
+      border-bottom-color: #1a73e8;
+      background: #f8fbff;
     }
     .preview-content {
       display: none;
-      max-height: 200px;
+      max-height: 160px;
       overflow-y: auto;
-      padding: 10px;
+      padding: 8px 10px;
     }
     .preview-content.active { display: block; }
     .preview-content pre {
-      font-family: 'Roboto Mono', monospace;
-      font-size: 10px;
+      font-family: 'Roboto Mono', 'Courier New', monospace;
+      font-size: 9.5px;
       color: #3c4043;
       white-space: pre-wrap;
       word-break: break-all;
+      line-height: 1.5;
     }
     .preview-empty {
       text-align: center;
       color: #80868b;
+      font-size: 11px;
       font-style: italic;
-      padding: 20px;
+      padding: 18px;
     }
 
     /* ---- Fund list ---- */
-    .fund-list-section { padding: 0 14px 12px; }
+    .fund-list-section { padding: 4px 12px 4px; }
     .fund-list {
       background: #fff;
-      border-radius: 8px;
-      border: 1px solid #e0e0e0;
-      max-height: 220px;
+      border-radius: 10px;
+      border: 1px solid #e0e3e8;
+      overflow: hidden;
+      max-height: 280px;
       overflow-y: auto;
     }
     .fund-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
+      padding: 8px 11px 7px;
       border-bottom: 1px solid #f1f3f4;
     }
     .fund-item:last-child { border-bottom: none; }
+    .fund-item-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
     .fund-cod {
-      font-size: 11px;
-      font-weight: 700;
-      color: #80868b;
-      min-width: 22px;
+      font-size: 10px;
+      font-weight: 800;
+      color: #aac4e0;
+      min-width: 20px;
       text-align: right;
+      flex-shrink: 0;
     }
-    .fund-info { flex: 1; }
-    .fund-name { font-size: 12px; font-weight: 600; color: #202124; }
-    .fund-type { font-size: 10px; color: #80868b; margin-top: 1px; }
-    .fund-rate {
-      font-size: 12px;
-      font-weight: 700;
-      color: #1e8e3e;
-      text-align: right;
-      white-space: nowrap;
-    }
-    .risk-dot {
-      width: 8px; height: 8px;
+    .fund-rdot {
+      width: 7px; height: 7px;
       border-radius: 50%;
       flex-shrink: 0;
     }
-    .risk-Muito-Baixo { background: #34a853; }
-    .risk-Baixo       { background: #fbbc04; }
-    .risk-Médio       { background: #ea8600; }
-    .risk-Alto        { background: #ea4335; }
+    .fund-name {
+      flex: 1;
+      font-size: 11px;
+      font-weight: 700;
+      color: #0d2d4f;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fund-rate {
+      font-size: 11px;
+      font-weight: 800;
+      color: #1e8e3e;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .fund-rate.zero { color: #80868b; }
+    .fund-item-bars {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding-left: 28px;
+    }
+    .fund-bar-lbl {
+      font-size: 9px;
+      color: #9aa0a6;
+      width: 14px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .fund-bar-wrap {
+      flex: 1;
+      background: #f1f3f4;
+      border-radius: 3px;
+      height: 4px;
+      overflow: hidden;
+    }
+    .fund-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+    .fund-bar-month { background: #aac4e0; }
+    .fund-bar-annual { background: #1a73e8; }
+    .fund-bar-val {
+      font-size: 9px;
+      color: #5f6368;
+      width: 36px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ---- Risk colors ---- */
+    .risk-Muito-Baixo, .rb-mb-dot { background: #34a853; }
+    .risk-Baixo,       .rb-b-dot  { background: #fbbc04; }
+    .risk-Médio,       .rb-m-dot  { background: #ea8600; }
+    .risk-Alto,        .rb-a-dot  { background: #ea4335; }
 
     /* ---- Spinner ---- */
     .spinner {
       display: inline-block;
-      width: 14px; height: 14px;
-      border: 2px solid rgba(255,255,255,0.4);
+      width: 13px; height: 13px;
+      border: 2px solid rgba(255,255,255,0.35);
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
       vertical-align: middle;
     }
     .spinner.dark {
-      border-color: rgba(30,60,90,0.3);
-      border-top-color: #1a3c5e;
+      border-color: rgba(30,60,90,0.2);
+      border-top-color: #1a5276;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ---- Toast ---- */
     .toast {
       position: fixed;
-      bottom: 16px;
-      left: 14px; right: 14px;
-      padding: 10px 14px;
-      border-radius: 8px;
+      bottom: 14px;
+      left: 12px; right: 12px;
+      padding: 9px 13px;
+      border-radius: 9px;
       font-size: 12px;
       font-weight: 600;
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.18);
       opacity: 0;
-      transform: translateY(8px);
+      transform: translateY(10px);
       transition: all 0.25s;
       pointer-events: none;
       z-index: 999;
     }
     .toast.show { opacity: 1; transform: none; }
-    .toast-success { background: #e6f4ea; color: #1e8e3e; }
-    .toast-error   { background: #fce8e6; color: #d93025; }
+    .toast-success { background: #e6f4ea; color: #1e8e3e; border: 1px solid #c8e6c9; }
+    .toast-error   { background: #fce8e6; color: #c5221f; border: 1px solid #f4b8b7; }
 
     /* ---- Footer ---- */
     .footer {
-      padding: 8px 14px 10px;
+      padding: 6px 12px 8px;
       text-align: center;
-      font-size: 10px;
-      color: #80868b;
+      font-size: 9.5px;
+      color: #9aa0a6;
+      border-top: 1px solid #e0e3e8;
+      margin-top: 4px;
     }
+
+    /* ---- Scrollbar ---- */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cdd5df; border-radius: 4px; }
   </style>
 </head>
 <body>
@@ -280,122 +506,202 @@
   <div class="header-logo">🏦</div>
   <div class="header-info">
     <div class="header-title">Gerenciador de Fundos</div>
-    <div class="header-subtitle">Banestes — T.I. / Sistema de Gestão</div>
+    <div class="header-subtitle">Banestes — T.I. / Gestão de Investimentos</div>
   </div>
+  <div class="header-badge">v1.0.0</div>
 </div>
 
-<!-- STATUS -->
-<div class="section">
-  <div class="section-title">📊 Status do Sistema</div>
-  <div class="status-grid">
-    <div class="status-card">
-      <div class="status-card-label">Total de Fundos</div>
-      <div class="status-card-value highlight" id="totalFundos">
-        <span class="spinner dark"></span>
+<div class="page">
+
+  <!-- ── MÉTRICAS ── -->
+  <div class="section">
+    <div class="section-label">📊 Visão Geral</div>
+
+    <!-- Row 1: Total fundos / Média a.a. / Acionador -->
+    <div class="card-row cols-3">
+      <div class="card">
+        <div class="card-accent accent-blue"></div>
+        <div class="card-lbl">Fundos</div>
+        <div class="card-val" id="metTotalFundos"><span class="spinner dark"></span></div>
+        <div class="card-sub">ativos</div>
+        <span class="card-icon">💼</span>
+      </div>
+      <div class="card">
+        <div class="card-accent accent-green"></div>
+        <div class="card-lbl">Média a.a.</div>
+        <div class="card-val" id="metMediaAnual"><span class="spinner dark"></span></div>
+        <div class="card-sub">rentabilidade</div>
+        <span class="card-icon">📈</span>
+      </div>
+      <div class="card">
+        <div class="card-accent accent-orange"></div>
+        <div class="card-lbl">Acionador</div>
+        <div class="card-val sm" id="metAcionador" style="margin-top:4px"><span class="spinner dark"></span></div>
+        <div class="card-sub">automático</div>
+        <span class="card-icon">⏰</span>
       </div>
     </div>
-    <div class="status-card">
-      <div class="status-card-label">Acionador</div>
-      <div class="status-card-value" id="acionadorStatus">
-        <span class="spinner dark"></span>
+
+    <!-- Melhor fundo -->
+    <div style="margin-bottom:7px" id="bestFundWrap">
+      <div class="best-fund-card">
+        <div class="best-fund-icon">🏆</div>
+        <div class="best-fund-info">
+          <div class="best-fund-name" id="metMelhorNome">Carregando…</div>
+          <div class="best-fund-sub" id="metMelhorRisco">—</div>
+        </div>
+        <div>
+          <div class="best-fund-rate" id="metMelhorRate">—</div>
+          <div class="best-fund-rate-lbl">ao ano</div>
+        </div>
       </div>
     </div>
-    <div class="status-card full">
-      <div class="status-card-label">Última Atualização</div>
-      <div class="status-card-value" id="ultimaAtualizacao">
-        <span class="spinner dark"></span>
+
+    <!-- Distribuição por risco -->
+    <div class="card" style="margin-bottom:7px">
+      <div class="card-lbl" style="margin-bottom:8px">Distribuição por Risco</div>
+      <div class="risk-dist-grid" id="riskDistGrid">
+        <div class="risk-row"><div class="risk-dot rb-mb" style="background:#34a853"></div><span class="risk-label">Muito Baixo</span><span class="risk-count">—</span></div>
+        <div class="risk-row"><div class="risk-dot" style="background:#fbbc04"></div><span class="risk-label">Baixo</span><span class="risk-count">—</span></div>
+        <div class="risk-row"><div class="risk-dot" style="background:#ea8600"></div><span class="risk-label">Médio</span><span class="risk-count">—</span></div>
+        <div class="risk-row"><div class="risk-dot" style="background:#ea4335"></div><span class="risk-label">Alto</span><span class="risk-count">—</span></div>
       </div>
     </div>
-    <div class="status-card full">
-      <div class="status-card-label">Último Status</div>
-      <div class="status-card-value" id="ultimoStatus" style="font-size:12px">
-        <span class="spinner dark"></span>
-      </div>
-    </div>
-    <div class="status-card full">
-      <div class="status-card-label">Destinatários (último envio)</div>
-      <div class="status-card-value" id="destinatarios" style="font-size:11px;font-weight:400">
-        <span class="spinner dark"></span>
+
+    <!-- Média de retorno por nível de risco -->
+    <div class="card" style="margin-bottom:4px">
+      <div class="card-lbl" style="margin-bottom:8px">Retorno Médio por Risco</div>
+      <div class="ret-compare-grid" id="retCompareGrid">
+        <div class="ret-row"><span class="ret-lbl">Muito Baixo</span><div class="ret-bar-wrap"><div class="ret-bar" style="width:0%"></div></div><span class="ret-val">—</span></div>
+        <div class="ret-row"><span class="ret-lbl">Baixo</span><div class="ret-bar-wrap"><div class="ret-bar" style="width:0%"></div></div><span class="ret-val">—</span></div>
+        <div class="ret-row"><span class="ret-lbl">Médio</span><div class="ret-bar-wrap"><div class="ret-bar" style="width:0%"></div></div><span class="ret-val">—</span></div>
+        <div class="ret-row"><span class="ret-lbl">Alto</span><div class="ret-bar-wrap"><div class="ret-bar" style="width:0%"></div></div><span class="ret-val">—</span></div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="divider"></div>
+  <div class="divider"></div>
 
-<!-- AÇÕES -->
-<div class="btn-group">
-  <div class="section-title" style="margin-bottom:0">⚡ Ações</div>
+  <!-- ── STATUS ── -->
+  <div class="section">
+    <div class="section-label">⚙️ Status do Sistema</div>
+    <div class="card-row">
+      <div class="card span-2">
+        <div class="card-accent accent-teal"></div>
+        <div class="card-lbl">Última Atualização</div>
+        <div class="card-val sm" id="ultimaAtualizacao"><span class="spinner dark"></span></div>
+      </div>
+    </div>
+    <div class="card-row">
+      <div class="card span-2">
+        <div class="card-accent accent-blue"></div>
+        <div class="card-lbl">Último Status</div>
+        <div class="card-val sm" id="ultimoStatus" style="font-weight:500"><span class="spinner dark"></span></div>
+      </div>
+    </div>
+    <div class="card-row">
+      <div class="card span-2">
+        <div class="card-accent accent-purple"></div>
+        <div class="card-lbl">Destinatários (último envio)</div>
+        <div class="card-val sm" id="destinatarios" style="font-weight:400;font-size:11px"><span class="spinner dark"></span></div>
+      </div>
+    </div>
+  </div>
 
-  <button class="btn btn-success" id="btnEnviar" onclick="gerarEEnviarAgora()">
-    🚀 Gerar e Enviar Agora
-  </button>
+  <div class="divider"></div>
 
-  <div class="btn-row">
-    <button class="btn btn-primary" id="btnAcionador" onclick="configurarAcionador()">
-      ⏰ Ativar Envio Automático
+  <!-- ── AÇÕES ── -->
+  <div class="btn-group">
+    <div class="section-label" style="margin:0 0 2px">⚡ Ações</div>
+
+    <button class="btn btn-success" id="btnEnviar" onclick="gerarEEnviarAgora()">
+      🚀 Gerar e Enviar Agora
     </button>
-    <button class="btn btn-danger" id="btnRemover" onclick="removerAcionador()">
-      🗑️ Remover
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btnAcionador" onclick="configurarAcionador()">
+        ⏰ Ativar Automático
+      </button>
+      <button class="btn btn-danger" id="btnRemover" onclick="removerAcionador()">
+        🗑️ Remover
+      </button>
+    </div>
+
+    <button class="btn btn-secondary" onclick="recarregarTudo()">
+      🔄 Atualizar Status
     </button>
   </div>
 
-  <button class="btn btn-secondary" onclick="recarregarStatus()">
-    🔄 Atualizar Status
-  </button>
-</div>
+  <div class="divider"></div>
 
-<div class="divider"></div>
-
-<!-- PRÉVIA DOS ARQUIVOS -->
-<div class="preview-section" style="padding-top:12px">
-  <div class="section-title">📄 Prévia do Último Arquivo Enviado</div>
-  <div class="preview-box">
-    <div class="preview-tabs">
-      <button class="preview-tab active" id="tabJson" onclick="trocarTab('json')">📋 JSON</button>
-      <button class="preview-tab" id="tabSql"  onclick="trocarTab('sql')">🗄️ Script SQL</button>
-    </div>
-    <div class="preview-content active" id="conteudoJson">
-      <div class="preview-empty">Nenhum arquivo gerado ainda.</div>
-    </div>
-    <div class="preview-content" id="conteudoSql">
-      <div class="preview-empty">Nenhum arquivo gerado ainda.</div>
+  <!-- ── PRÉVIA ── -->
+  <div class="preview-section" style="padding-top:10px">
+    <div class="section-label">📄 Prévia do Último Arquivo</div>
+    <div class="preview-box">
+      <div class="preview-tabs">
+        <button class="preview-tab active" id="tabJson" onclick="trocarTab('json')">📋 JSON</button>
+        <button class="preview-tab" id="tabSql"  onclick="trocarTab('sql')">🗄️ Script SQL</button>
+      </div>
+      <div class="preview-content active" id="conteudoJson">
+        <div class="preview-empty">Nenhum arquivo gerado ainda.</div>
+      </div>
+      <div class="preview-content" id="conteudoSql">
+        <div class="preview-empty">Nenhum arquivo gerado ainda.</div>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="divider"></div>
+  <div class="divider"></div>
 
-<!-- LISTA DE FUNDOS -->
-<div class="fund-list-section" style="padding-top:12px">
-  <div class="section-title">💼 Fundos Cadastrados</div>
-  <div class="fund-list" id="fundList">
-    <div class="preview-empty" style="padding:16px">
-      <span class="spinner dark"></span> Carregando...
+  <!-- ── LISTA DE FUNDOS ── -->
+  <div class="fund-list-section" style="padding-top:10px">
+    <div class="section-label">💼 Fundos Cadastrados</div>
+    <div class="fund-list" id="fundList">
+      <div class="preview-empty">
+        <span class="spinner dark"></span>&nbsp; Carregando…
+      </div>
     </div>
   </div>
-</div>
 
-<!-- FOOTER -->
-<div class="footer">
-  Desenvolvido por spandrade@banestes.com.br · v1.0.0
-</div>
+  <!-- FOOTER -->
+  <div class="footer">
+    Desenvolvido por spandrade@banestes.com.br &nbsp;·&nbsp; Banestes — T.I.
+  </div>
+
+</div><!-- /page -->
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
   var previewJson = '';
-  var previewSql = '';
+  var previewSql  = '';
 
-  // ---- Inicialização ----
+  /* ── Configuração de cores por nível de risco ── */
+  var RISCO_CONFIG = [
+    { key: 'Muito Baixo', cor: '#34a853', barCls: 'rb-mb' },
+    { key: 'Baixo',       cor: '#fbbc04', barCls: 'rb-b'  },
+    { key: 'Médio',       cor: '#ea8600', barCls: 'rb-m'  },
+    { key: 'Alto',        cor: '#ea4335', barCls: 'rb-a'  },
+  ];
+
+  /* ── Inicialização ── */
   document.addEventListener('DOMContentLoaded', function () {
     recarregarStatus();
+    carregarMetricas();
     carregarFundos();
     carregarPrevia();
   });
 
-  // ---- Recarregar status ----
+  /* ── Recarregar tudo ── */
+  function recarregarTudo() {
+    recarregarStatus();
+    carregarMetricas();
+    carregarFundos();
+    carregarPrevia();
+  }
+
+  /* ── Status ── */
   function recarregarStatus() {
     google.script.run
       .withSuccessHandler(atualizarStatusUI)
@@ -404,24 +710,79 @@
   }
 
   function atualizarStatusUI(status) {
-    document.getElementById('totalFundos').textContent = status.totalFundos;
     document.getElementById('ultimaAtualizacao').textContent = status.ultimaAtualizacao;
-    document.getElementById('ultimoStatus').textContent = status.ultimoStatus;
-    document.getElementById('destinatarios').textContent = status.destinatariosAtivos;
+    document.getElementById('ultimoStatus').textContent      = status.ultimoStatus;
+    document.getElementById('destinatarios').textContent     = status.destinatariosAtivos;
 
-    var acionadorEl = document.getElementById('acionadorStatus');
+    var acionadorEl = document.getElementById('metAcionador');
     if (status.acionadorAtivo) {
-      acionadorEl.innerHTML = '<span class="badge badge-green">✅ Ativo</span>';
+      acionadorEl.innerHTML = '<span class="chip chip-green">✅ Ativo</span>';
     } else {
-      acionadorEl.innerHTML = '<span class="badge badge-orange">⏸ Inativo</span>';
+      acionadorEl.innerHTML = '<span class="chip chip-amber">⏸ Inativo</span>';
     }
   }
 
-  // ---- Carregar fundos ----
+  /* ── Métricas ── */
+  function carregarMetricas() {
+    google.script.run
+      .withSuccessHandler(renderizarMetricas)
+      .withFailureHandler(function () {})
+      .obterMetricasPainel();
+  }
+
+  function renderizarMetricas(m) {
+    /* Totais */
+    document.getElementById('metTotalFundos').textContent = m.totalFundos;
+    document.getElementById('metMediaAnual').textContent  =
+      m.totalFundos > 0 ? (m.mediaRentAnual * 100).toFixed(1) + '%' : '—';
+
+    /* Melhor fundo */
+    if (m.melhorFundo) {
+      document.getElementById('metMelhorNome').textContent  = m.melhorFundo.nome;
+      document.getElementById('metMelhorRisco').textContent = 'Risco: ' + m.melhorFundo.risco;
+      document.getElementById('metMelhorRate').textContent  =
+        (m.melhorFundo.rentAnual * 100).toFixed(2) + '%';
+    }
+
+    /* Distribuição por risco */
+    var gridEl = document.getElementById('riskDistGrid');
+    gridEl.innerHTML = '';
+    var distValues = RISCO_CONFIG.map(function(r) { return m.distribuicaoRisco[r.key] || 0; });
+    var maxDist = Math.max.apply(null, distValues) || 1;
+    RISCO_CONFIG.forEach(function (r) {
+      var cnt = m.distribuicaoRisco[r.key] || 0;
+      gridEl.innerHTML +=
+        '<div class="risk-row">' +
+          '<div class="risk-dot" style="background:' + r.cor + '"></div>' +
+          '<span class="risk-label">' + r.key + '</span>' +
+          '<div class="risk-bar-wrap"><div class="risk-bar ' + r.barCls + '" style="width:' + (cnt / maxDist * 100) + '%"></div></div>' +
+          '<span class="risk-count">' + cnt + '</span>' +
+        '</div>';
+    });
+
+    /* Retorno médio por risco */
+    var retValues = RISCO_CONFIG.map(function(r) { return m.mediaRentPorRisco[r.key] || 0; });
+    var maxRet = Math.max.apply(null, retValues) || 1;
+    var retEl = document.getElementById('retCompareGrid');
+    retEl.innerHTML = '';
+    RISCO_CONFIG.forEach(function (r) {
+      var avg = m.mediaRentPorRisco[r.key] || 0;
+      var pct = avg > 0 ? (avg / maxRet * 100).toFixed(0) : 0;
+      var valStr = avg > 0 ? (avg * 100).toFixed(1) + '%' : '—';
+      retEl.innerHTML +=
+        '<div class="ret-row">' +
+          '<span class="ret-lbl">' + r.key + '</span>' +
+          '<div class="ret-bar-wrap"><div class="ret-bar" style="width:' + pct + '%"></div></div>' +
+          '<span class="ret-val">' + valStr + '</span>' +
+        '</div>';
+    });
+  }
+
+  /* ── Fundos ── */
   function carregarFundos() {
     google.script.run
       .withSuccessHandler(renderizarFundos)
-      .withFailureHandler(function (err) {
+      .withFailureHandler(function () {
         document.getElementById('fundList').innerHTML =
           '<div class="preview-empty">Erro ao carregar fundos.</div>';
       })
@@ -435,21 +796,37 @@
       return;
     }
 
-    var PERCENT_MULTIPLIER = 100; // fator de conversão de decimal para percentual
+    var rentValues = fundos.map(function(f) { return f.rentAnual || 0; });
+    var maxRent = Math.max.apply(null, rentValues) || 1;
+    var dotColors = {};
+    RISCO_CONFIG.forEach(function(r) { dotColors[r.key] = r.cor; });
+
     var html = fundos.map(function (f) {
-      var risco = (f.risco || '').replace(/\s/g, '-');
-      var taxa = f.rentAnual > 0
-        ? (f.rentAnual * PERCENT_MULTIPLIER).toFixed(2) + '% a.a.'
-        : '—';
+      var annualPct  = f.rentAnual  > 0 ? (f.rentAnual  / maxRent * 100).toFixed(0) : 0;
+      var monthlyPct = f.rentMensal > 0 ? (f.rentMensal / maxRent * 100).toFixed(0) : 0;
+      var annualStr  = f.rentAnual  > 0 ? (f.rentAnual  * 100).toFixed(2) + '%' : '—';
+      var monthlyStr = f.rentMensal > 0 ? (f.rentMensal * 100).toFixed(2) + '%' : '—';
+      var dotColor   = dotColors[f.risco] || '#9aa0a6';
+      var rateClass  = f.rentAnual > 0 ? '' : 'zero';
+
       return (
         '<div class="fund-item">' +
-          '<div class="fund-cod">' + f.codigo + '</div>' +
-          '<div class="risk-dot risk-' + risco + '" title="Risco: ' + f.risco + '"></div>' +
-          '<div class="fund-info">' +
-            '<div class="fund-name">' + f.nome + '</div>' +
-            '<div class="fund-type">' + f.tipo + '</div>' +
+          '<div class="fund-item-top">' +
+            '<span class="fund-cod">' + f.codigo + '</span>' +
+            '<div class="fund-rdot" style="background:' + dotColor + '" title="Risco: ' + f.risco + '"></div>' +
+            '<span class="fund-name" title="' + f.nome + '">' + f.nome + '</span>' +
+            '<span class="fund-rate ' + rateClass + '">' + annualStr + '</span>' +
           '</div>' +
-          '<div class="fund-rate">' + taxa + '</div>' +
+          '<div class="fund-item-bars">' +
+            '<span class="fund-bar-lbl">m</span>' +
+            '<div class="fund-bar-wrap"><div class="fund-bar-fill fund-bar-month" style="width:' + monthlyPct + '%"></div></div>' +
+            '<span class="fund-bar-val">' + monthlyStr + '</span>' +
+          '</div>' +
+          '<div class="fund-item-bars">' +
+            '<span class="fund-bar-lbl">a</span>' +
+            '<div class="fund-bar-wrap"><div class="fund-bar-fill fund-bar-annual" style="width:' + annualPct + '%"></div></div>' +
+            '<span class="fund-bar-val">' + annualStr + '</span>' +
+          '</div>' +
         '</div>'
       );
     }).join('');
@@ -457,21 +834,15 @@
     el.innerHTML = html;
   }
 
-  // ---- Carregar prévia ----
+  /* ── Prévia ── */
   function carregarPrevia() {
     google.script.run
-      .withSuccessHandler(function (txt) {
-        previewJson = txt;
-        renderizarPrevia();
-      })
+      .withSuccessHandler(function (txt) { previewJson = txt; renderizarPrevia(); })
       .withFailureHandler(function () {})
       .obterUltimoJSON();
 
     google.script.run
-      .withSuccessHandler(function (txt) {
-        previewSql = txt;
-        renderizarPrevia();
-      })
+      .withSuccessHandler(function (txt) { previewSql = txt; renderizarPrevia(); })
       .withFailureHandler(function () {})
       .obterUltimoSQL();
   }
@@ -489,7 +860,7 @@
       : '<div class="preview-empty">Nenhum arquivo gerado ainda.</div>';
   }
 
-  // ---- Tabs de prévia ----
+  /* ── Tabs ── */
   function trocarTab(aba) {
     document.getElementById('tabJson').classList.toggle('active', aba === 'json');
     document.getElementById('tabSql').classList.toggle('active', aba === 'sql');
@@ -497,20 +868,18 @@
     document.getElementById('conteudoSql').classList.toggle('active', aba === 'sql');
   }
 
-  // ---- Gerar e Enviar ----
+  /* ── Ações ── */
   function gerarEEnviarAgora() {
     setButtonsDisabled(true);
     var btn = document.getElementById('btnEnviar');
-    btn.innerHTML = '<span class="spinner"></span> Processando...';
+    btn.innerHTML = '<span class="spinner"></span>&nbsp; Processando…';
 
     google.script.run
       .withSuccessHandler(function (resultado) {
         setButtonsDisabled(false);
         btn.innerHTML = '🚀 Gerar e Enviar Agora';
         showToast('✅ Enviado para ' + resultado.destinatarios.join(', '), 'success');
-        recarregarStatus();
-        carregarFundos();
-        carregarPrevia();
+        recarregarTudo();
       })
       .withFailureHandler(function (err) {
         setButtonsDisabled(false);
@@ -520,7 +889,6 @@
       .gerarEEnviar();
   }
 
-  // ---- Acionador ----
   function configurarAcionador() {
     setButtonsDisabled(true);
     var btn = document.getElementById('btnAcionador');
@@ -528,13 +896,14 @@
     google.script.run
       .withSuccessHandler(function () {
         setButtonsDisabled(false);
-        btn.innerHTML = '⏰ Ativar Envio Automático';
+        btn.innerHTML = '⏰ Ativar Automático';
         showToast('⏰ Acionador configurado para toda segunda-feira às 8h!', 'success');
         recarregarStatus();
+        carregarMetricas();
       })
       .withFailureHandler(function (err) {
         setButtonsDisabled(false);
-        btn.innerHTML = '⏰ Ativar Envio Automático';
+        btn.innerHTML = '⏰ Ativar Automático';
         showToast('❌ Erro: ' + err.message, 'error');
       })
       .configurarAcionador();
@@ -547,6 +916,7 @@
         setButtonsDisabled(false);
         showToast('🗑️ Acionador removido com sucesso.', 'success');
         recarregarStatus();
+        carregarMetricas();
       })
       .withFailureHandler(function (err) {
         setButtonsDisabled(false);
@@ -555,7 +925,7 @@
       .removerAcionador();
   }
 
-  // ---- Utilidades ----
+  /* ── Utilidades ── */
   function setButtonsDisabled(disabled) {
     ['btnEnviar', 'btnAcionador', 'btnRemover'].forEach(function (id) {
       var el = document.getElementById(id);
@@ -577,9 +947,7 @@
     el.textContent = msg;
     el.className = 'toast toast-' + (type || 'success') + ' show';
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () {
-      el.classList.remove('show');
-    }, 4000);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 4000);
   }
 </script>
 </body>
