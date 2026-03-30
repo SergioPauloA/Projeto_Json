@@ -57,6 +57,7 @@ function onOpen() {
     .addItem('📊 Abrir Painel de Gestão', 'abrirPainel')
     .addSeparator()
     .addItem('🔄 Gerar e Enviar Agora', 'gerarEEnviar')
+    .addItem('🧪 Testar Envio de E-mail (Desenvolvedor)', 'testarEnvioEmail')
     .addSeparator()
     .addItem('⏰ Configurar Acionador Automático', 'configurarAcionador')
     .addItem('🗑️ Remover Acionador Automático', 'removerAcionador')
@@ -294,12 +295,17 @@ function enviarEmail(jsonStr, sqlStr, fundos) {
   ];
 
   // ---- Anexos ----
-  var jsonBlob = Utilities.newBlob(
-    jsonStr, 'application/json', 'fundos_banestes_' + sufixoArquivo + '.json'
-  );
-  var sqlBlob = Utilities.newBlob(
-    sqlStr, 'text/plain', 'script_mainframe_' + sufixoArquivo + '.sql'
-  );
+  // Usa setDataFromString com codificação UTF-8 explícita para evitar o erro
+  // "Unexpected error while getting the method or property newBlob on object Utilities"
+  // que ocorre quando Utilities.newBlob recebe strings com caracteres especiais.
+  var jsonBlob = Utilities.newBlob('')
+    .setDataFromString(jsonStr, 'UTF-8')
+    .setName('fundos_banestes_' + sufixoArquivo + '.json')
+    .setContentType('application/json');
+  var sqlBlob = Utilities.newBlob('')
+    .setDataFromString(sqlStr, 'UTF-8')
+    .setName('script_mainframe_' + sufixoArquivo + '.sql')
+    .setContentType('text/plain');
 
   // ---- Corpo HTML do e-mail ----
   var template = HtmlService.createTemplateFromFile('EmailTemplate');
@@ -427,6 +433,117 @@ function gerarEEnviar() {
     } catch (uiErr) {
       // Trigger — sem UI
     }
+    throw e;
+  }
+}
+
+// ============================================================
+// FUNÇÃO DE TESTE DE E-MAIL
+// ============================================================
+
+/**
+ * Envia um e-mail de teste para o e-mail do desenvolvedor.
+ * Usa o template de layout existente (EmailTemplate.html) e anexa
+ * arquivos JSON e SQL gerados a partir dos dados reais da planilha
+ * (ou dados de exemplo, se a aba ainda não existir).
+ *
+ * Chamada via menu "🧪 Testar Envio de E-mail (Desenvolvedor)" ou
+ * executada diretamente no editor de scripts para validação.
+ */
+function testarEnvioEmail() {
+  try {
+    var agora = new Date();
+    var dataStr = Utilities.formatDate(agora, Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm');
+    var sufixoArquivo = Utilities.formatDate(agora, Session.getScriptTimeZone(), 'yyyyMMdd_HHmmss');
+
+    // Obter dados reais da planilha, com fallback para dados de exemplo
+    var fundos = [];
+    try {
+      fundos = obterDadosFundos();
+    } catch (e) {
+      Logger.log('Aviso: não foi possível obter dados da planilha — usando dados de exemplo.');
+    }
+
+    if (fundos.length === 0) {
+      // Dados de exemplo para garantir que o e-mail tenha conteúdo mesmo sem planilha
+      fundos = [
+        {
+          FNDCD: 2, NOME: 'BANESTES INVEST MONEY', FNDCTFND: 'Renda Fixa',
+          FNDCLSRISC: 'Baixo', FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Referenciado DI',
+          FNDTOAMB: 'Renda Fixa Duração Baixa Grau de Investimento',
+          FNDTXSIMU: 0.1338, FNDCOTDIAUTIL: 'N',
+          RENT_DIARIA: 0.0365, RENT_MENSAL: 0.1123, RENT_ANUAL: 0.1338
+        },
+        {
+          FNDCD: 4, NOME: 'BANESTES VIP DI', FNDCTFND: 'Renda Fixa',
+          FNDCLSRISC: 'Baixo', FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Referenciado DI',
+          FNDTOAMB: 'Renda Fixa Duração Baixa Grau de Investimento',
+          FNDTXSIMU: 0.1420, FNDCOTDIAUTIL: 'N',
+          RENT_DIARIA: 0.0388, RENT_MENSAL: 0.1195, RENT_ANUAL: 0.1420
+        },
+        {
+          FNDCD: 24, NOME: 'BANESTES DIVIDENDOS', FNDCTFND: 'Ações',
+          FNDCLSRISC: 'Alto', FNDCLSCVM: 'Ações', FNDSUBCVM: 'Não se aplica',
+          FNDTOAMB: 'Ações Ativo Dividendos',
+          FNDTXSIMU: 0.4441, FNDCOTDIAUTIL: 'S',
+          RENT_DIARIA: 0.1213, RENT_MENSAL: 0.3734, RENT_ANUAL: 0.4441
+        },
+      ];
+    }
+
+    // Gerar conteúdo dos arquivos de teste
+    var jsonStr = gerarJSON(fundos);
+    var sqlStr = gerarSQL(fundos);
+    var nomeJson = 'TESTE_fundos_banestes_' + sufixoArquivo + '.json';
+    var nomeSql = 'TESTE_script_mainframe_' + sufixoArquivo + '.sql';
+
+    // Criar blobs com codificação UTF-8 explícita
+    var jsonBlob = Utilities.newBlob('')
+      .setDataFromString(jsonStr, 'UTF-8')
+      .setName(nomeJson)
+      .setContentType('application/json');
+    var sqlBlob = Utilities.newBlob('')
+      .setDataFromString(sqlStr, 'UTF-8')
+      .setName(nomeSql)
+      .setContentType('text/plain');
+
+    // Montar corpo HTML usando o template de layout existente
+    var template = HtmlService.createTemplateFromFile('EmailTemplate');
+    template.dataAtualizacao = dataStr + ' [TESTE]';
+    template.totalFundos = fundos.length;
+    template.fundos = fundos;
+    template.nomeArquivoJson = nomeJson;
+    template.nomeArquivoSql = nomeSql;
+    var corpoEmail = template.evaluate().getContent();
+
+    // Enviar apenas para o desenvolvedor
+    MailApp.sendEmail({
+      to: CONFIG.DEVELOPER_EMAIL,
+      subject: '[TESTE] 🏦 Banestes — Validação de Envio de E-mail — ' + dataStr,
+      htmlBody: corpoEmail,
+      attachments: [jsonBlob, sqlBlob],
+    });
+
+    Logger.log('E-mail de teste enviado para: ' + CONFIG.DEVELOPER_EMAIL);
+
+    try {
+      SpreadsheetApp.getUi().alert(
+        '✅ Teste Concluído!',
+        'E-mail de teste enviado com sucesso!\n\n' +
+        'Destinatário: ' + CONFIG.DEVELOPER_EMAIL + '\n' +
+        'Fundos incluídos: ' + fundos.length + '\n' +
+        'Anexos: ' + nomeJson + ', ' + nomeSql,
+        SpreadsheetApp.getUi().ButtonSet.OK
+      );
+    } catch (uiErr) {
+      // Execução sem UI (ex.: chamada direta no editor)
+    }
+
+  } catch (e) {
+    Logger.log('ERRO em testarEnvioEmail: ' + e.message);
+    try {
+      SpreadsheetApp.getUi().alert('❌ Erro no Teste', e.message, SpreadsheetApp.getUi().ButtonSet.OK);
+    } catch (uiErr) {}
     throw e;
   }
 }
