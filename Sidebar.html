@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerenciador de Fundos — Banestes</title>
+  <style>
+    /* ---- Reset & Base ---- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Google Sans', Roboto, Arial, sans-serif;
+      font-size: 13px;
+      color: #202124;
+      background: #f8f9fa;
+      padding: 0;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: linear-gradient(135deg, #1a3c5e 0%, #2d6a9f 100%);
+      color: #fff;
+      padding: 16px 14px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-logo { font-size: 26px; }
+    .header-info { flex: 1; }
+    .header-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .header-subtitle {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+
+    /* ---- Status cards ---- */
+    .section { padding: 12px 14px; }
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #5f6368;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .status-card {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      padding: 10px 12px;
+    }
+    .status-card.full { grid-column: 1 / -1; }
+    .status-card-label {
+      font-size: 10px;
+      color: #80868b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .status-card-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a3c5e;
+    }
+    .status-card-value.highlight { font-size: 22px; color: #2d6a9f; }
+    .status-card-value.ok  { color: #1e8e3e; }
+    .status-card-value.warn{ color: #e37400; }
+    .status-card-value.bad { color: #d93025; }
+
+    /* ---- Pill badge ---- */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-green  { background: #e6f4ea; color: #1e8e3e; }
+    .badge-orange { background: #fce8e6; color: #e37400; }
+    .badge-gray   { background: #f1f3f4; color: #5f6368; }
+
+    /* ---- Divider ---- */
+    .divider { height: 1px; background: #e8eaed; margin: 0 14px; }
+
+    /* ---- Buttons ---- */
+    .btn-group { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      transition: filter 0.15s, transform 0.1s;
+    }
+    .btn:hover  { filter: brightness(0.93); }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1a3c5e, #2d6a9f);
+      color: #fff;
+    }
+    .btn-secondary {
+      background: #fff;
+      color: #1a3c5e;
+      border: 1.5px solid #2d6a9f;
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #1e7e34, #28a745);
+      color: #fff;
+    }
+    .btn-danger {
+      background: #fff;
+      color: #d93025;
+      border: 1.5px solid #d93025;
+    }
+    .btn-row { display: flex; gap: 8px; }
+    .btn-row .btn { flex: 1; }
+
+    /* ---- Preview box ---- */
+    .preview-section { padding: 0 14px 12px; }
+    .preview-box {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      overflow: hidden;
+    }
+    .preview-tabs { display: flex; border-bottom: 1px solid #e0e0e0; }
+    .preview-tab {
+      flex: 1;
+      padding: 8px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: #80868b;
+      font-family: inherit;
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+    }
+    .preview-tab.active {
+      color: #1a3c5e;
+      border-bottom-color: #2d6a9f;
+    }
+    .preview-content {
+      display: none;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 10px;
+    }
+    .preview-content.active { display: block; }
+    .preview-content pre {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 10px;
+      color: #3c4043;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .preview-empty {
+      text-align: center;
+      color: #80868b;
+      font-style: italic;
+      padding: 20px;
+    }
+
+    /* ---- Fund list ---- */
+    .fund-list-section { padding: 0 14px 12px; }
+    .fund-list {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .fund-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-bottom: 1px solid #f1f3f4;
+    }
+    .fund-item:last-child { border-bottom: none; }
+    .fund-cod {
+      font-size: 11px;
+      font-weight: 700;
+      color: #80868b;
+      min-width: 22px;
+      text-align: right;
+    }
+    .fund-info { flex: 1; }
+    .fund-name { font-size: 12px; font-weight: 600; color: #202124; }
+    .fund-type { font-size: 10px; color: #80868b; margin-top: 1px; }
+    .fund-rate {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1e8e3e;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .risk-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .risk-Muito-Baixo { background: #34a853; }
+    .risk-Baixo       { background: #fbbc04; }
+    .risk-Médio       { background: #ea8600; }
+    .risk-Alto        { background: #ea4335; }
+
+    /* ---- Spinner ---- */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+    }
+    .spinner.dark {
+      border-color: rgba(30,60,90,0.3);
+      border-top-color: #1a3c5e;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 16px;
+      left: 14px; right: 14px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.25s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .toast.show { opacity: 1; transform: none; }
+    .toast-success { background: #e6f4ea; color: #1e8e3e; }
+    .toast-error   { background: #fce8e6; color: #d93025; }
+
+    /* ---- Footer ---- */
+    .footer {
+      padding: 8px 14px 10px;
+      text-align: center;
+      font-size: 10px;
+      color: #80868b;
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">🏦</div>
+  <div class="header-info">
+    <div class="header-title">Gerenciador de Fundos</div>
+    <div class="header-subtitle">Banestes — T.I. / Sistema de Gestão</div>
+  </div>
+</div>
+
+<!-- STATUS -->
+<div class="section">
+  <div class="section-title">📊 Status do Sistema</div>
+  <div class="status-grid">
+    <div class="status-card">
+      <div class="status-card-label">Total de Fundos</div>
+      <div class="status-card-value highlight" id="totalFundos">
+        <span class="spinner dark"></span>
+      </div>
+    </div>
+    <div class="status-card">
+      <div class="status-card-label">Acionador</div>
+      <div class="status-card-value" id="acionadorStatus">
+        <span class="spinner dark"></span>
+      </div>
+    </div>
+    <div class="status-card full">
+      <div class="status-card-label">Última Atualização</div>
+      <div class="status-card-value" id="ultimaAtualizacao">
+        <span class="spinner dark"></span>
+      </div>
+    </div>
+    <div class="status-card full">
+      <div class="status-card-label">Último Status</div>
+      <div class="status-card-value" id="ultimoStatus" style="font-size:12px">
+        <span class="spinner dark"></span>
+      </div>
+    </div>
+    <div class="status-card full">
+      <div class="status-card-label">Destinatários (último envio)</div>
+      <div class="status-card-value" id="destinatarios" style="font-size:11px;font-weight:400">
+        <span class="spinner dark"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- AÇÕES -->
+<div class="btn-group">
+  <div class="section-title" style="margin-bottom:0">⚡ Ações</div>
+
+  <button class="btn btn-success" id="btnEnviar" onclick="gerarEEnviarAgora()">
+    🚀 Gerar e Enviar Agora
+  </button>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btnAcionador" onclick="configurarAcionador()">
+      ⏰ Ativar Envio Automático
+    </button>
+    <button class="btn btn-danger" id="btnRemover" onclick="removerAcionador()">
+      🗑️ Remover
+    </button>
+  </div>
+
+  <button class="btn btn-secondary" onclick="recarregarStatus()">
+    🔄 Atualizar Status
+  </button>
+</div>
+
+<div class="divider"></div>
+
+<!-- PRÉVIA DOS ARQUIVOS -->
+<div class="preview-section" style="padding-top:12px">
+  <div class="section-title">📄 Prévia do Último Arquivo Enviado</div>
+  <div class="preview-box">
+    <div class="preview-tabs">
+      <button class="preview-tab active" id="tabJson" onclick="trocarTab('json')">📋 JSON</button>
+      <button class="preview-tab" id="tabSql"  onclick="trocarTab('sql')">🗄️ Script SQL</button>
+    </div>
+    <div class="preview-content active" id="conteudoJson">
+      <div class="preview-empty">Nenhum arquivo gerado ainda.</div>
+    </div>
+    <div class="preview-content" id="conteudoSql">
+      <div class="preview-empty">Nenhum arquivo gerado ainda.</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- LISTA DE FUNDOS -->
+<div class="fund-list-section" style="padding-top:12px">
+  <div class="section-title">💼 Fundos Cadastrados</div>
+  <div class="fund-list" id="fundList">
+    <div class="preview-empty" style="padding:16px">
+      <span class="spinner dark"></span> Carregando...
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  Desenvolvido por spandrade@banestes.com.br · v1.0.0
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  var previewJson = '';
+  var previewSql = '';
+
+  // ---- Inicialização ----
+  document.addEventListener('DOMContentLoaded', function () {
+    recarregarStatus();
+    carregarFundos();
+    carregarPrevia();
+  });
+
+  // ---- Recarregar status ----
+  function recarregarStatus() {
+    google.script.run
+      .withSuccessHandler(atualizarStatusUI)
+      .withFailureHandler(function (err) { showToast('Erro ao carregar status: ' + err.message, 'error'); })
+      .obterStatusAtual();
+  }
+
+  function atualizarStatusUI(status) {
+    document.getElementById('totalFundos').textContent = status.totalFundos;
+    document.getElementById('ultimaAtualizacao').textContent = status.ultimaAtualizacao;
+    document.getElementById('ultimoStatus').textContent = status.ultimoStatus;
+    document.getElementById('destinatarios').textContent = status.destinatariosAtivos;
+
+    var acionadorEl = document.getElementById('acionadorStatus');
+    if (status.acionadorAtivo) {
+      acionadorEl.innerHTML = '<span class="badge badge-green">✅ Ativo</span>';
+    } else {
+      acionadorEl.innerHTML = '<span class="badge badge-orange">⏸ Inativo</span>';
+    }
+  }
+
+  // ---- Carregar fundos ----
+  function carregarFundos() {
+    google.script.run
+      .withSuccessHandler(renderizarFundos)
+      .withFailureHandler(function (err) {
+        document.getElementById('fundList').innerHTML =
+          '<div class="preview-empty">Erro ao carregar fundos.</div>';
+      })
+      .obterListaFundosPainel();
+  }
+
+  function renderizarFundos(fundos) {
+    var el = document.getElementById('fundList');
+    if (!fundos || fundos.length === 0) {
+      el.innerHTML = '<div class="preview-empty">Nenhum fundo encontrado.</div>';
+      return;
+    }
+
+    var PERCENT = 100; // fator de conversão de decimal para percentual
+    var html = fundos.map(function (f) {
+      var risco = (f.risco || '').replace(/\s/g, '-');
+      var taxa = f.rentAnual > 0
+        ? (f.rentAnual * PERCENT).toFixed(2) + '% a.a.'
+        : '—';
+      return (
+        '<div class="fund-item">' +
+          '<div class="fund-cod">' + f.codigo + '</div>' +
+          '<div class="risk-dot risk-' + risco + '" title="Risco: ' + f.risco + '"></div>' +
+          '<div class="fund-info">' +
+            '<div class="fund-name">' + f.nome + '</div>' +
+            '<div class="fund-type">' + f.tipo + '</div>' +
+          '</div>' +
+          '<div class="fund-rate">' + taxa + '</div>' +
+        '</div>'
+      );
+    }).join('');
+
+    el.innerHTML = html;
+  }
+
+  // ---- Carregar prévia ----
+  function carregarPrevia() {
+    google.script.run
+      .withSuccessHandler(function (txt) {
+        previewJson = txt;
+        renderizarPrevia();
+      })
+      .withFailureHandler(function () {})
+      .obterUltimoJSON();
+
+    google.script.run
+      .withSuccessHandler(function (txt) {
+        previewSql = txt;
+        renderizarPrevia();
+      })
+      .withFailureHandler(function () {})
+      .obterUltimoSQL();
+  }
+
+  function renderizarPrevia() {
+    var jEl = document.getElementById('conteudoJson');
+    var sEl = document.getElementById('conteudoSql');
+
+    jEl.innerHTML = previewJson
+      ? '<pre>' + escapeHtml(previewJson) + '</pre>'
+      : '<div class="preview-empty">Nenhum arquivo gerado ainda.</div>';
+
+    sEl.innerHTML = previewSql
+      ? '<pre>' + escapeHtml(previewSql) + '</pre>'
+      : '<div class="preview-empty">Nenhum arquivo gerado ainda.</div>';
+  }
+
+  // ---- Tabs de prévia ----
+  function trocarTab(aba) {
+    document.getElementById('tabJson').classList.toggle('active', aba === 'json');
+    document.getElementById('tabSql').classList.toggle('active', aba === 'sql');
+    document.getElementById('conteudoJson').classList.toggle('active', aba === 'json');
+    document.getElementById('conteudoSql').classList.toggle('active', aba === 'sql');
+  }
+
+  // ---- Gerar e Enviar ----
+  function gerarEEnviarAgora() {
+    setButtonsDisabled(true);
+    var btn = document.getElementById('btnEnviar');
+    btn.innerHTML = '<span class="spinner"></span> Processando...';
+
+    google.script.run
+      .withSuccessHandler(function (resultado) {
+        setButtonsDisabled(false);
+        btn.innerHTML = '🚀 Gerar e Enviar Agora';
+        showToast('✅ Enviado para ' + resultado.destinatarios.join(', '), 'success');
+        recarregarStatus();
+        carregarFundos();
+        carregarPrevia();
+      })
+      .withFailureHandler(function (err) {
+        setButtonsDisabled(false);
+        btn.innerHTML = '🚀 Gerar e Enviar Agora';
+        showToast('❌ Erro: ' + err.message, 'error');
+      })
+      .gerarEEnviar();
+  }
+
+  // ---- Acionador ----
+  function configurarAcionador() {
+    setButtonsDisabled(true);
+    var btn = document.getElementById('btnAcionador');
+    btn.innerHTML = '<span class="spinner"></span>';
+    google.script.run
+      .withSuccessHandler(function () {
+        setButtonsDisabled(false);
+        btn.innerHTML = '⏰ Ativar Envio Automático';
+        showToast('⏰ Acionador configurado para toda segunda-feira às 8h!', 'success');
+        recarregarStatus();
+      })
+      .withFailureHandler(function (err) {
+        setButtonsDisabled(false);
+        btn.innerHTML = '⏰ Ativar Envio Automático';
+        showToast('❌ Erro: ' + err.message, 'error');
+      })
+      .configurarAcionador();
+  }
+
+  function removerAcionador() {
+    setButtonsDisabled(true);
+    google.script.run
+      .withSuccessHandler(function () {
+        setButtonsDisabled(false);
+        showToast('🗑️ Acionador removido com sucesso.', 'success');
+        recarregarStatus();
+      })
+      .withFailureHandler(function (err) {
+        setButtonsDisabled(false);
+        showToast('❌ Erro: ' + err.message, 'error');
+      })
+      .removerAcionador();
+  }
+
+  // ---- Utilidades ----
+  function setButtonsDisabled(disabled) {
+    ['btnEnviar', 'btnAcionador', 'btnRemover'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.disabled = disabled;
+    });
+  }
+
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  var toastTimer;
+  function showToast(msg, type) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast toast-' + (type || 'success') + ' show';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      el.classList.remove('show');
+    }, 4000);
+  }
+</script>
+</body>
+</html>
