@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gerenciador de Fundos — Banestes</title>
+  <title>Painel de Log — Fundos Banestes</title>
   <style>
-    /* ---- Reset & Base ---- */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -14,14 +13,13 @@
       color: #202124;
       background: #f1f3f4;
       min-height: 100vh;
-      overflow-x: hidden;
     }
 
-    /* ---- Header ---- */
+    /* ── Header ── */
     .header {
       background: linear-gradient(135deg, #0d2d4f 0%, #1a5276 50%, #2471a3 100%);
       color: #fff;
-      padding: 11px 14px 10px;
+      padding: 12px 16px 11px;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -31,41 +29,27 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.20);
     }
     .header-logo {
-      width: 32px; height: 32px;
+      width: 34px; height: 34px;
       background: rgba(255,255,255,0.15);
       border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 17px;
+      font-size: 18px;
       flex-shrink: 0;
     }
     .header-info { flex: 1; min-width: 0; }
-    .header-title {
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .header-subtitle {
-      font-size: 10px;
-      opacity: 0.75;
-      margin-top: 1px;
-    }
+    .header-title { font-size: 14px; font-weight: 700; }
+    .header-subtitle { font-size: 10px; opacity: 0.75; margin-top: 1px; }
     .header-badge {
       background: rgba(255,255,255,0.18);
       border-radius: 6px;
-      padding: 3px 8px;
+      padding: 3px 9px;
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.3px;
-      white-space: nowrap;
       flex-shrink: 0;
     }
 
-    /* ---- Page sections ---- */
-    .page { padding: 0 0 60px; max-width: 100%; }
-    .section { padding: 10px 12px 4px; }
+    /* ── Sections ── */
+    .page { padding: 12px 14px 60px; max-width: 900px; margin: 0 auto; }
     .section-label {
       font-size: 10px;
       font-weight: 700;
@@ -73,29 +57,29 @@
       color: #80868b;
       letter-spacing: 0.9px;
       margin-bottom: 8px;
+      margin-top: 16px;
       display: flex;
       align-items: center;
       gap: 5px;
     }
+    .section-label:first-child { margin-top: 0; }
 
-    /* ---- Card grid ---- */
+    /* ── Cards ── */
     .card-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin-bottom: 6px;
+      gap: 8px;
+      margin-bottom: 8px;
     }
-    .card-row.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card-row.cols-2 { grid-template-columns: 1fr 1fr; }
+    .card-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
     .card {
       background: #fff;
       border-radius: 8px;
       border: 1px solid #e0e3e8;
-      padding: 9px 10px 8px;
+      padding: 11px 13px 10px;
       position: relative;
       overflow: hidden;
-      min-width: 0;
     }
-    .card.span-2 { grid-column: 1 / -1; }
     .card-accent {
       position: absolute;
       left: 0; top: 0; bottom: 0;
@@ -105,218 +89,105 @@
     .accent-blue   { background: #1a73e8; }
     .accent-green  { background: #1e8e3e; }
     .accent-orange { background: #e37400; }
-    .accent-red    { background: #d93025; }
-    .accent-purple { background: #8430ce; }
     .accent-teal   { background: #007b83; }
+    .accent-red    { background: #d93025; }
     .card-lbl {
       font-size: 9.5px;
       font-weight: 600;
       color: #80868b;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
     .card-val {
-      font-size: 17px;
+      font-size: 22px;
       font-weight: 700;
       color: #0d2d4f;
       line-height: 1;
     }
-    .card-val.md  { font-size: 13px; }
-    .card-val.sm  { font-size: 11px; font-weight: 600; }
-    .card-sub {
-      font-size: 10px;
-      color: #80868b;
-      margin-top: 3px;
-    }
+    .card-val.sm { font-size: 12px; font-weight: 500; line-height: 1.4; }
+    .card-sub { font-size: 10px; color: #80868b; margin-top: 3px; }
     .card-icon {
       position: absolute;
       right: 10px; top: 8px;
-      font-size: 18px;
-      opacity: 0.18;
+      font-size: 20px;
+      opacity: 0.15;
     }
 
-    /* ---- Status chip ---- */
+    /* ── Status chip ── */
     .chip {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 3px 9px;
+      padding: 2px 9px;
       border-radius: 20px;
       font-size: 11px;
       font-weight: 700;
     }
     .chip-green  { background: #e6f4ea; color: #1e8e3e; }
     .chip-amber  { background: #fef7e0; color: #b06000; }
+    .chip-red    { background: #fce8e6; color: #c5221f; }
     .chip-gray   { background: #f1f3f4; color: #5f6368; }
 
-    /* ---- Divider ---- */
-    .divider { height: 1px; background: #e0e3e8; margin: 4px 12px; }
-
-    /* ---- Risk distribution ---- */
-    .risk-dist-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
-    .risk-row {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-    .risk-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .risk-label { font-size: 10px; color: #5f6368; flex: 1; }
-    .risk-count { font-size: 11px; font-weight: 700; color: #202124; }
-    .risk-bar-wrap {
-      flex: 1;
-      background: #f1f3f4;
-      border-radius: 4px;
-      height: 5px;
+    /* ── Table ── */
+    .log-table-wrap {
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid #e0e3e8;
       overflow: hidden;
+      overflow-x: auto;
     }
-    .risk-bar {
-      height: 100%;
-      border-radius: 4px;
-      transition: width 0.6s ease;
+    table.log-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
     }
-    .rb-mb  { background: #34a853; }
-    .rb-b   { background: #fbbc04; }
-    .rb-m   { background: #ea8600; }
-    .rb-a   { background: #ea4335; }
-
-    /* ---- Return comparison section ---- */
-    .ret-compare-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
+    .log-table thead tr {
+      background: #1a3c5e;
     }
-    .ret-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .ret-lbl {
-      font-size: 10px;
-      color: #5f6368;
-      width: 76px;
-      flex-shrink: 0;
-    }
-    .ret-bar-wrap {
-      flex: 1;
-      background: #f1f3f4;
-      border-radius: 4px;
-      height: 6px;
-      overflow: hidden;
-    }
-    .ret-bar {
-      height: 100%;
-      border-radius: 4px;
-      background: linear-gradient(90deg, #1a73e8, #34a853);
-      transition: width 0.7s ease;
-    }
-    .ret-val {
+    .log-table thead th {
+      color: #fff;
+      padding: 9px 12px;
+      text-align: left;
       font-size: 10px;
       font-weight: 700;
-      color: #1e8e3e;
-      width: 42px;
-      text-align: right;
-      flex-shrink: 0;
-    }
-
-    /* ---- Best fund highlight ---- */
-    .best-fund-card {
-      background: linear-gradient(135deg, #e8f5e9 0%, #f0fdf4 100%);
-      border: 1px solid #c8e6c9;
-      border-radius: 8px;
-      padding: 9px 11px;
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      min-width: 0;
-    }
-    .best-fund-icon {
-      font-size: 18px;
-      line-height: 1;
-      flex-shrink: 0;
-    }
-    .best-fund-info { flex: 1; min-width: 0; }
-    .best-fund-name {
-      font-size: 11px;
-      font-weight: 700;
-      color: #1a5276;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .best-fund-sub { font-size: 10px; color: #5f6368; margin-top: 1px; }
-    .best-fund-rate {
-      font-size: 15px;
-      font-weight: 800;
-      color: #1e8e3e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       white-space: nowrap;
     }
-    .best-fund-rate-lbl { font-size: 9px; color: #5f6368; text-align: right; }
+    .log-table tbody tr {
+      border-top: 1px solid #f1f3f4;
+      transition: background 0.12s;
+    }
+    .log-table tbody tr:hover { background: #f8f9fa; }
+    .log-table tbody td {
+      padding: 8px 12px;
+      color: #202124;
+      vertical-align: middle;
+    }
+    .log-table tbody td.muted { color: #9aa0a6; font-style: italic; }
+    .status-ok   { color: #1e8e3e; font-weight: 700; }
+    .status-err  { color: #c5221f; font-weight: 700; }
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: #80868b;
+      font-size: 12px;
+    }
+    .empty-state .empty-icon { font-size: 32px; margin-bottom: 8px; }
 
-    /* ---- Buttons ---- */
-    .btn-group { padding: 6px 12px 4px; display: flex; flex-direction: column; gap: 5px; }
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      padding: 7px 12px;
-      border-radius: 7px;
-      border: none;
-      cursor: pointer;
-      font-size: 11px;
-      font-weight: 700;
-      font-family: inherit;
-      transition: filter 0.15s, transform 0.1s, box-shadow 0.15s;
-      letter-spacing: 0.2px;
-    }
-    .btn:hover  { filter: brightness(0.92); box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
-    .btn:active { transform: scale(0.98); }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #0d2d4f, #1a73e8);
-      color: #fff;
-      box-shadow: 0 1px 4px rgba(26,115,232,0.30);
-    }
-    .btn-secondary {
-      background: #fff;
-      color: #1a5276;
-      border: 1.5px solid #aac4e0;
-    }
-    .btn-success {
-      background: linear-gradient(135deg, #1a7a34, #1e8e3e);
-      color: #fff;
-      box-shadow: 0 1px 4px rgba(30,142,62,0.28);
-    }
-    .btn-danger {
-      background: #fff;
-      color: #c5221f;
-      border: 1.5px solid #f4b8b7;
-    }
-    .btn-row { display: flex; gap: 7px; }
-    .btn-row .btn { flex: 1; }
-
-    /* ---- Preview box ---- */
-    .preview-section { padding: 4px 12px 4px; }
+    /* ── Preview (JSON/SQL) ── */
     .preview-box {
       background: #fff;
       border-radius: 10px;
       border: 1px solid #e0e3e8;
       overflow: hidden;
+      margin-bottom: 8px;
     }
     .preview-tabs { display: flex; border-bottom: 1px solid #e0e3e8; }
     .preview-tab {
       flex: 1;
-      padding: 7px 6px;
+      padding: 8px 10px;
       background: none;
       border: none;
       cursor: pointer;
@@ -324,20 +195,11 @@
       font-weight: 600;
       color: #80868b;
       font-family: inherit;
-      transition: all 0.2s;
       border-bottom: 2px solid transparent;
+      transition: all 0.2s;
     }
-    .preview-tab.active {
-      color: #1a5276;
-      border-bottom-color: #1a73e8;
-      background: #f8fbff;
-    }
-    .preview-content {
-      display: none;
-      max-height: 160px;
-      overflow-y: auto;
-      padding: 8px 10px;
-    }
+    .preview-tab.active { color: #1a5276; border-bottom-color: #1a73e8; background: #f8fbff; }
+    .preview-content { display: none; max-height: 200px; overflow-y: auto; padding: 10px 12px; }
     .preview-content.active { display: block; }
     .preview-content pre {
       font-family: 'Roboto Mono', 'Courier New', monospace;
@@ -347,223 +209,71 @@
       word-break: break-all;
       line-height: 1.5;
     }
-    .preview-empty {
-      text-align: center;
-      color: #80868b;
-      font-size: 11px;
-      font-style: italic;
-      padding: 18px;
-    }
+    .preview-empty { text-align: center; color: #80868b; font-size: 11px; font-style: italic; padding: 20px; }
 
-    /* ---- Fund list ---- */
-    .fund-list-section { padding: 4px 12px 4px; }
-    .fund-list {
-      background: #fff;
-      border-radius: 10px;
-      border: 1px solid #e0e3e8;
-      overflow: hidden;
-      max-height: 280px;
-      overflow-y: auto;
-    }
-    .fund-item {
-      padding: 8px 11px 7px;
-      border-bottom: 1px solid #f1f3f4;
-    }
-    .fund-item:last-child { border-bottom: none; }
-    .fund-item-top {
-      display: flex;
+    /* ── Button ── */
+    .btn {
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 5px;
-    }
-    .fund-cod {
-      font-size: 10px;
-      font-weight: 800;
-      color: #aac4e0;
-      min-width: 20px;
-      text-align: right;
-      flex-shrink: 0;
-    }
-    .fund-rdot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .fund-name {
-      flex: 1;
+      justify-content: center;
+      gap: 5px;
+      padding: 7px 14px;
+      border-radius: 7px;
+      border: 1.5px solid #aac4e0;
+      cursor: pointer;
       font-size: 11px;
       font-weight: 700;
-      color: #0d2d4f;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-family: inherit;
+      background: #fff;
+      color: #1a5276;
+      transition: filter 0.15s, box-shadow 0.15s;
     }
-    .fund-rate {
-      font-size: 11px;
-      font-weight: 800;
-      color: #1e8e3e;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .fund-rate.zero { color: #80868b; }
-    .fund-item-bars {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding-left: 28px;
-    }
-    .fund-bar-lbl {
-      font-size: 9px;
-      color: #9aa0a6;
-      width: 14px;
-      text-align: right;
-      flex-shrink: 0;
-    }
-    .fund-bar-wrap {
-      flex: 1;
-      background: #f1f3f4;
-      border-radius: 3px;
-      height: 4px;
-      overflow: hidden;
-    }
-    .fund-bar-fill {
-      height: 100%;
-      border-radius: 3px;
-      transition: width 0.6s ease;
-    }
-    .fund-bar-month { background: #aac4e0; }
-    .fund-bar-annual { background: #1a73e8; }
-    .fund-bar-val {
-      font-size: 9px;
-      color: #5f6368;
-      width: 36px;
-      text-align: right;
-      flex-shrink: 0;
-    }
+    .btn:hover { filter: brightness(0.94); box-shadow: 0 2px 6px rgba(0,0,0,0.10); }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* ---- Risk colors ---- */
-    .risk-Muito-Baixo, .rb-mb-dot { background: #34a853; }
-    .risk-Baixo,       .rb-b-dot  { background: #fbbc04; }
-    .risk-Médio,       .rb-m-dot  { background: #ea8600; }
-    .risk-Alto,        .rb-a-dot  { background: #ea4335; }
-
-    /* ---- Spinner ---- */
+    /* ── Spinner ── */
     .spinner {
       display: inline-block;
       width: 13px; height: 13px;
-      border: 2px solid rgba(255,255,255,0.35);
-      border-top-color: #fff;
+      border: 2px solid rgba(26,83,118,0.2);
+      border-top-color: #1a5276;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
       vertical-align: middle;
     }
-    .spinner.dark {
-      border-color: rgba(30,60,90,0.2);
-      border-top-color: #1a5276;
-    }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ---- Toast ---- */
-    .toast {
+    /* ── Auto-refresh bar ── */
+    .refresh-bar {
+      height: 2px;
+      background: linear-gradient(90deg, #1a73e8, #34a853);
+      width: 0%;
+      transition: width linear;
       position: fixed;
-      bottom: 14px;
-      left: 12px; right: 12px;
-      padding: 9px 13px;
-      border-radius: 9px;
-      font-size: 12px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.18);
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all 0.25s;
-      pointer-events: none;
-      z-index: 999;
+      bottom: 0; left: 0; right: 0;
     }
-    .toast.show { opacity: 1; transform: none; }
-    .toast-success { background: #e6f4ea; color: #1e8e3e; border: 1px solid #c8e6c9; }
-    .toast-error   { background: #fce8e6; color: #c5221f; border: 1px solid #f4b8b7; }
 
-    /* ---- Footer ---- */
+    /* ── Footer ── */
     .footer {
-      padding: 6px 12px 8px;
+      padding: 6px 14px 8px;
       text-align: center;
       font-size: 9.5px;
       color: #9aa0a6;
       border-top: 1px solid #e0e3e8;
-      margin-top: 4px;
+      background: #f8f9fa;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
     }
 
-    /* ---- Scrollbar ---- */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cdd5df; border-radius: 4px; }
-
-    /* ---- Responsivo: telas médias (≥480px) ---- */
-    @media (min-width: 480px) {
-      .page { padding: 0 0 80px; }
-      .section { padding: 14px 16px 6px; }
-      .card-val { font-size: 20px; }
-      .card-val.md { font-size: 14px; }
-      .card-val.sm { font-size: 12px; }
-      .best-fund-rate { font-size: 17px; }
-      .btn { padding: 8px 14px; font-size: 12px; }
-      .btn-group { padding: 8px 16px 6px; gap: 7px; }
-      .preview-content { max-height: 220px; }
-      .fund-list { max-height: 360px; }
-      .divider { margin: 6px 16px; }
-      .preview-section { padding: 4px 16px 4px; }
-      .fund-list-section { padding: 4px 16px 4px; }
-      .footer { padding: 8px 16px 10px; }
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .card-row.cols-3 { grid-template-columns: 1fr 1fr; }
+      .log-table thead th:nth-child(3),
+      .log-table tbody td:nth-child(3) { display: none; }
     }
-
-    /* ---- Responsivo: telas largas (≥768px) ---- */
-    @media (min-width: 768px) {
-      body { font-size: 14px; }
-      .header { padding: 16px 24px 14px; }
-      .header-title { font-size: 16px; }
-      .header-subtitle { font-size: 11px; }
-      .page { padding: 0 0 100px; }
-      .section { padding: 16px 24px 8px; }
-      .card-val { font-size: 22px; }
-      .card-val.md { font-size: 15px; }
-      .card-val.sm { font-size: 13px; }
-      .card { padding: 12px 14px 10px; }
-      .best-fund-rate { font-size: 20px; }
-      .btn { padding: 9px 18px; font-size: 13px; gap: 6px; }
-      .btn-group { padding: 10px 24px 8px; gap: 9px; }
-      .preview-content { max-height: 280px; }
-      .fund-list { max-height: 440px; }
-      .divider { margin: 8px 24px; }
-      .preview-section { padding: 6px 24px 6px; }
-      .fund-list-section { padding: 6px 24px 6px; }
-      .footer { padding: 10px 24px 12px; font-size: 11px; }
-      .toast { left: 24px; right: 24px; }
-    }
-
-    /* ---- Responsivo: desktop largo (≥1024px) ---- */
-    @media (min-width: 1024px) {
-      .header { padding: 18px 32px 16px; }
-      .page {
-        max-width: 860px;
-        margin: 0 auto;
-        padding-bottom: 60px;
-      }
-      .section { padding: 18px 32px 10px; }
-      .btn-group { padding: 12px 32px 10px; gap: 10px; }
-      .preview-section { padding: 8px 32px 8px; }
-      .fund-list-section { padding: 8px 32px 8px; }
-      .divider { margin: 8px 32px; }
-      .footer { padding: 12px 32px 14px; }
-      .card-val { font-size: 24px; }
-      .card-val.md { font-size: 16px; }
-      .card-val.sm { font-size: 14px; }
-      .best-fund-rate { font-size: 22px; }
-      .btn { padding: 10px 20px; font-size: 13px; }
-      .fund-list { max-height: 520px; }
-      .preview-content { max-height: 320px; }
+    @media (min-width: 600px) {
+      .page { padding: 16px 20px 60px; }
     }
   </style>
 </head>
@@ -573,450 +283,252 @@
 <div class="header">
   <div class="header-logo">🏦</div>
   <div class="header-info">
-    <div class="header-title">Gerenciador de Fundos</div>
-    <div class="header-subtitle">Banestes — T.I. / Gestão de Investimentos</div>
+    <div class="header-title">Painel de Log — Fundos Banestes</div>
+    <div class="header-subtitle">Sistema automático de gestão de fundos — T.I.</div>
   </div>
-  <div class="header-badge">v1.0.0</div>
+  <div class="header-badge" id="versaoBadge">v2.0.0</div>
 </div>
 
 <div class="page">
 
-  <!-- ── MÉTRICAS ── -->
-  <div class="section">
-    <div class="section-label">📊 Visão Geral</div>
-
-    <!-- Row 1: Total fundos / Média a.a. / Acionador -->
-    <div class="card-row cols-3">
-      <div class="card">
-        <div class="card-accent accent-blue"></div>
-        <div class="card-lbl">Fundos</div>
-        <div class="card-val" id="metTotalFundos"><span class="spinner dark"></span></div>
-        <div class="card-sub">ativos</div>
-        <span class="card-icon">💼</span>
-      </div>
-      <div class="card">
-        <div class="card-accent accent-green"></div>
-        <div class="card-lbl">Média a.a.</div>
-        <div class="card-val" id="metMediaAnual"><span class="spinner dark"></span></div>
-        <div class="card-sub">rentabilidade</div>
-        <span class="card-icon">📈</span>
-      </div>
-      <div class="card">
-        <div class="card-accent accent-orange"></div>
-        <div class="card-lbl">Acionador</div>
-        <div class="card-val sm" id="metAcionador" style="margin-top:4px"><span class="spinner dark"></span></div>
-        <div class="card-sub">automático</div>
-        <span class="card-icon">⏰</span>
-      </div>
+  <!-- ── STATUS DO SISTEMA ── -->
+  <div class="section-label">⚙️ Status do Sistema</div>
+  <div class="card-row cols-3">
+    <div class="card">
+      <div class="card-accent accent-blue"></div>
+      <div class="card-lbl">Fundos Ativos</div>
+      <div class="card-val" id="totalFundos"><span class="spinner"></span></div>
+      <div class="card-sub">no App</div>
+      <span class="card-icon">💼</span>
     </div>
-
-    <!-- Melhor fundo -->
-    <div style="margin-bottom:7px" id="bestFundWrap">
-      <div class="best-fund-card">
-        <div class="best-fund-icon">🏆</div>
-        <div class="best-fund-info">
-          <div class="best-fund-name" id="metMelhorNome">Carregando…</div>
-          <div class="best-fund-sub" id="metMelhorRisco">—</div>
-        </div>
-        <div>
-          <div class="best-fund-rate" id="metMelhorRate">—</div>
-          <div class="best-fund-rate-lbl">ao ano</div>
-        </div>
-      </div>
+    <div class="card">
+      <div class="card-accent accent-orange"></div>
+      <div class="card-lbl">Acionadores</div>
+      <div class="card-val" id="acionadores"><span class="spinner"></span></div>
+      <div class="card-sub">automáticos</div>
+      <span class="card-icon">⏰</span>
     </div>
-
-    <!-- Distribuição por risco -->
-    <div class="card" style="margin-bottom:7px">
-      <div class="card-lbl" style="margin-bottom:8px">Distribuição por Risco</div>
-      <div class="risk-dist-grid" id="riskDistGrid">
-        <div class="risk-row"><div class="risk-dot rb-mb" style="background:#34a853"></div><span class="risk-label">Muito Baixo</span><span class="risk-count">—</span></div>
-        <div class="risk-row"><div class="risk-dot" style="background:#fbbc04"></div><span class="risk-label">Baixo</span><span class="risk-count">—</span></div>
-        <div class="risk-row"><div class="risk-dot" style="background:#ea8600"></div><span class="risk-label">Médio</span><span class="risk-count">—</span></div>
-        <div class="risk-row"><div class="risk-dot" style="background:#ea4335"></div><span class="risk-label">Alto</span><span class="risk-count">—</span></div>
-      </div>
-    </div>
-
-    <!-- Média de retorno por nível de risco -->
-    <div class="card" style="margin-bottom:4px">
-      <div class="card-lbl" style="margin-bottom:8px">Retorno Médio por Risco</div>
-      <div class="ret-compare-grid" id="retCompareGrid">
-        <div class="ret-row"><span class="ret-lbl">Muito Baixo</span><div class="ret-bar-wrap"><div class="ret-bar" style="width:0%"></div></div><span class="ret-val">—</span></div>
-        <div class="ret-row"><span class="ret-lbl">Baixo</span><div class="ret-bar-wrap"><div class="ret-bar" style="width:0%"></div></div><span class="ret-val">—</span></div>
-        <div class="ret-row"><span class="ret-lbl">Médio</span><div class="ret-bar-wrap"><div class="ret-bar" style="width:0%"></div></div><span class="ret-val">—</span></div>
-        <div class="ret-row"><span class="ret-lbl">Alto</span><div class="ret-bar-wrap"><div class="ret-bar" style="width:0%"></div></div><span class="ret-val">—</span></div>
-      </div>
+    <div class="card">
+      <div class="card-accent accent-teal"></div>
+      <div class="card-lbl">Sistema</div>
+      <div class="card-val sm" id="sistemaStatus" style="margin-top:4px"><span class="spinner"></span></div>
+      <span class="card-icon">🔧</span>
     </div>
   </div>
 
-  <div class="divider"></div>
-
-  <!-- ── STATUS ── -->
-  <div class="section">
-    <div class="section-label">⚙️ Status do Sistema</div>
-    <div class="card-row">
-      <div class="card span-2">
-        <div class="card-accent accent-teal"></div>
-        <div class="card-lbl">Última Atualização</div>
-        <div class="card-val sm" id="ultimaAtualizacao"><span class="spinner dark"></span></div>
-      </div>
+  <div class="card-row cols-2">
+    <div class="card">
+      <div class="card-accent accent-green"></div>
+      <div class="card-lbl">Último Envio</div>
+      <div class="card-val sm" id="ultimaAtualizacao"><span class="spinner"></span></div>
     </div>
-    <div class="card-row">
-      <div class="card span-2">
-        <div class="card-accent accent-blue"></div>
-        <div class="card-lbl">Último Status</div>
-        <div class="card-val sm" id="ultimoStatus" style="font-weight:500"><span class="spinner dark"></span></div>
-      </div>
-    </div>
-    <div class="card-row">
-      <div class="card span-2">
-        <div class="card-accent accent-purple"></div>
-        <div class="card-lbl">Destinatários (último envio)</div>
-        <div class="card-val sm" id="destinatarios" style="font-weight:400;font-size:11px"><span class="spinner dark"></span></div>
-      </div>
+    <div class="card">
+      <div class="card-accent accent-blue"></div>
+      <div class="card-lbl">Destinatários</div>
+      <div class="card-val sm" id="destinatarios" style="font-size:11px"><span class="spinner"></span></div>
     </div>
   </div>
 
-  <div class="divider"></div>
-
-  <!-- ── AÇÕES ── -->
-  <div class="btn-group">
-    <div class="section-label" style="margin:0 0 2px">⚡ Ações</div>
-
-    <button class="btn btn-success" id="btnEnviar" onclick="gerarEEnviarAgora()">
-      🚀 Gerar e Enviar Agora
-    </button>
-
-    <div class="btn-row">
-      <button class="btn btn-primary" id="btnAcionador" onclick="configurarAcionador()">
-        ⏰ Ativar Automático
-      </button>
-      <button class="btn btn-danger" id="btnRemover" onclick="removerAcionador()">
-        🗑️ Remover
-      </button>
-    </div>
-
-    <button class="btn btn-secondary" onclick="recarregarTudo()">
-      🔄 Atualizar Status
-    </button>
+  <!-- ── ATUALIZAR ── -->
+  <div style="margin-bottom:16px">
+    <button class="btn" id="btnAtualizar" onclick="recarregarTudo()">🔄 Atualizar Status</button>
+    <span id="autoRefreshMsg" style="margin-left:10px;font-size:10px;color:#9aa0a6;">Auto-refresh em <span id="countdown">300</span>s</span>
   </div>
 
-  <div class="divider"></div>
-
-  <!-- ── PRÉVIA ── -->
-  <div class="preview-section" style="padding-top:10px">
-    <div class="section-label">📄 Prévia do Último Arquivo</div>
-    <div class="preview-box">
-      <div class="preview-tabs">
-        <button class="preview-tab active" id="tabJson" onclick="trocarTab('json')">📋 JSON</button>
-        <button class="preview-tab" id="tabSql"  onclick="trocarTab('sql')">🗄️ Script SQL</button>
-      </div>
-      <div class="preview-content active" id="conteudoJson">
-        <div class="preview-empty">Nenhum arquivo gerado ainda.</div>
-      </div>
-      <div class="preview-content" id="conteudoSql">
-        <div class="preview-empty">Nenhum arquivo gerado ainda.</div>
-      </div>
+  <!-- ── PRÉVIA DOS ÚLTIMOS ARQUIVOS ── -->
+  <div class="section-label">📄 Último Arquivo Gerado</div>
+  <div class="preview-box">
+    <div class="preview-tabs">
+      <button class="preview-tab active" id="tabJson" onclick="switchTab('json')">📋 JSON</button>
+      <button class="preview-tab" id="tabSql" onclick="switchTab('sql')">🗄️ Script SQL</button>
+    </div>
+    <div class="preview-content active" id="previewJson">
+      <div class="preview-empty">Carregando…</div>
+    </div>
+    <div class="preview-content" id="previewSql">
+      <div class="preview-empty">Carregando…</div>
     </div>
   </div>
 
-  <div class="divider"></div>
-
-  <!-- ── LISTA DE FUNDOS ── -->
-  <div class="fund-list-section" style="padding-top:10px">
-    <div class="section-label">💼 Fundos Cadastrados</div>
-    <div class="fund-list" id="fundList">
-      <div class="preview-empty">
-        <span class="spinner dark"></span>&nbsp; Carregando…
-      </div>
-    </div>
+  <!-- ── LOG DE ENVIOS ── -->
+  <div class="section-label">📋 Histórico de Envios</div>
+  <div class="log-table-wrap">
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Data/Hora</th>
+          <th>Destinatários</th>
+          <th>Fundos</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="logTableBody">
+        <tr><td colspan="4"><div class="empty-state"><div class="spinner"></div></div></td></tr>
+      </tbody>
+    </table>
   </div>
 
-  <!-- FOOTER -->
-  <div class="footer">
-    Desenvolvido por spandrade@banestes.com.br &nbsp;·&nbsp; Banestes — T.I.
-  </div>
+</div>
 
-</div><!-- /page -->
+<!-- FOOTER -->
+<div class="footer">
+  🏦 Banestes S.A. — T.I. — Sistema Automático de Gestão de Fundos &nbsp;|&nbsp;
+  Monitoramento em tempo real &nbsp;|&nbsp; v2.0.0
+</div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
+<!-- BARRA AUTO-REFRESH -->
+<div class="refresh-bar" id="refreshBar"></div>
 
 <script>
-  var previewJson = '';
-  var previewSql  = '';
+  var REFRESH_INTERVAL = 300; // segundos (5 minutos)
+  var countdown        = REFRESH_INTERVAL;
+  var refreshTimer     = null;
+  var countdownTimer   = null;
 
-  /* ── Configuração de cores por nível de risco ── */
-  var RISCO_CONFIG = [
-    { key: 'Muito Baixo', cor: '#34a853', barCls: 'rb-mb' },
-    { key: 'Baixo',       cor: '#fbbc04', barCls: 'rb-b'  },
-    { key: 'Médio',       cor: '#ea8600', barCls: 'rb-m'  },
-    { key: 'Alto',        cor: '#ea4335', barCls: 'rb-a'  },
-  ];
+  // ── Carregamento inicial ──────────────────────────────────
+  window.onload = function () {
+    recarregarTudo();
+    iniciarAutoRefresh();
+  };
 
-  /* ── Inicialização ── */
-  document.addEventListener('DOMContentLoaded', function () {
-    recarregarStatus();
-    carregarMetricas();
-    carregarFundos();
-    carregarPrevia();
-  });
-
-  /* ── Recarregar tudo ── */
   function recarregarTudo() {
-    recarregarStatus();
-    carregarMetricas();
-    carregarFundos();
-    carregarPrevia();
+    carregarStatus();
+    carregarPreviews();
+    carregarLogs();
+    resetarContagem();
   }
 
-  /* ── Status ── */
-  function recarregarStatus() {
+  // ── Status ────────────────────────────────────────────────
+  function carregarStatus() {
     google.script.run
-      .withSuccessHandler(atualizarStatusUI)
-      .withFailureHandler(function (err) { showToast('Erro ao carregar status: ' + err.message, 'error'); })
+      .withSuccessHandler(function (s) {
+        document.getElementById('totalFundos').textContent        = s.totalFundos;
+        document.getElementById('acionadores').textContent        = s.acionadoresAtivos;
+        document.getElementById('ultimaAtualizacao').textContent  = s.ultimaAtualizacao;
+        document.getElementById('destinatarios').textContent      = s.destinatariosAtivos;
+        document.getElementById('versaoBadge').textContent        = 'v' + s.versao;
+
+        var statusEl   = document.getElementById('sistemaStatus');
+        var isOk       = s.ultimoStatus && s.ultimoStatus.indexOf('Erro') === -1;
+        if (s.ultimoStatus === 'Nunca enviado') {
+          statusEl.innerHTML = '<span class="chip chip-gray">⏸ Aguardando</span>';
+        } else if (isOk) {
+          statusEl.innerHTML = '<span class="chip chip-green">✅ OK</span>';
+        } else {
+          statusEl.innerHTML = '<span class="chip chip-red">❌ Erro</span>';
+        }
+      })
+      .withFailureHandler(function (err) {
+        document.getElementById('sistemaStatus').innerHTML = '<span class="chip chip-red">❌ Falha</span>';
+        console.error(err);
+      })
       .obterStatusAtual();
   }
 
-  function atualizarStatusUI(status) {
-    document.getElementById('ultimaAtualizacao').textContent = status.ultimaAtualizacao;
-    document.getElementById('ultimoStatus').textContent      = status.ultimoStatus;
-    document.getElementById('destinatarios').textContent     = status.destinatariosAtivos;
-
-    var acionadorEl = document.getElementById('metAcionador');
-    if (status.acionadorAtivo) {
-      acionadorEl.innerHTML = '<span class="chip chip-green">✅ Ativo</span>';
-    } else {
-      acionadorEl.innerHTML = '<span class="chip chip-amber">⏸ Inativo</span>';
-    }
-  }
-
-  /* ── Métricas ── */
-  function carregarMetricas() {
+  // ── Previews JSON / SQL ───────────────────────────────────
+  function carregarPreviews() {
     google.script.run
-      .withSuccessHandler(renderizarMetricas)
-      .withFailureHandler(function () {})
-      .obterMetricasPainel();
-  }
-
-  function renderizarMetricas(m) {
-    /* Totais */
-    document.getElementById('metTotalFundos').textContent = m.totalFundos;
-    document.getElementById('metMediaAnual').textContent  =
-      m.totalFundos > 0 ? (m.mediaRentAnual * 100).toFixed(1) + '%' : '—';
-
-    /* Melhor fundo */
-    if (m.melhorFundo) {
-      document.getElementById('metMelhorNome').textContent  = m.melhorFundo.nome;
-      document.getElementById('metMelhorRisco').textContent = 'Risco: ' + m.melhorFundo.risco;
-      document.getElementById('metMelhorRate').textContent  =
-        (m.melhorFundo.rentAnual * 100).toFixed(2) + '%';
-    }
-
-    /* Distribuição por risco */
-    var gridEl = document.getElementById('riskDistGrid');
-    gridEl.innerHTML = '';
-    var distValues = RISCO_CONFIG.map(function(r) { return m.distribuicaoRisco[r.key] || 0; });
-    var maxDist = Math.max.apply(null, distValues) || 1;
-    RISCO_CONFIG.forEach(function (r) {
-      var cnt = m.distribuicaoRisco[r.key] || 0;
-      gridEl.innerHTML +=
-        '<div class="risk-row">' +
-          '<div class="risk-dot" style="background:' + r.cor + '"></div>' +
-          '<span class="risk-label">' + r.key + '</span>' +
-          '<div class="risk-bar-wrap"><div class="risk-bar ' + r.barCls + '" style="width:' + (cnt / maxDist * 100) + '%"></div></div>' +
-          '<span class="risk-count">' + cnt + '</span>' +
-        '</div>';
-    });
-
-    /* Retorno médio por risco */
-    var retValues = RISCO_CONFIG.map(function(r) { return m.mediaRentPorRisco[r.key] || 0; });
-    var maxRet = Math.max.apply(null, retValues) || 1;
-    var retEl = document.getElementById('retCompareGrid');
-    retEl.innerHTML = '';
-    RISCO_CONFIG.forEach(function (r) {
-      var avg = m.mediaRentPorRisco[r.key] || 0;
-      var pct = avg > 0 ? (avg / maxRet * 100).toFixed(0) : 0;
-      var valStr = avg > 0 ? (avg * 100).toFixed(1) + '%' : '—';
-      retEl.innerHTML +=
-        '<div class="ret-row">' +
-          '<span class="ret-lbl">' + r.key + '</span>' +
-          '<div class="ret-bar-wrap"><div class="ret-bar" style="width:' + pct + '%"></div></div>' +
-          '<span class="ret-val">' + valStr + '</span>' +
-        '</div>';
-    });
-  }
-
-  /* ── Fundos ── */
-  function carregarFundos() {
-    google.script.run
-      .withSuccessHandler(renderizarFundos)
-      .withFailureHandler(function () {
-        document.getElementById('fundList').innerHTML =
-          '<div class="preview-empty">Erro ao carregar fundos.</div>';
+      .withSuccessHandler(function (txt) {
+        document.getElementById('previewJson').innerHTML =
+          txt ? '<pre>' + escapeHtml(txt) + '</pre>'
+              : '<div class="preview-empty">Nenhum JSON gerado ainda.</div>';
       })
-      .obterListaFundosPainel();
-  }
-
-  function renderizarFundos(fundos) {
-    var el = document.getElementById('fundList');
-    if (!fundos || fundos.length === 0) {
-      el.innerHTML = '<div class="preview-empty">Nenhum fundo encontrado.</div>';
-      return;
-    }
-
-    var rentValues = fundos.map(function(f) { return f.rentAnual || 0; });
-    var maxRent = Math.max.apply(null, rentValues) || 1;
-    var dotColors = {};
-    RISCO_CONFIG.forEach(function(r) { dotColors[r.key] = r.cor; });
-
-    var html = fundos.map(function (f) {
-      var annualPct  = f.rentAnual  > 0 ? (f.rentAnual  / maxRent * 100).toFixed(0) : 0;
-      var monthlyPct = f.rentMensal > 0 ? (f.rentMensal / maxRent * 100).toFixed(0) : 0;
-      var annualStr  = f.rentAnual  > 0 ? (f.rentAnual  * 100).toFixed(2) + '%' : '—';
-      var monthlyStr = f.rentMensal > 0 ? (f.rentMensal * 100).toFixed(2) + '%' : '—';
-      var dotColor   = dotColors[f.risco] || '#9aa0a6';
-      var rateClass  = f.rentAnual > 0 ? '' : 'zero';
-
-      return (
-        '<div class="fund-item">' +
-          '<div class="fund-item-top">' +
-            '<span class="fund-cod">' + f.codigo + '</span>' +
-            '<div class="fund-rdot" style="background:' + dotColor + '" title="Risco: ' + f.risco + '"></div>' +
-            '<span class="fund-name" title="' + f.nome + '">' + f.nome + '</span>' +
-            '<span class="fund-rate ' + rateClass + '">' + annualStr + '</span>' +
-          '</div>' +
-          '<div class="fund-item-bars">' +
-            '<span class="fund-bar-lbl">m</span>' +
-            '<div class="fund-bar-wrap"><div class="fund-bar-fill fund-bar-month" style="width:' + monthlyPct + '%"></div></div>' +
-            '<span class="fund-bar-val">' + monthlyStr + '</span>' +
-          '</div>' +
-          '<div class="fund-item-bars">' +
-            '<span class="fund-bar-lbl">a</span>' +
-            '<div class="fund-bar-wrap"><div class="fund-bar-fill fund-bar-annual" style="width:' + annualPct + '%"></div></div>' +
-            '<span class="fund-bar-val">' + annualStr + '</span>' +
-          '</div>' +
-        '</div>'
-      );
-    }).join('');
-
-    el.innerHTML = html;
-  }
-
-  /* ── Prévia ── */
-  function carregarPrevia() {
-    google.script.run
-      .withSuccessHandler(function (txt) { previewJson = txt; renderizarPrevia(); })
-      .withFailureHandler(function () {})
+      .withFailureHandler(function () {
+        document.getElementById('previewJson').innerHTML =
+          '<div class="preview-empty">Erro ao carregar JSON.</div>';
+      })
       .obterUltimoJSON();
 
     google.script.run
-      .withSuccessHandler(function (txt) { previewSql = txt; renderizarPrevia(); })
-      .withFailureHandler(function () {})
+      .withSuccessHandler(function (txt) {
+        document.getElementById('previewSql').innerHTML =
+          txt ? '<pre>' + escapeHtml(txt) + '</pre>'
+              : '<div class="preview-empty">Nenhum SQL gerado ainda.</div>';
+      })
+      .withFailureHandler(function () {
+        document.getElementById('previewSql').innerHTML =
+          '<div class="preview-empty">Erro ao carregar SQL.</div>';
+      })
       .obterUltimoSQL();
   }
 
-  function renderizarPrevia() {
-    var jEl = document.getElementById('conteudoJson');
-    var sEl = document.getElementById('conteudoSql');
-
-    jEl.innerHTML = previewJson
-      ? '<pre>' + escapeHtml(previewJson) + '</pre>'
-      : '<div class="preview-empty">Nenhum arquivo gerado ainda.</div>';
-
-    sEl.innerHTML = previewSql
-      ? '<pre>' + escapeHtml(previewSql) + '</pre>'
-      : '<div class="preview-empty">Nenhum arquivo gerado ainda.</div>';
-  }
-
-  /* ── Tabs ── */
-  function trocarTab(aba) {
-    document.getElementById('tabJson').classList.toggle('active', aba === 'json');
-    document.getElementById('tabSql').classList.toggle('active', aba === 'sql');
-    document.getElementById('conteudoJson').classList.toggle('active', aba === 'json');
-    document.getElementById('conteudoSql').classList.toggle('active', aba === 'sql');
-  }
-
-  /* ── Ações ── */
-  function gerarEEnviarAgora() {
-    setButtonsDisabled(true);
-    var btn = document.getElementById('btnEnviar');
-    btn.innerHTML = '<span class="spinner"></span>&nbsp; Processando…';
-
+  // ── Log table ─────────────────────────────────────────────
+  function carregarLogs() {
     google.script.run
-      .withSuccessHandler(function (resultado) {
-        setButtonsDisabled(false);
-        btn.innerHTML = '🚀 Gerar e Enviar Agora';
-        showToast('✅ Enviado para ' + resultado.destinatarios.join(', '), 'success');
-        recarregarTudo();
+      .withSuccessHandler(function (logs) {
+        var tbody = document.getElementById('logTableBody');
+        if (!logs || logs.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="4"><div class="empty-state">' +
+            '<div class="empty-icon">📭</div>' +
+            '<div>Nenhum envio registrado ainda.</div>' +
+            '</div></td></tr>';
+          return;
+        }
+        tbody.innerHTML = logs.map(function (l) {
+          var isOk   = l.status && l.status.indexOf('Erro') === -1;
+          var stCls  = isOk ? 'status-ok' : 'status-err';
+          var stIcon = isOk ? '✅' : '❌';
+          return '<tr>' +
+            '<td style="white-space:nowrap">' + escapeHtml(l.dataHora) + '</td>' +
+            '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + escapeHtml(l.destinatarios) + '">' + escapeHtml(l.destinatarios) + '</td>' +
+            '<td style="text-align:center">' + (l.qtdFundos || '—') + '</td>' +
+            '<td class="' + stCls + '">' + stIcon + ' ' + escapeHtml(l.status) + '</td>' +
+            '</tr>';
+        }).join('');
       })
       .withFailureHandler(function (err) {
-        setButtonsDisabled(false);
-        btn.innerHTML = '🚀 Gerar e Enviar Agora';
-        showToast('❌ Erro: ' + err.message, 'error');
+        document.getElementById('logTableBody').innerHTML =
+          '<tr><td colspan="4" class="muted" style="padding:16px;text-align:center">Erro ao carregar logs: ' + escapeHtml(String(err)) + '</td></tr>';
       })
-      .gerarEEnviar();
+      .obterLogsRecentes(20);
   }
 
-  function configurarAcionador() {
-    setButtonsDisabled(true);
-    var btn = document.getElementById('btnAcionador');
-    btn.innerHTML = '<span class="spinner"></span>';
-    google.script.run
-      .withSuccessHandler(function () {
-        setButtonsDisabled(false);
-        btn.innerHTML = '⏰ Ativar Automático';
-        showToast('⏰ Acionador configurado para toda segunda-feira às 8h!', 'success');
-        recarregarStatus();
-        carregarMetricas();
-      })
-      .withFailureHandler(function (err) {
-        setButtonsDisabled(false);
-        btn.innerHTML = '⏰ Ativar Automático';
-        showToast('❌ Erro: ' + err.message, 'error');
-      })
-      .configurarAcionador();
-  }
-
-  function removerAcionador() {
-    setButtonsDisabled(true);
-    google.script.run
-      .withSuccessHandler(function () {
-        setButtonsDisabled(false);
-        showToast('🗑️ Acionador removido com sucesso.', 'success');
-        recarregarStatus();
-        carregarMetricas();
-      })
-      .withFailureHandler(function (err) {
-        setButtonsDisabled(false);
-        showToast('❌ Erro: ' + err.message, 'error');
-      })
-      .removerAcionador();
-  }
-
-  /* ── Utilidades ── */
-  function setButtonsDisabled(disabled) {
-    ['btnEnviar', 'btnAcionador', 'btnRemover'].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.disabled = disabled;
+  // ── Tabs Preview ──────────────────────────────────────────
+  function switchTab(tab) {
+    ['json', 'sql'].forEach(function (t) {
+      document.getElementById('preview' + t.charAt(0).toUpperCase() + t.slice(1))
+        .classList.toggle('active', t === tab);
+      document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1))
+        .classList.toggle('active', t === tab);
     });
   }
 
+  // ── Auto-refresh ──────────────────────────────────────────
+  function iniciarAutoRefresh() {
+    clearInterval(refreshTimer);
+    clearInterval(countdownTimer);
+
+    refreshTimer = setInterval(function () {
+      recarregarTudo();
+    }, REFRESH_INTERVAL * 1000);
+
+    countdownTimer = setInterval(function () {
+      countdown--;
+      if (countdown < 0) countdown = REFRESH_INTERVAL;
+      document.getElementById('countdown').textContent = countdown;
+
+      var pct = ((REFRESH_INTERVAL - countdown) / REFRESH_INTERVAL) * 100;
+      var bar = document.getElementById('refreshBar');
+      bar.style.transition = 'width 1s linear';
+      bar.style.width = pct + '%';
+    }, 1000);
+  }
+
+  function resetarContagem() {
+    countdown = REFRESH_INTERVAL;
+    document.getElementById('refreshBar').style.width = '0%';
+  }
+
+  // ── Helpers ───────────────────────────────────────────────
   function escapeHtml(str) {
-    return str
+    return String(str)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
   }
-
-  var toastTimer;
-  function showToast(msg, type) {
-    var el = document.getElementById('toast');
-    el.textContent = msg;
-    el.className = 'toast toast-' + (type || 'success') + ' show';
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 4000);
-  }
 </script>
+
 </body>
 </html>
