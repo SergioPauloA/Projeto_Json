@@ -1563,6 +1563,18 @@ function buildEmailHTML(dataStr, total, fundos, nomeJson, nomeSql) {
  * @returns {Object} Resultado do envio.
  */
 function enviarEmail(jsonStr, sqlStr, fundos) {
+  // Permite chamar a função diretamente do editor do Apps Script sem argumentos.
+  if (!fundos) {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    sincronizarValoresDerivados(ss);
+    fundos = obterDadosFundos();
+    if (fundos.length === 0) {
+      throw new Error('Nenhum fundo encontrado. Verifique as abas "Inicial" ou "Fundos" na planilha.');
+    }
+  }
+  if (!jsonStr) { jsonStr = gerarJSON(fundos); }
+  if (!sqlStr)  { sqlStr  = gerarSQL(fundos);  }
+
   var agora = new Date();
   var dataStr = Utilities.formatDate(agora, Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm');
   var sufixo  = Utilities.formatDate(agora, Session.getScriptTimeZone(), 'yyyyMMdd_HHmmss');
