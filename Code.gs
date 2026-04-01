@@ -292,32 +292,6 @@ var FUND_DATA = {
   },
 };
 
-// ============================================================
-// MENU E INICIALIZAÇÃO
-// ============================================================
-
-function onOpen() {
-  SpreadsheetApp.getUi()
-    .createMenu('🏦 Gerenciador Fundos')
-    .addItem('🗂️ Configurar Abas da Planilha', 'configurarPlanilha')
-    .addItem('♻️ Reconfigurar Abas (Excluir e Recriar)', 'reconfigurarPlanilha')
-    .addSeparator()
-    .addItem('📋 Abrir Painel de Log', 'abrirPainel')
-    .addSeparator()
-    .addItem('🔄 Gerar e Enviar Agora', 'gerarEEnviar')
-    .addItem('🧪 Testar Envio de E-mail', 'testarEnvioEmail')
-    .addSeparator()
-    .addItem('⏰ Configurar Acionadores Automáticos', 'configurarAcionador')
-    .addItem('🗑️ Remover Acionadores Automáticos', 'removerAcionador')
-    .addToUi();
-}
-
-function abrirPainel() {
-  var html = HtmlService.createHtmlOutputFromFile('Sidebar')
-    .setTitle('🏦 Painel de Log — Fundos Banestes')
-    .setWidth(480);
-  SpreadsheetApp.getUi().showSidebar(html);
-}
 
 /**
  * Serve a página de log/status como Web App.
@@ -869,9 +843,6 @@ function configurarPlanilha() {
     + '2. Os triggers automáticos irão gerar e enviar os dados sem nenhuma interação manual.';
 
   Logger.log('configurarPlanilha concluído. Criadas: [' + criadas.join(', ') + ']');
-  try {
-    SpreadsheetApp.getUi().alert('🏦 Planilha Configurada!', msg, SpreadsheetApp.getUi().ButtonSet.OK);
-  } catch (e) {}
 }
 
 /**
@@ -883,32 +854,9 @@ function configurarPlanilha() {
  * Dados importados via =IMPORTRANGE(...) na aba COAFI precisarão ser
  * reconfigurados após a execução desta função.
  *
- * Execute via menu 🏦 Gerenciador Fundos → "♻️ Reconfigurar Abas (Excluir e Recriar)".
+ * Execute esta função diretamente no editor do Apps Script quando necessário.
  */
 function reconfigurarPlanilha() {
-  var ui = SpreadsheetApp.getUi();
-
-  // Confirmação obrigatória antes de excluir qualquer dado
-  var resposta = ui.alert(
-    '♻️ Reconfigurar Planilha',
-    'Esta ação irá EXCLUIR e RECRIAR as seguintes abas:\n\n' +
-      '• ' + CONFIG.SHEET_COAFI     + '\n' +
-      '• ' + CONFIG.SHEET_PODE_SIM  + '\n' +
-      '• ' + CONFIG.SHEET_TAXA_NOVA + '\n' +
-      '• ' + CONFIG.SHEET_INICIAL   + '\n' +
-      '• ' + CONFIG.SHEET_LOG       + '\n' +
-      '• ' + CONFIG.SHEET_FUNDS     + '\n\n' +
-    '⚠️ Todos os dados atuais nessas abas serão PERDIDOS.\n' +
-    'O =IMPORTRANGE(...) da aba COAFI precisará ser reconfigurado.\n\n' +
-    'Deseja continuar?',
-    ui.ButtonSet.YES_NO
-  );
-
-  if (resposta !== ui.Button.YES) {
-    ui.alert('Operação cancelada.', 'Nenhuma aba foi modificada.', ui.ButtonSet.OK);
-    return;
-  }
-
   var ss = SpreadsheetApp.getActiveSpreadsheet();
 
   // Lista de abas gerenciadas a excluir e recriar (ordem de exclusão)
@@ -950,16 +898,6 @@ function reconfigurarPlanilha() {
   ss.deleteSheet(tempSheet);
 
   Logger.log('reconfigurarPlanilha concluído. Excluídas e recriadas: [' + excluidas.join(', ') + ']');
-
-  ui.alert(
-    '✅ Planilha Reconfigurada!',
-    'As seguintes abas foram excluídas e recriadas com sucesso:\n\n' +
-      '• ' + excluidas.join('\n• ') + '\n\n' +
-    'Próximos passos:\n' +
-    '1. Autorize o IMPORTRANGE na aba ' + CONFIG.SHEET_COAFI + ' (necessário apenas na primeira vez).\n' +
-    '2. Os triggers automáticos irão gerar e enviar os dados sem nenhuma interação manual.',
-    ui.ButtonSet.OK
-  );
 }
 
 /**
@@ -1547,7 +1485,6 @@ function gerarEEnviar() {
       Logger.log(msg);
       // Registra no log para visibilidade no painel — sem envio de e-mail
       registrarInfoLog('ℹ️ ' + msg);
-      try { SpreadsheetApp.getUi().alert('ℹ️ Sem alterações', msg, SpreadsheetApp.getUi().ButtonSet.OK); } catch (e) {}
       return { success: false, reason: 'no_change' };
     }
 
@@ -1560,21 +1497,11 @@ function gerarEEnviar() {
     props.setProperty(CONFIG.PROP_LAST_RUN,  agora.toISOString());
 
     Logger.log('Envio concluído: ' + resultado.dataEnvio + ' — ' + resultado.totalFundos + ' fundos.');
-    try {
-      SpreadsheetApp.getUi().alert(
-        '✅ Concluído!',
-        'JSON e Script SQL gerados e enviados com sucesso!\n\nData: ' + resultado.dataEnvio +
-        '\nFundos: ' + resultado.totalFundos +
-        '\nDestinatários: ' + resultado.destinatarios.join(', '),
-        SpreadsheetApp.getUi().ButtonSet.OK
-      );
-    } catch (e) { /* trigger sem UI */ }
 
     return resultado;
   } catch (e) {
     Logger.log('ERRO em gerarEEnviar: ' + e.message);
     registrarErroLog(e);
-    try { SpreadsheetApp.getUi().alert('❌ Erro', e.message, SpreadsheetApp.getUi().ButtonSet.OK); } catch (ui) {}
     throw e;
   }
 }
@@ -1627,18 +1554,9 @@ function testarEnvioEmail() {
     });
 
     Logger.log('E-mail de teste enviado para: ' + CONFIG.DEVELOPER_EMAIL);
-    try {
-      SpreadsheetApp.getUi().alert(
-        '✅ Teste Concluído!',
-        'E-mail de teste enviado!\n\nDestinatário: ' + CONFIG.DEVELOPER_EMAIL +
-        '\nFundos: ' + fundos.length + '\nAnexos: ' + nomeJson + ', ' + nomeSql,
-        SpreadsheetApp.getUi().ButtonSet.OK
-      );
-    } catch (e) { /* sem UI */ }
 
   } catch (e) {
     Logger.log('ERRO em testarEnvioEmail: ' + e.message);
-    try { SpreadsheetApp.getUi().alert('❌ Erro no Teste', e.message, SpreadsheetApp.getUi().ButtonSet.OK); } catch (ui) {}
     throw e;
   }
 }
@@ -1675,13 +1593,6 @@ function configurarAcionador() {
     .create();
 
   Logger.log('Acionadores configurados com sucesso.');
-  try {
-    SpreadsheetApp.getUi().alert(
-      '⏰ Acionadores configurados!',
-      'Envio automático ativo:\n• Semanal: toda segunda-feira às 8h\n• Imediato: toda vez que a planilha for atualizada (incluindo IMPORTRANGE)',
-      SpreadsheetApp.getUi().ButtonSet.OK
-    );
-  } catch (e) {}
 }
 
 /**
@@ -1697,15 +1608,6 @@ function removerAcionador() {
     }
   });
   Logger.log('Acionadores removidos: ' + removidos);
-  try {
-    SpreadsheetApp.getUi().alert(
-      '🗑️ Acionadores removidos',
-      removidos > 0
-        ? removidos + ' acionador(es) automático(s) removido(s) com sucesso.'
-        : 'Nenhum acionador automático estava configurado.',
-      SpreadsheetApp.getUi().ButtonSet.OK
-    );
-  } catch (e) {}
 }
 
 // ============================================================
