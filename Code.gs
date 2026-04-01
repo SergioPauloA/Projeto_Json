@@ -293,6 +293,157 @@ var FUND_DATA = {
 };
 
 
+// ============================================================
+// DADOS RICOS DOS FUNDOS (conteúdo estático completo)
+// Contém descrições, condições comerciais, taxas, prestadores,
+// tributação, documentos, demonstrações contábeis e comunicados.
+// Os campos "podeSimular?" e "taxaRentabilidade" de condicoesComerciais
+// são preenchidos dinamicamente a partir da planilha em gerarJSON().
+// Para fundos sem dados completos, os campos descritivos são null —
+// preencha conforme os dados de cada fundo forem disponibilizados.
+// ============================================================
+var FUND_RICH_DATA = {
+  'invest_btg_pactual_absoluto': {
+    descricaoCurta: 'O FUNDO se caracteriza como fundo de investimento financeiro "FIF" e contará com CLASSE única de cotas.',
+    publicoAlvo: 'O FUNDO é destinado à captação de recursos de investidores pessoas físicas e/ou jurídicas em geral, sujeitos a limites de aplicações estabelecidos pelo ADMINISTRADOR, doravante designados, coletivamente, COTISTAS ou, individualmente, COTISTA.',
+    objetivo: 'A CLASSE tem por objetivo propiciar aos seus COTISTAS a valorização de suas cotas por meio da aplicação dos recursos em cotas do BANESTES BTG PACTUAL ABSOLUTO INSTITUCIONAL FIC DE FIF DE AÇÕES RESPONSABILIDADE LIMITADA, inscrito no CNPJ sob o nº 11.977.794/0001-64, além de outros ativos financeiros disponíveis no âmbito do mercado financeiro e de capitais, sem perseguir uma correlação com qualquer índice de ações ou benchmark específico. O objetivo descrito no caput, o qual o GESTOR perseguirá, não constitui, em hipótese alguma, garantia ou promessa de rendimento por parte do ADMINISTRADOR e/ou do GESTOR.',
+    politicaInvestimento: 'A CLASSE é classificada como Ações e investirá, no mínimo, 95% (noventa e cinco por cento) de seu patrimônio líquido em cotas da Classe Única do BTG PACTUAL ABSOLUTO INSTITUCIONAL FUNDO DE INVESTIMENTO FINANCEIRO EM COTAS DE FUNDOS DE INVESTIMENTO EM AÇÕES - RESPONSABILIDADE LIMITADA, inscrito no CNPJ sob o nº 11.977.794/0001-64, doravante designada CLASSE INVESTIDA. Os 5% (cinco por cento) remanescentes de seu patrimônio líquido podem ser aplicados em: a) títulos de emissão do Tesouro Nacional e/ou operações compromissadas lastreadas nesses títulos; b) ativos financeiros de renda fixa de emissão de instituição financeira; c) cotas de classe de FIF classificadas como "Renda Fixa" Curto Prazo, Referenciado ou Simples.',
+    condicoesComerciais: {
+      aplicacaoInicial: 'R$ 5.000,00',
+      investimentoAdicionalMinimo: 'R$ 1.000,00',
+      resgateMinimo: 'R$ 1.000,00',
+      saldoMinimoPermanencia: 'R$ 1.000,00',
+      tipoCota: 'Fechamento',
+      carencia: 'Não há',
+      cotaAplicacao: 'D+1 dias úteis',
+      cotaResgate: 'D+30 dias corridos',
+      debitoContaCorrente: 'D+0',
+      creditoContaCorrente: 'D+35 (30 dias corridos + 5 dias úteis)',
+      horarioLimite: 'Até as 15:00h',
+      pf: true,
+      pj: true,
+    },
+    taxas: {
+      taxaGlobal: '3,00 % a.a.',
+      taxaPerformance: 'Não há',
+      taxaIngresso: 'Não há',
+      taxaSaida: 'Não há',
+    },
+    prestadoresServicos: {
+      administradorFiduciario: 'Banestes DTVM S.A.',
+      gestorRecursos: 'Banestes DTVM S.A.',
+      tesourariaControleProcessamento: 'Banestes DTVM S.A.',
+      escrituracaoEmissaoResgate: 'Banestes DTVM S.A.',
+      custodiaAtivosFinanceiros: 'Banestes S.A.',
+      distribuicaoCotas: 'Banestes S.A.',
+      auditorIndependente: 'RSM Brasil Auditores Independentes',
+    },
+    tributacao: {
+      iof: {
+        titulo: 'IOF',
+        descricao: 'Atualmente, os resgates de cotas dos fundos de investimento em ações estão isentos de Imposto Sobre Operações Financeiras (IOF).',
+      },
+      ir: {
+        titulo: 'IR',
+        descricao: 'Os cotistas do Fundo sofrerão tributação na fonte, exclusivamente no resgate de cotas, sobre o rendimento auferido no período, à alíquota de 15% (quinze por cento).',
+      },
+      tabelaLongoPrazo: null,
+      tabelaCurtoPrazo: null,
+      observacao: null,
+    },
+    documentos: [
+      { titulo: 'Declarações Complementares do Investidor', url: '/investimentos/pdf/declaracao_investidor.pdf' },
+      { titulo: 'Demonstração de Desempenho', url: '/investimentos/pdf/desempenho_DD_FDB.pdf' },
+      { titulo: 'Lâmina', url: '/investimentos/pdf/lamina_btg_pactual_absoluto.pdf' },
+      { titulo: 'Material Publicitário', url: '/investimentos/pdf/publicitario_btg.pdf' },
+      { titulo: 'Política de Exercício de Direito de Voto em Assembleia', url: '/investimentos/pdf/politica_exercicio_direito_voto_assembleia.pdf' },
+      { titulo: 'Principais Fatores de Risco do Fundo', url: '/investimentos/pdf/risco-Absoluto-Institucional.pdf' },
+      { titulo: 'Regulamento', url: '/investimentos/pdf/regulamento_btg.pdf' },
+      { titulo: 'Rentabilidade e Carteira', url: '/investimentos/pdf/rentabilidade_BTG_Pactual_Absoluto.pdf' },
+      { titulo: 'Sumário de Remuneração', url: '/investimentos/pdf/sumario_btg_.pdf' },
+      { titulo: 'Termo de Adesão', url: '/investimentos/pdf/adesao_btg.pdf' },
+    ],
+    demonstracoesContabeis: [
+      { titulo: 'Exercício 2024', url: '/institucional/demonstracoes/fundos_investimento/2024/demoCon_Absoluto-2024.pdf' },
+      { titulo: 'Exercício 2023', url: '/institucional/demonstracoes/fundos_investimento/2023/BTG_Absoluto-2023.pdf' },
+      { titulo: 'Exercício 2022', url: '/institucional/demonstracoes/fundos_investimento/2022/BTG_Absoluto-2022.pdf' },
+      { titulo: 'Exercício 2021', url: '/institucional/demonstracoes/fundos_investimento/2021/BTG_Absoluto-2021.pdf' },
+      { titulo: 'Exercício 2020', url: '/institucional/demonstracoes/fundos_investimento/2020/btg-pactual-2020.pdf' },
+      { titulo: 'Exercício 2019', url: '/institucional/demonstracoes/fundos_investimento/2019/btg-pactual-2019.pdf' },
+      { titulo: 'Exercício 2018', url: '/institucional/demonstracoes/fundos_investimento/2018/btg-pactual-2018.pdf' },
+      { titulo: 'Exercício 2017', url: '/institucional/demonstracoes/fundos_investimento/2017/btg-pactual-2017.pdf' },
+      { titulo: 'Exercício 2016', url: '/institucional/demonstracoes/fundos_investimento/2016/btg_pactual2016.pdf' },
+      { titulo: 'Exercício 2015', url: '/institucional/demonstracoes/fundos_investimento/2015/btg_pactual2015.pdf' },
+      { titulo: 'Exercício 2014', url: '/institucional/demonstracoes/fundos_investimento/2014/btg_pactual2014.pdf' },
+    ],
+    comunicados: [
+      { data: '12.02.2026', titulo: 'Funcionamento no Feriado de Carnaval 2026 - Fundos de Investimento.', url: '/investimentos/pdf/comunicados/comunicado_12_02_2026.pdf' },
+      { data: '12.02.2026', titulo: 'Funcionamento no Feriado de Carnaval 2026 - Fundos de Investimento.', url: '/investimentos/pdf/comunicados/comunicado_12_02_2026.pdf' },
+      { data: '16.12.2025', titulo: 'Procedimentos Final do Ano - Fundos de Investimento', url: '/investimentos/pdf/comunicados/final-ano-16-12-25.pdf' },
+      { data: '12.06.2025', titulo: 'Adaptação do Regulamento aos termos da Resolução CVM nº 175', url: '/investimentos/pdf/comunicados/15_btg_absoluto_comunicado.pdf' },
+      { data: '29.05.2025', titulo: 'Ata da Assembleia Geral de Cotistas', url: '/investimentos/pdf/comunicados/15BTGABSOLUTO-ATA.pdf' },
+      { data: '29.05.2025', titulo: 'Resumo das Deliberações da Assembleia Geral de Cotistas', url: '/investimentos/pdf/comunicados/15BTGABSOLUTO-ResumodasDelibera.pdf' },
+      { data: '15.04.2025', titulo: 'Instruções para realização do Voto Eletrônico', url: '/investimentos/pdf/comunicados/15BTGABSOLUTO-TextoEmail.pdf' },
+      { data: '15.04.2025', titulo: 'Edital de Convocação - Assembleia Geral de Cotistas', url: '/investimentos/pdf/comunicados/15BTGABSOLUTO-Edital_de_Convocação.pdf' },
+      { data: '27.02.2025', titulo: 'Funcionamento no Feriado de Carnaval 2025 - Fundos de Investimento', url: '/investimentos/pdf/comunicados/comunicado_27_02_2025.pdf' },
+      { data: '16.12.2024', titulo: 'Procedimentos Final do Ano - Fundos de Investimento', url: '/investimentos/pdf/comunicados/invest_comunicado_16_12_2024.pdf' },
+      { data: '25.04.2024', titulo: 'Resumo das Deliberações da Assembleia Geral Ordinária', url: '/investimentos/pdf/comunicados/btg_resumo_AGO_04_29_24.pdf' },
+      { data: '25.04.2024', titulo: 'Ata da Assembleia Geral Ordinária', url: '/investimentos/pdf/comunicados/btg_ata_AGO_04_29_24.pdf' },
+      { data: '02.04.2024', titulo: 'Instruções para realização do Voto Eletrônico', url: '/investimentos/pdf/comunicados/btg_instrucoes_03_04_24.pdf' },
+      { data: '02.04.2024', titulo: 'Edital de Convocação - Assembleia Geral Ordinária', url: '/investimentos/pdf/comunicados/edital_AGO_02_04_24.pdf' },
+      { data: '14.02.2024', titulo: 'Envio de Convocações de Assembleias por Meio Eletrônico', url: '/investimentos/pdf/comunicados/comunicado_envio_de_e-mail_14_02_24.pdf' },
+      { data: '07.02.2024', titulo: 'Funcionamento no Feriado de Carnaval 2024 - Fundos de Investimento', url: '/investimentos/pdf/comunicados/comunicado_fundos_carnaval_07_02_24.pdf' },
+      { data: '26.12.2023', titulo: 'Fato Relevante: Procedimentos Final do Ano', url: '/investimentos/pdf/comunicados/comunicado_fato_relevante_12_26_23.pdf' },
+      { data: '28.04.2023', titulo: 'Resumo das Deliberações das Assembleias Gerais Ordinária e Extraordinária', url: '/investimentos/pdf/comunicados/AGO_05_03_2023.pdf' },
+      { data: '31.03.2023', titulo: 'Minuta de Alteração de Regulamento.', url: '/investimentos/pdf/comunicados/comunicado_minuta_regulamento_btg.pdf' },
+      { data: '31.03.2023', titulo: 'Edital de Convocação - Assembleias Gerais Ordinária e Extraordinária.', url: '/investimentos/pdf/comunicados/comunicado_Edital_Absoluto_27_04_23.pdf' },
+      { data: '23.03.2023', titulo: 'Deliberações - AGE de cotistas do BTG PACTUAL ABSOLUTO INSTITUCIONAL FUNDO DE INVESTIMENTO EM QUOTAS DE FUNDOS DE INVESTIMENTO DE AES realizada em 23/03/2023.', url: '/investimentos/pdf/comunicados/ata_2023_05_04-01.pdf' },
+      { data: '17.02.2023', titulo: 'Fato Relevante', url: '/investimentos/pdf/comunicados/fato_relevante_2023_02_17-01.pdf' },
+      { data: '17.02.2023', titulo: 'Resumo das Deliberações da Assembleia Geral Extraordinária', url: '/investimentos/pdf/comunicados/invest_comunicado_absoluto_2021_02_17-01.pdf' },
+      { data: '16.02.2023', titulo: 'Funcionamento dos Fundos de Investimento durante o feriado de Carnaval', url: '/investimentos/pdf/comunicados/invest_comunicado_2023_02_16.pdf' },
+      { data: '30.01.2023', titulo: 'Minuta de Alteração de Regulamento', url: '/investimentos/pdf/comunicados/2023-minuta-btg-absoluto.pdf' },
+      { data: '30.01.2023', titulo: 'Edital de Convocação - Assembleia Geral Extraordinária', url: '/investimentos/pdf/comunicados/AGE-absoluto-2023.pdf' },
+      { data: '20.01.2023', titulo: 'Fato Relevante', url: '/investimentos/pdf/comunicados/fato_relevante_2023_01_20-02.pdf' },
+      { data: '20.01.2023', titulo: 'Fato Relevante', url: '/investimentos/pdf/comunicados/fato_relevante_2023_01_20-btg-absoluto.pdf' },
+      { data: '12.01.2023', titulo: 'Fato Relevante', url: '/investimentos/pdf/comunicados/fato_relevante_2023_01_12.pdf' },
+      { data: '26.12.2022', titulo: 'Fato Relevante', url: '/investimentos/pdf/comunicados/fato_relevante_2022_12_26.pdf' },
+      { data: '22.12.2022', titulo: 'Procedimentos Final do Ano - Fundos de Investimento', url: '/investimentos/pdf/comunicados/invest_comunicado_2022_12_22.pdf' },
+      { data: '28.04.2022', titulo: 'Resumo das Deliberações das Assembleias Gerais Ordinária e Extraordinária', url: '/investimentos/pdf/comunicados/resumoAGOE_btg_2022_04_28.pdf' },
+      { data: '28.04.2022', titulo: 'Fato Relevante', url: '/investimentos/pdf/comunicados/fato_relevante_btg_2022_04_28.pdf' },
+      { data: '06.04.2022', titulo: 'Fato Relevante', url: '/investimentos/pdf/comunicados/fato_relevante_2022_04_06.pdf' },
+      { data: '06.04.2022', titulo: 'Minuta de Alteração de Regulamento', url: '/investimentos/pdf/comunicados/minuta_btg_2022_04_06.pdf' },
+      { data: '06.04.2022', titulo: 'Edital de Convocação - Assembleias Gerais Ordinária e Extraordinária', url: '/investimentos/pdf/comunicados/AGE_btg_2022_04_06.pdf' },
+      { data: '21.02.2022', titulo: 'Funcionamento no Feriado de Carnaval 2022 - Fundos de Investimento', url: '/investimentos/pdf/comunicados/invest_comunicado_2022_02_21.pdf' },
+      { data: '21.12.2021', titulo: 'Procedimentos Final do Ano - Fundos de Investimento', url: '/investimentos/pdf/comunicados/invest_comunicado_2021_12_21.pdf' },
+      { data: '13.05.2021', titulo: 'Resumo das Deliberações da Assembleia Geral Ordinária', url: '/investimentos/pdf/comunicados/invest_comunicado_absoluto_2021_05_13-01.pdf' },
+      { data: '05.04.2021', titulo: 'Assembleia Geral Ordinária - Consulta Formal', url: '/investimentos/pdf/comunicados/invest_comunicado_2021_04_05-12.pdf' },
+      { data: '12.02.2021', titulo: 'Funcionamento no feriado de carnaval 2021- Fundos de Investimento', url: '/investimentos/pdf/comunicados/invest_comunicado_2021_02_12.pdf' },
+      { data: '22.12.2020', titulo: 'Procedimentos Final de Ano - Fundos de Investimento', url: '/investimentos/pdf/comunicados/comunicado-2020.pdf' },
+      { data: '30.07.2020', titulo: 'Resumo das Deliberações da Assembleia Geral Ordinária', url: '/investimentos/pdf/comunicados/AGO-deliberacoes-consultaFormal-absoluto.pdf' },
+      { data: '28.07.2020', titulo: 'Assembleia Geral Ordinária - Consulta Formal', url: '/investimentos/pdf/comunicados/AGO-consulta-2020.07-absoluto.pdf' },
+      { data: '01.11.2019', titulo: 'Fato relevante', url: '/investimentos/pdf/2019/2019-fato-relevante-btg-absoluto.pdf' },
+      { data: '20.05.2019', titulo: 'Resumo das Deliberações das Assembleias Gerais Ordinária e Extraordinária', url: '/investimentos/pdf/2019/AGE-resumo-BTG-20-05-2019.pdf' },
+      { data: '22.04.2019', titulo: 'Minuta de Alteração de Regulamento', url: '/investimentos/pdf/2019/2019-minuta-btg-absoluto.pdf' },
+      { data: '18.04.2019', titulo: 'Edital de Convocação - Assembleia Geral Ordinária e Extraordinária', url: '/investimentos/pdf/2019/AGE-absoluto-2019.pdf' },
+      { data: '09.05.2018', titulo: 'Resumo das deliberações da Assembleia Geral Ordinária', url: '/investimentos/pdf/2018/AGO-resumo-deliberacoes-btg.pdf' },
+      { data: '06.04.2018', titulo: 'Edital de Convocação - Assembleia Geral Ordinária', url: '/investimentos/pdf/2018/AGE-absoluto-2018.pdf' },
+      { data: '21.03.2018', titulo: 'Resumo das Deliberações da Assembleia Geral Extraordinária', url: '/investimentos/pdf/2018/age-2018.03.21-FIC-FIA-BTG.pdf' },
+      { data: '09.03.2018', titulo: 'Minuta de Alteração de Regulamento', url: '/investimentos/pdf/2018/minuta-banestes-FIC-FIA-BTG.pdf' },
+      { data: '09.03.2018', titulo: 'Edital de Convocação - Assembleia Geral Extraordinária', url: '/investimentos/pdf/2018/AGE-edital-banestes-FIC-FIA-BTG.pdf' },
+      { data: '16.11.2017', titulo: 'Alteração do Regulamento', url: '/investimentos/pdf/comunicados/comunicado-2017.11.16-BTGAbsoluto.pdf' },
+      { data: '01.09.2017', titulo: 'Interrupção do envio de extrato por meio físico', url: '/investimentos/pdf/comunicados/comunicado-2017.09.01-BTGAbsoluto.pdf' },
+      { data: '18.04.2017', titulo: 'Edital de Convocação - Assembleia Geral Ordinária', url: '/investimentos/pdf/comunicados/btg-pactual-dividendos-age-180417.pdf' },
+      { data: '15.03.2017', titulo: 'Minuta de Alteração de Regulamento', url: '/investimentos/pdf/comunicados/btg-pactual-dividendos-minuta-170315.pdf' },
+      { data: '15.03.2017', titulo: 'Edital de Convocação - Assembleia Geral Extraordinária', url: '/investimentos/pdf/comunicados/btg-pactual-dividendos-age-170315.pdf' },
+      { data: '22.04.2016', titulo: 'Minuta de alteração do Regulamento', url: '/investimentos/pdf/comunicados/minuta-regulamento-dividendos-2016_04_22.pdf' },
+      { data: '18.04.2016', titulo: 'Assembleias Gerais Ordinária e Extraordinária', url: '/investimentos/pdf/comunicados/dividendos-age-ago-2016_04_18.pdf' },
+      { data: '30.09.2015', titulo: 'ATA Assembleia Geral Extraordinária', url: '/investimentos/pdf/comunicados/btg-pactual-dividendos-age-300915.pdf' },
+      { data: '11.09.2015', titulo: 'Minuta de Alteração de Regulamento', url: '/investimentos/pdf/comunicados/btg-pactual-dividendos-minuta-150911.pdf' },
+      { data: '11.09.2015', titulo: 'Edital de Convocação - Assembleia Geral Extraordinária', url: '/investimentos/pdf/comunicados/btg-pactual-dividendos-age-150911.pdf' },
+    ],
+  },
+};
+
 /**
  * Serve a página de log/status como Web App.
  */
@@ -663,10 +814,15 @@ function obterDadosFundos() {
       taxaSimulacao = parseTaxaPercent(taxaAtualStr);
     }
 
+    // Taxa formatada para saída no JSON (ex: "35,80%") — campo dinâmico de condicoesComerciais
+    var taxaNovaFormatada = (podeSimNovo === 'Sim') ? (taxaNovaStr || taxaAtualStr) : '';
+
     // Rentabilidade da aba Fundos (se disponível)
     var rent = rentMap[d.FNDCD] || { RENT_DIARIA: 0, RENT_MENSAL: 0, RENT_ANUAL: 0 };
 
     fundos.push({
+      FUND_ID:      fundId,
+      TAXA_NOVA_FORMATADA: taxaNovaFormatada,
       FNDCD:        d.FNDCD,
       NOME:         nomePlanilha || d.NOME,
       FNDCTFND:     d.FNDCTFND,
@@ -737,6 +893,13 @@ function obterDadosFallback(ss) {
   var data = sheet.getDataRange().getValues();
   if (data.length < 2) return [];
   var headers = data[0];
+  // Mapa reverso: FNDCD → ID do fundo (para enriquecimento com FUND_RICH_DATA)
+  var fndcdToId = {};
+  for (var k in FUND_DATA) {
+    var cd = FUND_DATA[k].FNDCD;
+    if (cd) fndcdToId[cd] = k;
+  }
+
   var fundos = [];
   for (var i = 1; i < data.length; i++) {
     var row = data[i];
@@ -744,6 +907,9 @@ function obterDadosFallback(ss) {
     var f = {};
     headers.forEach(function (h, idx) { f[h] = row[idx]; });
     f.PODE_SIMULAR = (Number(f.FNDTXSIMU) > 0) ? 'Sim' : 'Não';
+    f.FUND_ID = fndcdToId[Number(f.FNDCD)] || '';
+    f.TAXA_NOVA_FORMATADA = (f.PODE_SIMULAR === 'Sim' && Number(f.FNDTXSIMU) > 0)
+      ? (Number(f.FNDTXSIMU) * 100).toFixed(2).replace('.', ',') + '%' : '';
     fundos.push(f);
   }
   return fundos;
@@ -1099,35 +1265,60 @@ function _criarAbaInicial(ss) {
 // ============================================================
 
 /**
- * Gera o conteúdo JSON com os dados dos fundos.
+ * Gera o conteúdo JSON com os dados dos fundos no mesmo modelo da planilha original.
+ * Campos estáticos (descrições, documentos, taxas, etc.) vêm de FUND_RICH_DATA.
+ * Campos dinâmicos ("podeSimular?" e "taxaRentabilidade") vêm da planilha via planilha.
  * @param {Array<Object>} fundos Lista de fundos.
  * @returns {string} JSON formatado.
  */
 function gerarJSON(fundos) {
-  var agora = new Date();
   var payload = {
-    dataAtualizacao: Utilities.formatDate(agora, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss"),
-    versao: '2.0',
-    fonte: 'Banestes — Sistema de Gestão de Fundos (GEART via Google Sheets)',
-    totalFundos: fundos.length,
     fundos: fundos.map(function (f) {
+      var id          = String(f['FUND_ID'] || '');
+      var rich        = FUND_RICH_DATA[id] || {};
+      var podeSimular = String(f['PODE_SIMULAR'] || 'Não');
+      var taxaRent    = String(f['TAXA_NOVA_FORMATADA'] || '');
+
+      // Condições comerciais: campos estáticos mesclados com os dinâmicos da planilha
+      var cc = rich.condicoesComerciais || {};
+      var condicoesComerciais = {
+        aplicacaoInicial:            cc.aplicacaoInicial            !== undefined ? cc.aplicacaoInicial            : null,
+        investimentoAdicionalMinimo: cc.investimentoAdicionalMinimo !== undefined ? cc.investimentoAdicionalMinimo : null,
+        resgateMinimo:               cc.resgateMinimo               !== undefined ? cc.resgateMinimo               : null,
+        saldoMinimoPermanencia:      cc.saldoMinimoPermanencia      !== undefined ? cc.saldoMinimoPermanencia      : null,
+        tipoCota:                    cc.tipoCota                    !== undefined ? cc.tipoCota                    : null,
+        carencia:                    cc.carencia                    !== undefined ? cc.carencia                    : null,
+        cotaAplicacao:               cc.cotaAplicacao               !== undefined ? cc.cotaAplicacao               : null,
+        cotaResgate:                 cc.cotaResgate                 !== undefined ? cc.cotaResgate                 : null,
+        debitoContaCorrente:         cc.debitoContaCorrente         !== undefined ? cc.debitoContaCorrente         : null,
+        creditoContaCorrente:        cc.creditoContaCorrente        !== undefined ? cc.creditoContaCorrente        : null,
+        horarioLimite:               cc.horarioLimite               !== undefined ? cc.horarioLimite               : null,
+        'podeSimular?':              podeSimular,
+        taxaRentabilidade:           taxaRent,
+        pf:                          cc.pf                          !== undefined ? cc.pf                          : null,
+        pj:                          cc.pj                          !== undefined ? cc.pj                          : null,
+      };
+
       return {
-        codigo:            Number(f['FNDCD']),
-        nome:              String(f['NOME']),
-        tipo:              String(f['FNDCTFND']),
-        podeSimular:       String(f['PODE_SIMULAR'] || 'Não'),
-        classificacaoRisco: String(f['FNDCLSRISC']),
-        codigoRisco:       RISCO_CODIGO[f['FNDCLSRISC']] !== undefined ? RISCO_CODIGO[f['FNDCLSRISC']] : 1,
-        classificacaoCVM:  String(f['FNDCLSCVM']),
-        subClassificacaoCVM: String(f['FNDSUBCVM']),
-        tipoANBIMA:        String(f['FNDTOAMB']),
-        taxaSimulacao:     Number(f['FNDTXSIMU']),
-        cotacaoDiaUtil:    String(f['FNDCOTDIAUTIL']),
-        rentabilidade: {
-          diaria: Number(f['RENT_DIARIA']),
-          mensal: Number(f['RENT_MENSAL']),
-          anual:  Number(f['RENT_ANUAL']),
+        id:                    id,
+        nomeCompleto:          String(f['NOME']),
+        descricaoCurta:        rich.descricaoCurta        !== undefined ? rich.descricaoCurta        : null,
+        publicoAlvo:           rich.publicoAlvo           !== undefined ? rich.publicoAlvo           : null,
+        objetivo:              rich.objetivo              !== undefined ? rich.objetivo              : null,
+        politicaInvestimento:  rich.politicaInvestimento  !== undefined ? rich.politicaInvestimento  : null,
+        caracteristicas: {
+          classificacaoRisco: String(f['FNDCLSRISC']),
+          classificacaoCVM:   String(f['FNDCLSCVM']),
+          subclasseCVM:       String(f['FNDSUBCVM']),
+          tipoANBIMA:         String(f['FNDTOAMB']),
         },
+        condicoesComerciais:   condicoesComerciais,
+        taxas:                 rich.taxas                 !== undefined ? rich.taxas                 : null,
+        prestadoresServicos:   rich.prestadoresServicos   !== undefined ? rich.prestadoresServicos   : null,
+        tributacao:            rich.tributacao            !== undefined ? rich.tributacao            : null,
+        documentos:            rich.documentos            !== undefined ? rich.documentos            : null,
+        demonstracoesContabeis: rich.demonstracoesContabeis !== undefined ? rich.demonstracoesContabeis : null,
+        comunicados:           rich.comunicados           !== undefined ? rich.comunicados           : null,
       };
     }),
   };
