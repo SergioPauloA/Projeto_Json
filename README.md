@@ -9,6 +9,7 @@ Ferramenta de gestão de fundos de investimento do Banestes, desenvolvida em **G
 | Quando | O que acontece | Função responsável |
 |---|---|---|
 | A planilha é aberta | O menu **🏦 Gerenciador Fundos** é criado | `onOpen()` |
+| **Primeira vez** | Todas as abas são criadas e populadas com dados e fórmulas | `configurarPlanilha()` |
 | Dados da planilha são alterados (inclui IMPORTRANGE/COAFI) | JSON + SQL gerados e enviados por e-mail automaticamente | `aoAlterarPlanilha()` → `gerarEEnviar()` |
 | Toda segunda-feira às 8h | Envio automático semanal garantido | `gerarEEnviar()` via trigger |
 | A cada envio | Registro salvo na aba `Log_Envios` | `registrarLog()` |
@@ -60,9 +61,14 @@ Projeto_Json/
 
 ### 2. Primeira execução e autorização
 
-1. No seletor de funções, escolha `gerarEEnviar` e clique em ▶ **Executar**.
-2. Autorize os escopos solicitados (Sheets, Gmail, Triggers).
-3. Verifique se o e-mail chegou em `spandrade@banestes.com.br`.
+1. No menu **🏦 Gerenciador Fundos → 🗂️ Configurar Abas da Planilha**, execute `configurarPlanilha()`.
+   - Isso cria automaticamente todas as abas necessárias: `COAFI`, `PodeSimular`, `TaxaNova`, `Inicial`, `Log_Envios` e `Fundos`.
+   - Abas já existentes **não são modificadas**.
+2. (Opcional) Na aba `COAFI`, substitua a linha de placeholder pelo `=IMPORTRANGE(...)` que aponta para a planilha GEART.
+3. (Opcional) Na aba `PodeSimular`, preencha a coluna `DATA_INICIO` de cada fundo; a coluna `PODE_SIMULAR` recalcula automaticamente.
+4. No seletor de funções, escolha `gerarEEnviar` e clique em ▶ **Executar** (ou use o menu).
+5. Autorize os escopos solicitados (Sheets, Gmail, Triggers).
+6. Verifique se o e-mail chegou em `spandrade@banestes.com.br`.
 
 ### 3. Ativar os acionadores automáticos (uma única vez)
 
@@ -74,7 +80,9 @@ Isso configura:
 
 ### 4. Testar o envio de e-mail
 
-Execute `testarEnvioEmail()` diretamente no editor do Apps Script para validar o fluxo completo sem depender de triggers.
+Execute `testarEnvioEmail()` diretamente no editor do Apps Script (ou via menu **🧪 Testar Envio de E-mail**) para validar o fluxo completo sem depender de triggers.
+
+> **Pré-requisito:** execute `configurarPlanilha()` primeiro para que as abas existam.
 
 ---
 
@@ -84,6 +92,7 @@ Execute `testarEnvioEmail()` diretamente no editor do Apps Script para validar o
 
 | Função | Como usar | O que faz |
 |---|---|---|
+| `configurarPlanilha` | **Menu / Editor GAS** — execute **primeiro** | Cria todas as abas necessárias (COAFI, PodeSimular, TaxaNova, Inicial, Log_Envios, Fundos) com dados e fórmulas |
 | `gerarEEnviar` | Menu / Editor GAS | Gera JSON + SQL + envia e-mail + registra log |
 | `testarEnvioEmail` | **Editor GAS** | Envia e-mail de TESTE para o desenvolvedor (prefixo `TESTE_`) |
 | `configurarAcionador` | Menu / Editor GAS | Ativa acionadores automáticos (onChange + semanal) |
@@ -102,6 +111,12 @@ Execute `testarEnvioEmail()` diretamente no editor do Apps Script para validar o
 | `enviarEmail(...)` | Monta os anexos e envia o e-mail |
 | `registrarLog(...)` | Salva resultado na aba `Log_Envios` e no `PropertiesService` |
 | `computeHash(str)` | MD5 para detectar mudanças nos dados (evita reenvios idênticos) |
+| `_criarAbaCoafi(ss)` | Cria aba `COAFI` com estrutura placeholder para IMPORTRANGE |
+| `_criarAbaPodeSimular(ss)` | Cria aba `PodeSimular` com todos os fundos e fórmula de data |
+| `_criarAbaTaxaNova(ss)` | Cria aba `TaxaNova` com todos os fundos e taxas padrão |
+| `_criarAbaInicial(ss)` | Cria aba `Inicial` com dados e fórmulas VLOOKUP nas cols F e G |
+| `criarAbaDadosFundos(ss)` | Cria aba `Fundos` (fallback) com dados estruturados e rentabilidade |
+| `garantirAbaLog(ss)` | Cria aba `Log_Envios` se não existir |
 
 ---
 
