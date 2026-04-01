@@ -54,18 +54,19 @@ var COL_E_INICIO    = 4;   // col E  = "Início das atividades" (seção INFORMA
 var COL_AR_12MESES  = 43;  // col AR = rentabilidade acumulada 12 meses
 
 // Fundos que NUNCA simulam, independentemente da data de início.
-// Corresponde às células com "Não" fixo na col D da aba PodeSimular do sistema original.
-var FUNDO_SEMPRE_NAO = {
-  'invest_investpublic':                            true,
-  'invest_investidor':                              true,
-  'invest_previdenciario':                          true,
-  'banestes_tesouro_fi_renda_fixa_referenciado_di': true,
-  'invest_solidez':                                 true,
-  'invest_referencial':                             true,
-  'invest_funses':                                  true,
-  'invest_soberano':                                true,
-  'invest_tenax':                                   true,
-  'invest_Synergy':                                 true,
+// Chaveado pelo nome do fundo (NOME_SITE / col A da aba PodeSimular),
+// exatamente como o sistema original fixava "Não" em células específicas da col D.
+var NOME_SITE_SEMPRE_NAO = {
+  'Banestes Invest Public Automático FIF CP RL':                              true,
+  'Banestes Investidor Automático FIF Renda Fixa CP RL':                      true,
+  'Banestes IMA-B Títulos Públicos FIF Renda Fixa RL':                        true,
+  'Banestes Tesouro FIF Renda Fixa Referenciado DI RL':                       true,
+  'Banestes Solidez Automático FIF Renda Fixa CP RL':                         true,
+  'Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL':                      true,
+  'Banestes FUNSES Multimercado RL':                                           true,
+  'Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL': true,
+  'Banestes Tenax Ações FIF em Cotas de FIA RL':                              true,
+  'Banestes Synergy Long Only FIF em Cotas de FIA RL':                        true,
 };
 
 // Mapeamento: ID do fundo → nome exato na col B da aba COAFI (para buscar DATA_INICIO)
@@ -293,6 +294,157 @@ var FUND_DATA = {
 };
 
 
+// ============================================================
+// DADOS RICOS DOS FUNDOS (conteúdo estático completo)
+// Contém descrições, condições comerciais, taxas, prestadores,
+// tributação, documentos, demonstrações contábeis e comunicados.
+// Os campos "podeSimular?" e "taxaRentabilidade" de condicoesComerciais
+// são preenchidos dinamicamente a partir da planilha em gerarJSON().
+// Para fundos sem dados completos, os campos descritivos são null —
+// preencha conforme os dados de cada fundo forem disponibilizados.
+// ============================================================
+var FUND_RICH_DATA = {
+  'invest_btg_pactual_absoluto': {
+    descricaoCurta: 'O FUNDO se caracteriza como fundo de investimento financeiro "FIF" e contará com CLASSE única de cotas.',
+    publicoAlvo: 'O FUNDO é destinado à captação de recursos de investidores pessoas físicas e/ou jurídicas em geral, sujeitos a limites de aplicações estabelecidos pelo ADMINISTRADOR, doravante designados, coletivamente, COTISTAS ou, individualmente, COTISTA.',
+    objetivo: 'A CLASSE tem por objetivo propiciar aos seus COTISTAS a valorização de suas cotas por meio da aplicação dos recursos em cotas do BANESTES BTG PACTUAL ABSOLUTO INSTITUCIONAL FIC DE FIF DE AÇÕES RESPONSABILIDADE LIMITADA, inscrito no CNPJ sob o nº 11.977.794/0001-64, além de outros ativos financeiros disponíveis no âmbito do mercado financeiro e de capitais, sem perseguir uma correlação com qualquer índice de ações ou benchmark específico. O objetivo descrito no caput, o qual o GESTOR perseguirá, não constitui, em hipótese alguma, garantia ou promessa de rendimento por parte do ADMINISTRADOR e/ou do GESTOR.',
+    politicaInvestimento: 'A CLASSE é classificada como Ações e investirá, no mínimo, 95% (noventa e cinco por cento) de seu patrimônio líquido em cotas da Classe Única do BTG PACTUAL ABSOLUTO INSTITUCIONAL FUNDO DE INVESTIMENTO FINANCEIRO EM COTAS DE FUNDOS DE INVESTIMENTO EM AÇÕES - RESPONSABILIDADE LIMITADA, inscrito no CNPJ sob o nº 11.977.794/0001-64, doravante designada CLASSE INVESTIDA. Os 5% (cinco por cento) remanescentes de seu patrimônio líquido podem ser aplicados em: a) títulos de emissão do Tesouro Nacional e/ou operações compromissadas lastreadas nesses títulos; b) ativos financeiros de renda fixa de emissão de instituição financeira; c) cotas de classe de FIF classificadas como "Renda Fixa" Curto Prazo, Referenciado ou Simples.',
+    condicoesComerciais: {
+      aplicacaoInicial: 'R$ 5.000,00',
+      investimentoAdicionalMinimo: 'R$ 1.000,00',
+      resgateMinimo: 'R$ 1.000,00',
+      saldoMinimoPermanencia: 'R$ 1.000,00',
+      tipoCota: 'Fechamento',
+      carencia: 'Não há',
+      cotaAplicacao: 'D+1 dias úteis',
+      cotaResgate: 'D+30 dias corridos',
+      debitoContaCorrente: 'D+0',
+      creditoContaCorrente: 'D+35 (30 dias corridos + 5 dias úteis)',
+      horarioLimite: 'Até as 15:00h',
+      pf: true,
+      pj: true,
+    },
+    taxas: {
+      taxaGlobal: '3,00 % a.a.',
+      taxaPerformance: 'Não há',
+      taxaIngresso: 'Não há',
+      taxaSaida: 'Não há',
+    },
+    prestadoresServicos: {
+      administradorFiduciario: 'Banestes DTVM S.A.',
+      gestorRecursos: 'Banestes DTVM S.A.',
+      tesourariaControleProcessamento: 'Banestes DTVM S.A.',
+      escrituracaoEmissaoResgate: 'Banestes DTVM S.A.',
+      custodiaAtivosFinanceiros: 'Banestes S.A.',
+      distribuicaoCotas: 'Banestes S.A.',
+      auditorIndependente: 'RSM Brasil Auditores Independentes',
+    },
+    tributacao: {
+      iof: {
+        titulo: 'IOF',
+        descricao: 'Atualmente, os resgates de cotas dos fundos de investimento em ações estão isentos de Imposto Sobre Operações Financeiras (IOF).',
+      },
+      ir: {
+        titulo: 'IR',
+        descricao: 'Os cotistas do Fundo sofrerão tributação na fonte, exclusivamente no resgate de cotas, sobre o rendimento auferido no período, à alíquota de 15% (quinze por cento).',
+      },
+      tabelaLongoPrazo: null,
+      tabelaCurtoPrazo: null,
+      observacao: null,
+    },
+    documentos: [
+      { titulo: 'Declarações Complementares do Investidor', url: '/investimentos/pdf/declaracao_investidor.pdf' },
+      { titulo: 'Demonstração de Desempenho', url: '/investimentos/pdf/desempenho_DD_FDB.pdf' },
+      { titulo: 'Lâmina', url: '/investimentos/pdf/lamina_btg_pactual_absoluto.pdf' },
+      { titulo: 'Material Publicitário', url: '/investimentos/pdf/publicitario_btg.pdf' },
+      { titulo: 'Política de Exercício de Direito de Voto em Assembleia', url: '/investimentos/pdf/politica_exercicio_direito_voto_assembleia.pdf' },
+      { titulo: 'Principais Fatores de Risco do Fundo', url: '/investimentos/pdf/risco-Absoluto-Institucional.pdf' },
+      { titulo: 'Regulamento', url: '/investimentos/pdf/regulamento_btg.pdf' },
+      { titulo: 'Rentabilidade e Carteira', url: '/investimentos/pdf/rentabilidade_BTG_Pactual_Absoluto.pdf' },
+      { titulo: 'Sumário de Remuneração', url: '/investimentos/pdf/sumario_btg_.pdf' },
+      { titulo: 'Termo de Adesão', url: '/investimentos/pdf/adesao_btg.pdf' },
+    ],
+    demonstracoesContabeis: [
+      { titulo: 'Exercício 2024', url: '/institucional/demonstracoes/fundos_investimento/2024/demoCon_Absoluto-2024.pdf' },
+      { titulo: 'Exercício 2023', url: '/institucional/demonstracoes/fundos_investimento/2023/BTG_Absoluto-2023.pdf' },
+      { titulo: 'Exercício 2022', url: '/institucional/demonstracoes/fundos_investimento/2022/BTG_Absoluto-2022.pdf' },
+      { titulo: 'Exercício 2021', url: '/institucional/demonstracoes/fundos_investimento/2021/BTG_Absoluto-2021.pdf' },
+      { titulo: 'Exercício 2020', url: '/institucional/demonstracoes/fundos_investimento/2020/btg-pactual-2020.pdf' },
+      { titulo: 'Exercício 2019', url: '/institucional/demonstracoes/fundos_investimento/2019/btg-pactual-2019.pdf' },
+      { titulo: 'Exercício 2018', url: '/institucional/demonstracoes/fundos_investimento/2018/btg-pactual-2018.pdf' },
+      { titulo: 'Exercício 2017', url: '/institucional/demonstracoes/fundos_investimento/2017/btg-pactual-2017.pdf' },
+      { titulo: 'Exercício 2016', url: '/institucional/demonstracoes/fundos_investimento/2016/btg_pactual2016.pdf' },
+      { titulo: 'Exercício 2015', url: '/institucional/demonstracoes/fundos_investimento/2015/btg_pactual2015.pdf' },
+      { titulo: 'Exercício 2014', url: '/institucional/demonstracoes/fundos_investimento/2014/btg_pactual2014.pdf' },
+    ],
+    comunicados: [
+      { data: '12.02.2026', titulo: 'Funcionamento no Feriado de Carnaval 2026 - Fundos de Investimento.', url: '/investimentos/pdf/comunicados/comunicado_12_02_2026.pdf' },
+      { data: '12.02.2026', titulo: 'Funcionamento no Feriado de Carnaval 2026 - Fundos de Investimento.', url: '/investimentos/pdf/comunicados/comunicado_12_02_2026.pdf' },
+      { data: '16.12.2025', titulo: 'Procedimentos Final do Ano - Fundos de Investimento', url: '/investimentos/pdf/comunicados/final-ano-16-12-25.pdf' },
+      { data: '12.06.2025', titulo: 'Adaptação do Regulamento aos termos da Resolução CVM nº 175', url: '/investimentos/pdf/comunicados/15_btg_absoluto_comunicado.pdf' },
+      { data: '29.05.2025', titulo: 'Ata da Assembleia Geral de Cotistas', url: '/investimentos/pdf/comunicados/15BTGABSOLUTO-ATA.pdf' },
+      { data: '29.05.2025', titulo: 'Resumo das Deliberações da Assembleia Geral de Cotistas', url: '/investimentos/pdf/comunicados/15BTGABSOLUTO-ResumodasDelibera.pdf' },
+      { data: '15.04.2025', titulo: 'Instruções para realização do Voto Eletrônico', url: '/investimentos/pdf/comunicados/15BTGABSOLUTO-TextoEmail.pdf' },
+      { data: '15.04.2025', titulo: 'Edital de Convocação - Assembleia Geral de Cotistas', url: '/investimentos/pdf/comunicados/15BTGABSOLUTO-Edital_de_Convocação.pdf' },
+      { data: '27.02.2025', titulo: 'Funcionamento no Feriado de Carnaval 2025 - Fundos de Investimento', url: '/investimentos/pdf/comunicados/comunicado_27_02_2025.pdf' },
+      { data: '16.12.2024', titulo: 'Procedimentos Final do Ano - Fundos de Investimento', url: '/investimentos/pdf/comunicados/invest_comunicado_16_12_2024.pdf' },
+      { data: '25.04.2024', titulo: 'Resumo das Deliberações da Assembleia Geral Ordinária', url: '/investimentos/pdf/comunicados/btg_resumo_AGO_04_29_24.pdf' },
+      { data: '25.04.2024', titulo: 'Ata da Assembleia Geral Ordinária', url: '/investimentos/pdf/comunicados/btg_ata_AGO_04_29_24.pdf' },
+      { data: '02.04.2024', titulo: 'Instruções para realização do Voto Eletrônico', url: '/investimentos/pdf/comunicados/btg_instrucoes_03_04_24.pdf' },
+      { data: '02.04.2024', titulo: 'Edital de Convocação - Assembleia Geral Ordinária', url: '/investimentos/pdf/comunicados/edital_AGO_02_04_24.pdf' },
+      { data: '14.02.2024', titulo: 'Envio de Convocações de Assembleias por Meio Eletrônico', url: '/investimentos/pdf/comunicados/comunicado_envio_de_e-mail_14_02_24.pdf' },
+      { data: '07.02.2024', titulo: 'Funcionamento no Feriado de Carnaval 2024 - Fundos de Investimento', url: '/investimentos/pdf/comunicados/comunicado_fundos_carnaval_07_02_24.pdf' },
+      { data: '26.12.2023', titulo: 'Fato Relevante: Procedimentos Final do Ano', url: '/investimentos/pdf/comunicados/comunicado_fato_relevante_12_26_23.pdf' },
+      { data: '28.04.2023', titulo: 'Resumo das Deliberações das Assembleias Gerais Ordinária e Extraordinária', url: '/investimentos/pdf/comunicados/AGO_05_03_2023.pdf' },
+      { data: '31.03.2023', titulo: 'Minuta de Alteração de Regulamento.', url: '/investimentos/pdf/comunicados/comunicado_minuta_regulamento_btg.pdf' },
+      { data: '31.03.2023', titulo: 'Edital de Convocação - Assembleias Gerais Ordinária e Extraordinária.', url: '/investimentos/pdf/comunicados/comunicado_Edital_Absoluto_27_04_23.pdf' },
+      { data: '23.03.2023', titulo: 'Deliberações - AGE de cotistas do BTG PACTUAL ABSOLUTO INSTITUCIONAL FUNDO DE INVESTIMENTO EM QUOTAS DE FUNDOS DE INVESTIMENTO DE AES realizada em 23/03/2023.', url: '/investimentos/pdf/comunicados/ata_2023_05_04-01.pdf' },
+      { data: '17.02.2023', titulo: 'Fato Relevante', url: '/investimentos/pdf/comunicados/fato_relevante_2023_02_17-01.pdf' },
+      { data: '17.02.2023', titulo: 'Resumo das Deliberações da Assembleia Geral Extraordinária', url: '/investimentos/pdf/comunicados/invest_comunicado_absoluto_2021_02_17-01.pdf' },
+      { data: '16.02.2023', titulo: 'Funcionamento dos Fundos de Investimento durante o feriado de Carnaval', url: '/investimentos/pdf/comunicados/invest_comunicado_2023_02_16.pdf' },
+      { data: '30.01.2023', titulo: 'Minuta de Alteração de Regulamento', url: '/investimentos/pdf/comunicados/2023-minuta-btg-absoluto.pdf' },
+      { data: '30.01.2023', titulo: 'Edital de Convocação - Assembleia Geral Extraordinária', url: '/investimentos/pdf/comunicados/AGE-absoluto-2023.pdf' },
+      { data: '20.01.2023', titulo: 'Fato Relevante', url: '/investimentos/pdf/comunicados/fato_relevante_2023_01_20-02.pdf' },
+      { data: '20.01.2023', titulo: 'Fato Relevante', url: '/investimentos/pdf/comunicados/fato_relevante_2023_01_20-btg-absoluto.pdf' },
+      { data: '12.01.2023', titulo: 'Fato Relevante', url: '/investimentos/pdf/comunicados/fato_relevante_2023_01_12.pdf' },
+      { data: '26.12.2022', titulo: 'Fato Relevante', url: '/investimentos/pdf/comunicados/fato_relevante_2022_12_26.pdf' },
+      { data: '22.12.2022', titulo: 'Procedimentos Final do Ano - Fundos de Investimento', url: '/investimentos/pdf/comunicados/invest_comunicado_2022_12_22.pdf' },
+      { data: '28.04.2022', titulo: 'Resumo das Deliberações das Assembleias Gerais Ordinária e Extraordinária', url: '/investimentos/pdf/comunicados/resumoAGOE_btg_2022_04_28.pdf' },
+      { data: '28.04.2022', titulo: 'Fato Relevante', url: '/investimentos/pdf/comunicados/fato_relevante_btg_2022_04_28.pdf' },
+      { data: '06.04.2022', titulo: 'Fato Relevante', url: '/investimentos/pdf/comunicados/fato_relevante_2022_04_06.pdf' },
+      { data: '06.04.2022', titulo: 'Minuta de Alteração de Regulamento', url: '/investimentos/pdf/comunicados/minuta_btg_2022_04_06.pdf' },
+      { data: '06.04.2022', titulo: 'Edital de Convocação - Assembleias Gerais Ordinária e Extraordinária', url: '/investimentos/pdf/comunicados/AGE_btg_2022_04_06.pdf' },
+      { data: '21.02.2022', titulo: 'Funcionamento no Feriado de Carnaval 2022 - Fundos de Investimento', url: '/investimentos/pdf/comunicados/invest_comunicado_2022_02_21.pdf' },
+      { data: '21.12.2021', titulo: 'Procedimentos Final do Ano - Fundos de Investimento', url: '/investimentos/pdf/comunicados/invest_comunicado_2021_12_21.pdf' },
+      { data: '13.05.2021', titulo: 'Resumo das Deliberações da Assembleia Geral Ordinária', url: '/investimentos/pdf/comunicados/invest_comunicado_absoluto_2021_05_13-01.pdf' },
+      { data: '05.04.2021', titulo: 'Assembleia Geral Ordinária - Consulta Formal', url: '/investimentos/pdf/comunicados/invest_comunicado_2021_04_05-12.pdf' },
+      { data: '12.02.2021', titulo: 'Funcionamento no feriado de carnaval 2021- Fundos de Investimento', url: '/investimentos/pdf/comunicados/invest_comunicado_2021_02_12.pdf' },
+      { data: '22.12.2020', titulo: 'Procedimentos Final de Ano - Fundos de Investimento', url: '/investimentos/pdf/comunicados/comunicado-2020.pdf' },
+      { data: '30.07.2020', titulo: 'Resumo das Deliberações da Assembleia Geral Ordinária', url: '/investimentos/pdf/comunicados/AGO-deliberacoes-consultaFormal-absoluto.pdf' },
+      { data: '28.07.2020', titulo: 'Assembleia Geral Ordinária - Consulta Formal', url: '/investimentos/pdf/comunicados/AGO-consulta-2020.07-absoluto.pdf' },
+      { data: '01.11.2019', titulo: 'Fato relevante', url: '/investimentos/pdf/2019/2019-fato-relevante-btg-absoluto.pdf' },
+      { data: '20.05.2019', titulo: 'Resumo das Deliberações das Assembleias Gerais Ordinária e Extraordinária', url: '/investimentos/pdf/2019/AGE-resumo-BTG-20-05-2019.pdf' },
+      { data: '22.04.2019', titulo: 'Minuta de Alteração de Regulamento', url: '/investimentos/pdf/2019/2019-minuta-btg-absoluto.pdf' },
+      { data: '18.04.2019', titulo: 'Edital de Convocação - Assembleia Geral Ordinária e Extraordinária', url: '/investimentos/pdf/2019/AGE-absoluto-2019.pdf' },
+      { data: '09.05.2018', titulo: 'Resumo das deliberações da Assembleia Geral Ordinária', url: '/investimentos/pdf/2018/AGO-resumo-deliberacoes-btg.pdf' },
+      { data: '06.04.2018', titulo: 'Edital de Convocação - Assembleia Geral Ordinária', url: '/investimentos/pdf/2018/AGE-absoluto-2018.pdf' },
+      { data: '21.03.2018', titulo: 'Resumo das Deliberações da Assembleia Geral Extraordinária', url: '/investimentos/pdf/2018/age-2018.03.21-FIC-FIA-BTG.pdf' },
+      { data: '09.03.2018', titulo: 'Minuta de Alteração de Regulamento', url: '/investimentos/pdf/2018/minuta-banestes-FIC-FIA-BTG.pdf' },
+      { data: '09.03.2018', titulo: 'Edital de Convocação - Assembleia Geral Extraordinária', url: '/investimentos/pdf/2018/AGE-edital-banestes-FIC-FIA-BTG.pdf' },
+      { data: '16.11.2017', titulo: 'Alteração do Regulamento', url: '/investimentos/pdf/comunicados/comunicado-2017.11.16-BTGAbsoluto.pdf' },
+      { data: '01.09.2017', titulo: 'Interrupção do envio de extrato por meio físico', url: '/investimentos/pdf/comunicados/comunicado-2017.09.01-BTGAbsoluto.pdf' },
+      { data: '18.04.2017', titulo: 'Edital de Convocação - Assembleia Geral Ordinária', url: '/investimentos/pdf/comunicados/btg-pactual-dividendos-age-180417.pdf' },
+      { data: '15.03.2017', titulo: 'Minuta de Alteração de Regulamento', url: '/investimentos/pdf/comunicados/btg-pactual-dividendos-minuta-170315.pdf' },
+      { data: '15.03.2017', titulo: 'Edital de Convocação - Assembleia Geral Extraordinária', url: '/investimentos/pdf/comunicados/btg-pactual-dividendos-age-170315.pdf' },
+      { data: '22.04.2016', titulo: 'Minuta de alteração do Regulamento', url: '/investimentos/pdf/comunicados/minuta-regulamento-dividendos-2016_04_22.pdf' },
+      { data: '18.04.2016', titulo: 'Assembleias Gerais Ordinária e Extraordinária', url: '/investimentos/pdf/comunicados/dividendos-age-ago-2016_04_18.pdf' },
+      { data: '30.09.2015', titulo: 'ATA Assembleia Geral Extraordinária', url: '/investimentos/pdf/comunicados/btg-pactual-dividendos-age-300915.pdf' },
+      { data: '11.09.2015', titulo: 'Minuta de Alteração de Regulamento', url: '/investimentos/pdf/comunicados/btg-pactual-dividendos-minuta-150911.pdf' },
+      { data: '11.09.2015', titulo: 'Edital de Convocação - Assembleia Geral Extraordinária', url: '/investimentos/pdf/comunicados/btg-pactual-dividendos-age-150911.pdf' },
+    ],
+  },
+};
+
 /**
  * Serve a página de log/status como Web App.
  */
@@ -378,11 +530,11 @@ function computeHash(str) {
  * Recalcula a coluna PODE_SIMULAR (col D) da aba PodeSimular inteiramente
  * no backend, sem usar fórmulas na célula.
  *
- * Regra (equivalente ao IF que estava na célula):
- *   • Fundo em FUNDO_SEMPRE_NAO → preserva 'Não' fixo (nunca recalcula)
+ * Equivalência exata com a lógica original da planilha:
+ *   • Fundo em NOME_SITE_SEMPRE_NAO → "Não" fixo (igual às células sem fórmula)
  *   • DATA_INICIO vazia → preserva valor existente em col D
- *   • DATA_INICIO preenchida e fundo com ≥ 1 ano de operação → "Sim"
- *   • DATA_INICIO preenchida e fundo com < 1 ano de operação → "Não"
+ *   • DATA_INICIO preenchida → =SE(DATADIF(C;HOJE();"Y")>0;"Sim";"Não")
+ *     Conta anos calendario completos: > 0 = pelo menos 1 ano completo = "Sim"
  *
  * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
  */
@@ -394,25 +546,30 @@ function atualizarColunaPodeSimular(ss) {
   var hoje = new Date();
 
   for (var i = 1; i < data.length; i++) {
-    var fundId = String(data[i][0] || '').trim(); // col A: ID_FUNDO
+    var nomeSite = String(data[i][0] || '').trim(); // col A: NOME_SITE
     // Fundos que nunca podem simular: manter 'Não' fixo, independente da data
-    if (FUNDO_SEMPRE_NAO[fundId]) {
+    if (NOME_SITE_SEMPRE_NAO[nomeSite]) {
       sheet.getRange(i + 1, 4).setValue('Não');
       continue;
     }
 
     var dataInicio = data[i][2]; // col C: DATA_INICIO
-    // When no date is set, preserve whatever value is already in col D
-    // (allows initial 'Sim' entries to be kept until COAFI data arrives).
+    // Sem data preenchida: preserva o valor já existente em col D
     if (!dataInicio) continue;
 
     var dt = (dataInicio instanceof Date) ? dataInicio : new Date(dataInicio);
-    // Guard against invalid dates (e.g. unexpected text in column C)
+    // Proteção contra datas inválidas (ex: texto inesperado na coluna C)
     if (isNaN(dt.getTime())) continue;
 
-    // Use 365 days to match the behaviour of the original DATADIF formula
-    var anos = (hoje - dt) / (365 * 24 * 60 * 60 * 1000);
-    sheet.getRange(i + 1, 4).setValue(anos >= 1 ? 'Sim' : 'Não');
+    // Equivalente exato a =SE(DATADIF(C;HOJE();"Y")>0;"Sim";"Não")
+    // Conta anos calendario completos entre DATA_INICIO e HOJE.
+    var startYear  = dt.getFullYear(),  startMonth  = dt.getMonth(),  startDay  = dt.getDate();
+    var todayYear  = hoje.getFullYear(), todayMonth  = hoje.getMonth(), todayDay  = hoje.getDate();
+    var anosCompletos = todayYear - startYear;
+    if (todayMonth < startMonth || (todayMonth === startMonth && todayDay < startDay)) {
+      anosCompletos--;
+    }
+    sheet.getRange(i + 1, 4).setValue(anosCompletos > 0 ? 'Sim' : 'Não');
   }
 }
 
@@ -420,11 +577,13 @@ function atualizarColunaPodeSimular(ss) {
  * Recalcula as colunas PODE_SIMULAR_NOVO (col F) e TAXA_NOVA (col G) da aba
  * Inicial inteiramente no backend, sem usar fórmulas nas células.
  *
- * Equivalência com as fórmulas que estavam nas células:
- *   Col F: =IFERROR(VLOOKUP(B,PodeSimular!A:D,4,FALSE), D)
- *   Col G: =SE(F="Sim";CONCATENAR(PROCV(B;TaxaNova!A:C;3;FALSO);"%");"")
- *          Produz "XX,XX%" quando podeSimNovo="Sim" e taxa > 0; vazio caso contrário.
- *          A aba TaxaNova armazena os valores como número percentual (ex: 35.80 para 35,80%).
+ * Equivalência exata com as fórmulas originais:
+ *   Col F: =PROCV(C; PodeSimular!A:D; 4; 0)
+ *           Busca o NOME_FUNDO (col C) na col A (NOME_SITE) de PodeSimular,
+ *           retorna col D (PODE_SIMULAR). Fallback: valor atual de col D desta aba.
+ *   Col G: =SE(F="Sim"; CONCATENAR(PROCV(C; TaxaNova!A:C; 3; FALSO); "%"); "")
+ *           Busca o NOME_FUNDO (col C) na col A (NOME_SITE) de TaxaNova,
+ *           retorna col C (TAXA_NOVA) formatado como "XX,XX%".
  *
  * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
  */
@@ -432,42 +591,42 @@ function atualizarColunasInicial(ss) {
   var inicialSheet = ss.getSheetByName(CONFIG.SHEET_INICIAL);
   if (!inicialSheet || inicialSheet.getLastRow() < 2) return;
 
-  // Mapa ID → PODE_SIMULAR (col D) da aba PodeSimular
+  // Mapa NOME_SITE → PODE_SIMULAR (col D) da aba PodeSimular
+  // Chave = col A (NOME_SITE), equivalente à busca PROCV(C; PodeSimular!A:D; 4; 0)
   var podeSimMap = {};
   var psSheet = ss.getSheetByName(CONFIG.SHEET_PODE_SIM);
   if (psSheet && psSheet.getLastRow() >= 2) {
     var psData = psSheet.getDataRange().getValues();
     for (var p = 1; p < psData.length; p++) {
-      var psId = String(psData[p][0] || '').trim();
-      if (psId) podeSimMap[psId] = String(psData[p][3] || '').trim();
+      var psNome = String(psData[p][0] || '').trim(); // col A: NOME_SITE
+      if (psNome) podeSimMap[psNome] = String(psData[p][3] || '').trim(); // col D
     }
   }
 
-  // Mapa ID → TAXA_NOVA (col C, percentual numérico como 35.80) da aba TaxaNova
+  // Mapa NOME_SITE → TAXA_NOVA (col C, número percentual como 35.80) da aba TaxaNova
+  // Chave = col A (NOME_SITE), equivalente à busca PROCV(C; TaxaNova!A:C; 3; FALSO)
   var taxaNovaMap = {};
   var tnSheet = ss.getSheetByName(CONFIG.SHEET_TAXA_NOVA);
   if (tnSheet && tnSheet.getLastRow() >= 2) {
     var tnData = tnSheet.getDataRange().getValues();
     for (var t = 1; t < tnData.length; t++) {
-      var tnId = String(tnData[t][0] || '').trim();
-      if (tnId) taxaNovaMap[tnId] = tnData[t][2];
+      var tnNome = String(tnData[t][0] || '').trim(); // col A: NOME_SITE
+      if (tnNome) taxaNovaMap[tnNome] = tnData[t][2]; // col C
     }
   }
 
   var inicialData = inicialSheet.getDataRange().getValues();
   var fgValues = [];
   for (var i = 1; i < inicialData.length; i++) {
-    var fundId       = String(inicialData[i][1] || '').trim(); // col B: ID_FUNDO
+    var nomeSite     = String(inicialData[i][2] || '').trim(); // col C: NOME_FUNDO (nome_site)
     var podeSimAtual = String(inicialData[i][3] || '').trim(); // col D: fallback
 
-    // Col F: PODE_SIMULAR_NOVO — lookup em PodeSimular; fallback: col D desta aba
-    var podeSimNovo = podeSimMap.hasOwnProperty(fundId) ? podeSimMap[fundId] : podeSimAtual;
+    // Col F: =PROCV(C; PodeSimular!A:D; 4; 0) — busca por nome_site
+    var podeSimNovo = podeSimMap.hasOwnProperty(nomeSite) ? podeSimMap[nomeSite] : podeSimAtual;
 
-    // Col G: TAXA_NOVA — equivalente à fórmula original:
-    //   =SE(F2="Sim";CONCATENAR(PROCV(C2;TaxaNova!A:C;3;FALSO);"%");"")
-    // Formata como "XX,XX%" quando podeSimNovo="Sim" e o valor for válido; caso contrário, vazio.
-    // A aba TaxaNova armazena o valor como número percentual (ex: 35.80 para 35,80%).
-    var taxaNovaRaw = taxaNovaMap.hasOwnProperty(fundId) ? taxaNovaMap[fundId] : '';
+    // Col G: =SE(F="Sim"; CONCATENAR(PROCV(C; TaxaNova!A:C; 3; FALSO); "%"); "")
+    // Busca por nome_site; formata como "XX,XX%" quando podeSimNovo="Sim".
+    var taxaNovaRaw = taxaNovaMap.hasOwnProperty(nomeSite) ? taxaNovaMap[nomeSite] : '';
     var taxaNovaFormatada = '';
     if (podeSimNovo === 'Sim') {
       var taxaNum = Number(taxaNovaRaw);
@@ -488,13 +647,15 @@ function atualizarColunasInicial(ss) {
  * Lê a aba COAFI (importada via IMPORTRANGE do GEART/RENTABILIDADE) e atualiza:
  *   • Aba PodeSimular col C (DATA_INICIO) — equivalente à fórmula original
  *       =PROCV(B; COAFI!B:E; 4; FALSO)
+ *       onde col B de PodeSimular = "Nome Planilha COAFI" (nome completo na col B do COAFI)
  *   • Aba TaxaNova col C (TAXA_NOVA) — equivalente à fórmula original
  *       =TEXTO(PROCV(B; COAFI!B:AR; 43; FALSO); "0.00")
+ *       onde col B de TaxaNova = "Nome Planilha COAFI" (nome curto na col B do COAFI)
  *
  * Estrutura da aba COAFI (dados do GEART/RENTABILIDADE!A:AR):
  *   Col B (índice 1)   = nome do fundo (chave de lookup)
  *   Col E (índice 4)   = DATA_INICIO   (seção "INFORMAÇÕES COMPLEMENTARES")
- *   Col AR (índice 43) = TAXA_NOVA "12 meses" (seção de rentabilidade)
+ *   Col AR (índice 43) = rentabilidade acumulada "12 meses"
  *
  * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
  */
@@ -516,19 +677,17 @@ function atualizarDadosDeCoafi(ss) {
     var row  = coafiData[i];
     var nome = String(row[COL_B_NOME] || '').trim();  // col B
     if (!nome) continue;
-    // col E = DATA_INICIO na seção INFORMAÇÕES COMPLEMENTARES
     mapaInicio[nome] = row[COL_E_INICIO];
-    // col AR = "12 meses" acumulado na seção de rentabilidade
     mapaTaxa[nome]   = row.length > COL_AR_12MESES ? row[COL_AR_12MESES] : undefined;
   }
 
   // ── Atualiza PodeSimular col C (DATA_INICIO) ──────────────────────────────
+  // Equivalente a =PROCV(B; COAFI!B:E; 4; FALSO) onde B = col B de PodeSimular (NOME_COAFI)
   var psSheet = ss.getSheetByName(CONFIG.SHEET_PODE_SIM);
   if (psSheet && psSheet.getLastRow() >= 2) {
     var psData = psSheet.getDataRange().getValues();
     for (var p = 1; p < psData.length; p++) {
-      var fundId    = String(psData[p][0] || '').trim();
-      var coafiNome = FUND_ID_TO_COAFI_INICIO[fundId];
+      var coafiNome = String(psData[p][1] || '').trim(); // col B: NOME_COAFI
       if (!coafiNome || !mapaInicio.hasOwnProperty(coafiNome)) continue;
       var dataVal = mapaInicio[coafiNome];
       if (dataVal != null && dataVal !== '') {
@@ -538,12 +697,12 @@ function atualizarDadosDeCoafi(ss) {
   }
 
   // ── Atualiza TaxaNova col C (TAXA_NOVA) ───────────────────────────────────
+  // Equivalente a =TEXTO(PROCV(B; COAFI!B:AR; 43; FALSO); "0.00") onde B = col B de TaxaNova
   var tnSheet = ss.getSheetByName(CONFIG.SHEET_TAXA_NOVA);
   if (tnSheet && tnSheet.getLastRow() >= 2) {
     var tnData = tnSheet.getDataRange().getValues();
     for (var t = 1; t < tnData.length; t++) {
-      var fId           = String(tnData[t][0] || '').trim();
-      var coafiNomeTaxa = FUND_ID_TO_COAFI_TAXA[fId];
+      var coafiNomeTaxa = String(tnData[t][1] || '').trim(); // col B: NOME_COAFI (nome curto)
       if (!coafiNomeTaxa || !mapaTaxa.hasOwnProperty(coafiNomeTaxa)) continue;
       var taxaVal = mapaTaxa[coafiNomeTaxa];
       if (taxaVal != null && taxaVal !== '') {
@@ -663,10 +822,15 @@ function obterDadosFundos() {
       taxaSimulacao = parseTaxaPercent(taxaAtualStr);
     }
 
+    // Taxa formatada para saída no JSON (ex: "35,80%") — campo dinâmico de condicoesComerciais
+    var taxaNovaFormatada = (podeSimNovo === 'Sim') ? (taxaNovaStr || taxaAtualStr) : '';
+
     // Rentabilidade da aba Fundos (se disponível)
     var rent = rentMap[d.FNDCD] || { RENT_DIARIA: 0, RENT_MENSAL: 0, RENT_ANUAL: 0 };
 
     fundos.push({
+      FUND_ID:      fundId,
+      TAXA_NOVA_FORMATADA: taxaNovaFormatada,
       FNDCD:        d.FNDCD,
       NOME:         nomePlanilha || d.NOME,
       FNDCTFND:     d.FNDCTFND,
@@ -737,6 +901,13 @@ function obterDadosFallback(ss) {
   var data = sheet.getDataRange().getValues();
   if (data.length < 2) return [];
   var headers = data[0];
+  // Mapa reverso: FNDCD → ID do fundo (para enriquecimento com FUND_RICH_DATA)
+  var fndcdToId = {};
+  for (var k in FUND_DATA) {
+    var cd = FUND_DATA[k].FNDCD;
+    if (cd) fndcdToId[cd] = k;
+  }
+
   var fundos = [];
   for (var i = 1; i < data.length; i++) {
     var row = data[i];
@@ -744,6 +915,9 @@ function obterDadosFallback(ss) {
     var f = {};
     headers.forEach(function (h, idx) { f[h] = row[idx]; });
     f.PODE_SIMULAR = (Number(f.FNDTXSIMU) > 0) ? 'Sim' : 'Não';
+    f.FUND_ID = fndcdToId[Number(f.FNDCD)] || '';
+    f.TAXA_NOVA_FORMATADA = (f.PODE_SIMULAR === 'Sim' && Number(f.FNDTXSIMU) > 0)
+      ? (Number(f.FNDTXSIMU) * 100).toFixed(2).replace('.', ',') + '%' : '';
     fundos.push(f);
   }
   return fundos;
@@ -919,45 +1093,45 @@ function _criarAbaCoafi(ss) {
 }
 
 /**
- * Cria a aba PodeSimular com todos os 26 fundos de FUND_DATA.
- * Coluna D (PODE_SIMULAR): calculada pelo backend a partir de DATA_INICIO —
- * "Sim" se o fundo tiver ≥ 1 ano de operação, "Sim" como padrão enquanto
- * DATA_INICIO não estiver preenchida.
+ * Cria a aba PodeSimular com todos os 26 fundos.
+ * Estrutura idêntica à planilha original:
+ *   Col A (NOME_SITE):    nome completo do fundo como exibido no site
+ *   Col B (NOME_COAFI):   nome do fundo na planilha COAFI (col B do GEART) — chave do PROCV de DATA_INICIO
+ *   Col C (DATA_INICIO):  preenchida por atualizarDadosDeCoafi() via lookup na aba COAFI
+ *   Col D (PODE_SIMULAR): "Não" fixo para fundos em NOME_SITE_SEMPRE_NAO;
+ *                         para os demais, calculado por atualizarColunaPodeSimular()
+ *                         via DATADIF(C; HOJE(); "Y") > 0
  */
 function _criarAbaPodeSimular(ss) {
-  var headers = ['ID_FUNDO', 'NOME_FUNDO', 'DATA_INICIO', 'PODE_SIMULAR'];
-  // Order matches the original "PodeSimular" spreadsheet tab (A2:A27).
-  // Column 4 (PODE_SIMULAR) contains the correct initial value:
-  //   'Não' — hardcoded funds that must never simulate regardless of age.
-  //   'Sim' — funds whose eligibility is determined by their start date;
-  //            atualizarColunaPodeSimular() will recalculate when DATA_INICIO is filled.
+  var headers = ['NOME_SITE', 'NOME_COAFI', 'DATA_INICIO', 'PODE_SIMULAR'];
+  // Ordem igual à aba original: col A = "Nome site", col B = "Nome Planilha COAFI"
   var staticRows = [
-    ['invest_investpublic',                            'Banestes Invest Public Automático FIF CP RL',                                       '', 'Não'],
-    ['invest_investmoney',                             'Banestes Invest Money FIF Renda Fixa RL',                                           '', 'Sim'],
-    ['invest_investidor',                              'Banestes Investidor Automático FIF Renda Fixa CP RL',                               '', 'Não'],
-    ['invest-vitoria-500',                             'Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',                     '', 'Sim'],
-    ['invest_vipdi',                                   'Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                          '', 'Sim'],
-    ['invest_institucional',                           'Banestes Institucional FIF Renda Fixa RL',                                          '', 'Sim'],
-    ['invest_previdenciario',                          'Banestes IMA-B Títulos Públicos FIF Renda Fixa RL',                                 '', 'Não'],
-    ['banestes_tesouro_fi_renda_fixa_referenciado_di', 'Banestes Tesouro FIF Renda Fixa Referenciado DI RL',                                '', 'Não'],
-    ['invest_solidez',                                 'Banestes Solidez Automático FIF Renda Fixa CP RL',                                  '', 'Não'],
-    ['invest_btg_pactual_absoluto',                    'Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',               '', 'Sim'],
-    ['invest-valores',                                 'Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',                '', 'Sim'],
-    ['invest_liquidez_referenciado',                   'Banestes Liquidez FIF Renda Fixa Referenciado DI RL',                               '', 'Sim'],
-    ['invest_referencial',                             'Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL',                               '', 'Não'],
-    ['invest_debentures',                              'Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',        '', 'Sim'],
-    ['invest-estrategia',                              'Banestes Estratégia FIC de FIF Renda Fixa RL',                                      '', 'Sim'],
-    ['invest_dividendos',                              'Banestes Dividendos FIC de FIF de Ações RL',                                        '', 'Sim'],
-    ['invest_funses',                                  'Banestes FUNSES Multimercado RL',                                                   '', 'Não'],
-    ['invest_facil',                                   'Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',                 '', 'Sim'],
-    ['invest_cred_corp',                               'Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',                 '', 'Sim'],
-    ['invest_ima-b5',                                  'Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',                             '', 'Sim'],
-    ['invest_multiestrategia',                         'Banestes Multiestratégia FIC de FIF Multimercado RL',                               '', 'Sim'],
-    ['invest_selection',                               'Banestes Selection FI Renda Fixa CP RL',                                            '', 'Sim'],
-    ['invest_fundo_reserva_climatica',                 'Banestes Reserva Climática FIF RF Referenciado DI RL',                              '', 'Sim'],
-    ['invest_soberano',                                'Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL',           '', 'Não'],
-    ['invest_tenax',                                   'Banestes Tenax Ações FIF em Cotas de FIA RL',                                       '', 'Não'],
-    ['invest_Synergy',                                 'Banestes Synergy Long Only FIF em Cotas de FIA RL',                                 '', 'Não'],
+    ['Banestes Invest Public Automático FIF CP RL',                                      'Banestes Invest Public Automático FI',                                                                                      '', 'Não'],
+    ['Banestes Invest Money FIF Renda Fixa RL',                                          'Banestes Invest Money FI RF',                                                                                               '', 'Sim'],
+    ['Banestes Investidor Automático FIF Renda Fixa CP RL',                              'Banestes Investidor Automático FI',                                                                                         '', 'Não'],
+    ['Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',                    'Banestes Vitória 500 FIC RF DI',                                                                                            '', 'Sim'],
+    ['Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                         'Banestes Vip Di FIC RF DI',                                                                                                 '', 'Sim'],
+    ['Banestes Institucional FIF Renda Fixa RL',                                         'Banestes Institucional FI RF',                                                                                              '', 'Sim'],
+    ['Banestes IMA-B Títulos Públicos FIF Renda Fixa RL',                                'Banestes IMA-B Títulos Públicos FI RF',                                                                                     '', 'Não'],
+    ['Banestes Tesouro FIF Renda Fixa Referenciado DI RL',                               'Banestes Tesouro FI RF DI',                                                                                                 '', 'Não'],
+    ['Banestes Solidez Automático FIF Renda Fixa CP RL',                                 'Banestes Solidez Automático FI',                                                                                            '', 'Não'],
+    ['Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',              'Banestes BTG Pactual Inst. Absoluto',                                                                                        '', 'Sim'],
+    ['Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',               'Banestes Valores FIC RF DI',                                                                                                '', 'Sim'],
+    ['Banestes Liquidez FIF Renda Fixa Referenciado DI RL',                              'Banestes Liquidez FI RF REF DI',                                                                                            '', 'Sim'],
+    ['Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL',                              'Banestes IRF-M 1Títulos Públicos RF',                                                                                       '', 'Não'],
+    ['Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',       'Banestes Infraestrutura FIC RF Cred Priv',                                                                                  '', 'Sim'],
+    ['Banestes Estratégia FIC de FIF Renda Fixa RL',                                     'Banestes Estratégia FI RF',                                                                                                 '', 'Sim'],
+    ['Banestes Dividendos FIC de FIF de Ações RL',                                       'Banestes Dividendos FIC de FI',                                                                                             '', 'Sim'],
+    ['Banestes FUNSES Multimercado RL',                                                   'Banestes Funses FI',                                                                                                        '', 'Não'],
+    ['Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',                'Banestes Invest Fácil FI RF Simples',                                                                                       '', 'Sim'],
+    ['Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',                'Banestes Credito Corporativo I FIC RF Cred Priv LP',                                                                       '', 'Sim'],
+    ['Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',                            'Banestes IMA-B5 Títulos Públicos FI RF LP',                                                                                 '', 'Sim'],
+    ['Banestes Multiestratégia FIC de FIF Multimercado RL',                              'Banestes Multiestrategia FIC Multimercado',                                                                                  '', 'Sim'],
+    ['Banestes Selection FI Renda Fixa CP RL',                                           'Banestes Selection FI RF Cred Priv',                                                                                        '', 'Sim'],
+    ['Banestes Reserva Climática FIF RF Referenciado DI RL',                             'Banestes Reserva Climática FIF RF DI Resp. Ltda.',                                                                          '', 'Sim'],
+    ['Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL',          'Banestes Soberano FIF RF Simples Resp. Ltda.',                                                                              '', 'Não'],
+    ['Banestes Tenax Ações FIF em Cotas de FIA RL',                                      'Banestes Tenax Ações FIF Em Cotas De Fundo de Investimento Em Ações Resp. Ltda.',                                         '', 'Não'],
+    ['Banestes Synergy Long Only FIF em Cotas de FIA RL',                                'BANESTES SYNERGY LONG ONLY FIF EM COTAS DE FUNDOS DE INVESTIMENTO EM AÇÕES RESP. Ltda.',                                   '', 'Não'],
   ];
 
   var sheet  = ss.insertSheet(CONFIG.SHEET_PODE_SIM);
@@ -965,12 +1139,12 @@ function _criarAbaPodeSimular(ss) {
   hRange.setValues([headers])
     .setBackground('#1a3c5e').setFontColor('#ffffff').setFontWeight('bold').setFontSize(10);
 
-  // Write all 4 columns (ID, NOME, DATA_INICIO, PODE_SIMULAR) at once
+  // Escreve as 4 colunas (NOME_SITE, NOME_COAFI, DATA_INICIO, PODE_SIMULAR) de uma vez
   sheet.getRange(2, 1, staticRows.length, 4).setValues(staticRows);
   sheet.getRange(2, 3, staticRows.length, 1).setNumberFormat('dd/MM/yyyy');
 
-  // atualizarColunaPodeSimular is NOT called here because DATA_INICIO is empty;
-  // it will only recalculate PODE_SIMULAR once real dates are filled in.
+  // atualizarColunaPodeSimular não é chamada aqui porque DATA_INICIO está vazia;
+  // ela recalculará PODE_SIMULAR somente quando as datas reais forem preenchidas pelo COAFI.
 
   sheet.setFrozenRows(1);
   sheet.autoResizeColumns(1, headers.length);
@@ -978,43 +1152,43 @@ function _criarAbaPodeSimular(ss) {
 }
 
 /**
- * Cria a aba TaxaNova com todos os 26 fundos de FUND_DATA e suas taxas de
- * simulação padrão em formato percentual (ex: 35.80 representa 35,80%).
- * Atualize a coluna C via PROCV no COAFI (coluna AR) quando os dados reais
- * do GEART estiverem disponíveis.
+ * Cria a aba TaxaNova com todos os 26 fundos.
+ * Estrutura idêntica à planilha original:
+ *   Col A (NOME_SITE):  nome completo do fundo como exibido no site
+ *   Col B (NOME_COAFI): nome curto do fundo na planilha COAFI (col B do GEART) — chave do PROCV de TAXA_NOVA
+ *   Col C (TAXA_NOVA):  preenchida por atualizarDadosDeCoafi() via =TEXTO(PROCV(B;COAFI!B:AR;43;FALSO);"0.00")
+ *                       Armazenado como número percentual (ex: 35.80 para 35,80%).
  */
 function _criarAbaTaxaNova(ss) {
-  var headers = ['ID_FUNDO', 'NOME_FUNDO', 'TAXA_NOVA'];
-  // Order matches the original "TaxaNova" spreadsheet tab (alphabetical by fund full name).
-  // Column C stores the rate as a percentage NUMBER (e.g. 35.80 for 35,80%),
-  // matching the original =TEXTO(PROCV(B;COAFI!B:AR;43;FALSO);"0.00") formula output.
+  var headers = ['NOME_SITE', 'NOME_COAFI', 'TAXA_NOVA'];
+  // Ordem igual à aba original: col A = "Nome site", col B = "Nome Planilha COAFI" (nome curto)
   var rows = [
-    ['invest_btg_pactual_absoluto',                    'Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',               35.80 ],
-    ['invest_cred_corp',                               'Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',                 14.42 ],
-    ['invest_dividendos',                              'Banestes Dividendos FIC de FIF de Ações RL',                                        44.41 ],
-    ['invest-estrategia',                              'Banestes Estratégia FIC de FIF Renda Fixa RL',                                      14.06 ],
-    ['invest_debentures',                              'Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',        13.18 ],
-    ['invest_funses',                                  'Banestes FUNSES Multimercado RL',                                                   0     ],
-    ['invest_ima-b5',                                  'Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',                             11.38 ],
-    ['invest_previdenciario',                          'Banestes IMA-B Títulos Públicos FIF Renda Fixa RL',                                 0     ],
-    ['invest_institucional',                           'Banestes Institucional FIF Renda Fixa RL',                                          14.56 ],
-    ['invest_facil',                                   'Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',                 13.18 ],
-    ['invest_investmoney',                             'Banestes Invest Money FIF Renda Fixa RL',                                           13.38 ],
-    ['invest_investpublic',                            'Banestes Invest Public Automático FIF CP RL',                                       0     ],
-    ['invest_investidor',                              'Banestes Investidor Automático FIF Renda Fixa CP RL',                               0     ],
-    ['invest_liquidez_referenciado',                   'Banestes Liquidez FIF Renda Fixa Referenciado DI RL',                               14.52 ],
-    ['invest_multiestrategia',                         'Banestes Multiestratégia FIC de FIF Multimercado RL',                               14.21 ],
-    ['invest_referencial',                             'Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL',                               0     ],
-    ['invest_fundo_reserva_climatica',                 'Banestes Reserva Climática FIF RF Referenciado DI RL',                              14.34 ],
-    ['invest_selection',                               'Banestes Selection FI Renda Fixa CP RL',                                            14.33 ],
-    ['invest_soberano',                                'Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL',           0     ],
-    ['invest_solidez',                                 'Banestes Solidez Automático FIF Renda Fixa CP RL',                                  0     ],
-    ['invest_Synergy',                                 'Banestes Synergy Long Only FIF em Cotas de FIA RL',                                 0     ],
-    ['invest_tenax',                                   'Banestes Tenax Ações FIF em Cotas de FIA RL',                                       0     ],
-    ['banestes_tesouro_fi_renda_fixa_referenciado_di', 'Banestes Tesouro FIF Renda Fixa Referenciado DI RL',                                0     ],
-    ['invest_vipdi',                                   'Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                          14.20 ],
-    ['invest-valores',                                 'Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',                14.14 ],
-    ['invest-vitoria-500',                             'Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',                     12.75 ],
+    ['Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',              'Absoluto',               35.80 ],
+    ['Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',                'Credito Corporativo I',  14.42 ],
+    ['Banestes Dividendos FIC de FIF de Ações RL',                                       'Dividendos',             44.41 ],
+    ['Banestes Estratégia FIC de FIF Renda Fixa RL',                                     'Estratégia',             14.06 ],
+    ['Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',       'Infraestrutura',         13.18 ],
+    ['Banestes FUNSES Multimercado RL',                                                   'Funses',                 0     ],
+    ['Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',                            'IMA-B5 Títulos Públicos',11.38 ],
+    ['Banestes IMA-B Títulos Públicos FIF Renda Fixa RL',                                'IMA-B Títulos Públicos', 0     ],
+    ['Banestes Institucional FIF Renda Fixa RL',                                         'Institucional',          14.56 ],
+    ['Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',                'Fácil',                  13.18 ],
+    ['Banestes Invest Money FIF Renda Fixa RL',                                          'Money',                  13.38 ],
+    ['Banestes Invest Public Automático FIF CP RL',                                      'Public',                 0     ],
+    ['Banestes Investidor Automático FIF Renda Fixa CP RL',                              'Investidor',             0     ],
+    ['Banestes Liquidez FIF Renda Fixa Referenciado DI RL',                              'Liquidez',               14.52 ],
+    ['Banestes Multiestratégia FIC de FIF Multimercado RL',                              'Multiestrategia',        14.21 ],
+    ['Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL',                              'IRF-M 1 Títulos Públicos',0     ],
+    ['Banestes Reserva Climática FIF RF Referenciado DI RL',                             'Reserva',                14.34 ],
+    ['Banestes Selection FI Renda Fixa CP RL',                                           'Selection',              14.33 ],
+    ['Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL',          'Soberano',               0     ],
+    ['Banestes Solidez Automático FIF Renda Fixa CP RL',                                 'Solidez',                0     ],
+    ['Banestes Synergy Long Only FIF em Cotas de FIA RL',                                'Synergy',                0     ],
+    ['Banestes Tenax Ações FIF em Cotas de FIA RL',                                      'Tenax',                  0     ],
+    ['Banestes Tesouro FIF Renda Fixa Referenciado DI RL',                               'Tesouro',                0     ],
+    ['Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                         'Vip Di',                 14.20 ],
+    ['Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',               'Valores',                14.14 ],
+    ['Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',                    'Vitória 500',            12.75 ],
   ];
 
   var sheet  = ss.insertSheet(CONFIG.SHEET_TAXA_NOVA);
@@ -1099,35 +1273,60 @@ function _criarAbaInicial(ss) {
 // ============================================================
 
 /**
- * Gera o conteúdo JSON com os dados dos fundos.
+ * Gera o conteúdo JSON com os dados dos fundos no mesmo modelo da planilha original.
+ * Campos estáticos (descrições, documentos, taxas, etc.) vêm de FUND_RICH_DATA.
+ * Campos dinâmicos ("podeSimular?" e "taxaRentabilidade") vêm da planilha via planilha.
  * @param {Array<Object>} fundos Lista de fundos.
  * @returns {string} JSON formatado.
  */
 function gerarJSON(fundos) {
-  var agora = new Date();
   var payload = {
-    dataAtualizacao: Utilities.formatDate(agora, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm:ss"),
-    versao: '2.0',
-    fonte: 'Banestes — Sistema de Gestão de Fundos (GEART via Google Sheets)',
-    totalFundos: fundos.length,
     fundos: fundos.map(function (f) {
+      var id          = String(f['FUND_ID'] || '');
+      var rich        = FUND_RICH_DATA[id] || {};
+      var podeSimular = String(f['PODE_SIMULAR'] || 'Não');
+      var taxaRent    = String(f['TAXA_NOVA_FORMATADA'] || '');
+
+      // Condições comerciais: campos estáticos mesclados com os dinâmicos da planilha
+      var cc = rich.condicoesComerciais || {};
+      var condicoesComerciais = {
+        aplicacaoInicial:            cc.aplicacaoInicial            !== undefined ? cc.aplicacaoInicial            : null,
+        investimentoAdicionalMinimo: cc.investimentoAdicionalMinimo !== undefined ? cc.investimentoAdicionalMinimo : null,
+        resgateMinimo:               cc.resgateMinimo               !== undefined ? cc.resgateMinimo               : null,
+        saldoMinimoPermanencia:      cc.saldoMinimoPermanencia      !== undefined ? cc.saldoMinimoPermanencia      : null,
+        tipoCota:                    cc.tipoCota                    !== undefined ? cc.tipoCota                    : null,
+        carencia:                    cc.carencia                    !== undefined ? cc.carencia                    : null,
+        cotaAplicacao:               cc.cotaAplicacao               !== undefined ? cc.cotaAplicacao               : null,
+        cotaResgate:                 cc.cotaResgate                 !== undefined ? cc.cotaResgate                 : null,
+        debitoContaCorrente:         cc.debitoContaCorrente         !== undefined ? cc.debitoContaCorrente         : null,
+        creditoContaCorrente:        cc.creditoContaCorrente        !== undefined ? cc.creditoContaCorrente        : null,
+        horarioLimite:               cc.horarioLimite               !== undefined ? cc.horarioLimite               : null,
+        'podeSimular?':              podeSimular,
+        taxaRentabilidade:           taxaRent,
+        pf:                          cc.pf                          !== undefined ? cc.pf                          : null,
+        pj:                          cc.pj                          !== undefined ? cc.pj                          : null,
+      };
+
       return {
-        codigo:            Number(f['FNDCD']),
-        nome:              String(f['NOME']),
-        tipo:              String(f['FNDCTFND']),
-        podeSimular:       String(f['PODE_SIMULAR'] || 'Não'),
-        classificacaoRisco: String(f['FNDCLSRISC']),
-        codigoRisco:       RISCO_CODIGO[f['FNDCLSRISC']] !== undefined ? RISCO_CODIGO[f['FNDCLSRISC']] : 1,
-        classificacaoCVM:  String(f['FNDCLSCVM']),
-        subClassificacaoCVM: String(f['FNDSUBCVM']),
-        tipoANBIMA:        String(f['FNDTOAMB']),
-        taxaSimulacao:     Number(f['FNDTXSIMU']),
-        cotacaoDiaUtil:    String(f['FNDCOTDIAUTIL']),
-        rentabilidade: {
-          diaria: Number(f['RENT_DIARIA']),
-          mensal: Number(f['RENT_MENSAL']),
-          anual:  Number(f['RENT_ANUAL']),
+        id:                    id,
+        nomeCompleto:          String(f['NOME']),
+        descricaoCurta:        rich.descricaoCurta        !== undefined ? rich.descricaoCurta        : null,
+        publicoAlvo:           rich.publicoAlvo           !== undefined ? rich.publicoAlvo           : null,
+        objetivo:              rich.objetivo              !== undefined ? rich.objetivo              : null,
+        politicaInvestimento:  rich.politicaInvestimento  !== undefined ? rich.politicaInvestimento  : null,
+        caracteristicas: {
+          classificacaoRisco: String(f['FNDCLSRISC']),
+          classificacaoCVM:   String(f['FNDCLSCVM']),
+          subclasseCVM:       String(f['FNDSUBCVM']),
+          tipoANBIMA:         String(f['FNDTOAMB']),
         },
+        condicoesComerciais:   condicoesComerciais,
+        taxas:                 rich.taxas                 !== undefined ? rich.taxas                 : null,
+        prestadoresServicos:   rich.prestadoresServicos   !== undefined ? rich.prestadoresServicos   : null,
+        tributacao:            rich.tributacao            !== undefined ? rich.tributacao            : null,
+        documentos:            rich.documentos            !== undefined ? rich.documentos            : null,
+        demonstracoesContabeis: rich.demonstracoesContabeis !== undefined ? rich.demonstracoesContabeis : null,
+        comunicados:           rich.comunicados           !== undefined ? rich.comunicados           : null,
       };
     }),
   };
@@ -1507,16 +1706,16 @@ function gerarEEnviar() {
 }
 
 // ============================================================
-// FUNÇÃO DE TESTE DE E-MAIL (executar via editor do Apps Script)
+// FUNÇÃO DE VALIDAÇÃO DE E-MAIL (executar via editor do Apps Script)
 // ============================================================
 
 /**
- * Envia um e-mail de TESTE para o e-mail do desenvolvedor.
+ * Envia um e-mail de validação para o e-mail do desenvolvedor.
  * Use esta função diretamente no editor do Apps Script para validar o envio
  * sem depender de triggers ou alterações na planilha.
  *
  * Utiliza exclusivamente dados reais da planilha — mesma lógica de gerarEEnviar().
- * Os arquivos são prefixados com "TESTE_" para identificação fácil.
+ * Utiliza os mesmos nomes de arquivo que a execução automática.
  */
 function testarEnvioEmail() {
   try {
@@ -1536,8 +1735,8 @@ function testarEnvioEmail() {
 
     var jsonStr  = gerarJSON(fundos);
     var sqlStr   = gerarSQL(fundos);
-    var nomeJson = 'TESTE_fundos_banestes_' + sufixo + '.json';
-    var nomeSql  = 'TESTE_script_mainframe_' + sufixo + '.sql';
+    var nomeJson = 'fundos_banestes_' + sufixo + '.json';
+    var nomeSql  = 'script_mainframe_' + sufixo + '.sql';
 
     var jsonBlob = Utilities.newBlob('').setDataFromString(jsonStr, 'UTF-8')
       .setName(nomeJson).setContentType('application/json');
@@ -1548,12 +1747,12 @@ function testarEnvioEmail() {
 
     MailApp.sendEmail({
       to: CONFIG.DEVELOPER_EMAIL,
-      subject: '[TESTE] 🏦 Banestes — Validação de Envio — ' + dataStr,
+      subject: '🏦 Banestes — Validação de Envio — ' + dataStr,
       htmlBody: corpoEmail,
       attachments: [jsonBlob, sqlBlob],
     });
 
-    Logger.log('E-mail de teste enviado para: ' + CONFIG.DEVELOPER_EMAIL);
+    Logger.log('E-mail de validação enviado para: ' + CONFIG.DEVELOPER_EMAIL);
 
   } catch (e) {
     Logger.log('ERRO em testarEnvioEmail: ' + e.message);
