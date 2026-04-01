@@ -1706,16 +1706,16 @@ function gerarEEnviar() {
 }
 
 // ============================================================
-// FUNÇÃO DE TESTE DE E-MAIL (executar via editor do Apps Script)
+// FUNÇÃO DE VALIDAÇÃO DE E-MAIL (executar via editor do Apps Script)
 // ============================================================
 
 /**
- * Envia um e-mail de TESTE para o e-mail do desenvolvedor.
+ * Envia um e-mail de validação para o e-mail do desenvolvedor.
  * Use esta função diretamente no editor do Apps Script para validar o envio
  * sem depender de triggers ou alterações na planilha.
  *
  * Utiliza exclusivamente dados reais da planilha — mesma lógica de gerarEEnviar().
- * Os arquivos são prefixados com "TESTE_" para identificação fácil.
+ * Utiliza os mesmos nomes de arquivo que a execução automática.
  */
 function testarEnvioEmail() {
   try {
@@ -1735,8 +1735,8 @@ function testarEnvioEmail() {
 
     var jsonStr  = gerarJSON(fundos);
     var sqlStr   = gerarSQL(fundos);
-    var nomeJson = 'TESTE_fundos_banestes_' + sufixo + '.json';
-    var nomeSql  = 'TESTE_script_mainframe_' + sufixo + '.sql';
+    var nomeJson = 'fundos_banestes_' + sufixo + '.json';
+    var nomeSql  = 'script_mainframe_' + sufixo + '.sql';
 
     var jsonBlob = Utilities.newBlob('').setDataFromString(jsonStr, 'UTF-8')
       .setName(nomeJson).setContentType('application/json');
@@ -1747,12 +1747,12 @@ function testarEnvioEmail() {
 
     MailApp.sendEmail({
       to: CONFIG.DEVELOPER_EMAIL,
-      subject: '[TESTE] 🏦 Banestes — Validação de Envio — ' + dataStr,
+      subject: '🏦 Banestes — Validação de Envio — ' + dataStr,
       htmlBody: corpoEmail,
       attachments: [jsonBlob, sqlBlob],
     });
 
-    Logger.log('E-mail de teste enviado para: ' + CONFIG.DEVELOPER_EMAIL);
+    Logger.log('E-mail de validação enviado para: ' + CONFIG.DEVELOPER_EMAIL);
 
   } catch (e) {
     Logger.log('ERRO em testarEnvioEmail: ' + e.message);
