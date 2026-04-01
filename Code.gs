@@ -312,6 +312,119 @@ function computeHash(str) {
 }
 
 // ============================================================
+// CÁLCULO DE VALORES DERIVADOS (substitui fórmulas das células)
+// ============================================================
+
+/**
+ * Recalcula a coluna PODE_SIMULAR (col D) da aba PodeSimular inteiramente
+ * no backend, sem usar fórmulas na célula.
+ *
+ * Regra (equivalente ao IF que estava na célula):
+ *   • DATA_INICIO vazia → "Sim" (padrão enquanto data não estiver preenchida)
+ *   • DATA_INICIO preenchida e fundo com ≥ 1 ano de operação → "Sim"
+ *   • DATA_INICIO preenchida e fundo com < 1 ano de operação → "Não"
+ *
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
+ */
+function atualizarColunaPodeSimular(ss) {
+  var sheet = ss.getSheetByName(CONFIG.SHEET_PODE_SIM);
+  if (!sheet || sheet.getLastRow() < 2) return;
+
+  var data  = sheet.getDataRange().getValues();
+  var hoje  = new Date();
+  var valores = [];
+
+  for (var i = 1; i < data.length; i++) {
+    var dataInicio = data[i][2]; // col C: DATA_INICIO
+    var valor;
+    if (!dataInicio || dataInicio === '') {
+      valor = 'Sim';
+    } else {
+      var dt   = (dataInicio instanceof Date) ? dataInicio : new Date(dataInicio);
+      // Guarda contra datas inválidas (e.g. texto inesperado na coluna C)
+      if (isNaN(dt.getTime())) {
+        valor = 'Sim';
+      } else {
+        // Usa 365 dias (inteiros) para coincidir com o comportamento original da fórmula
+        var anos = (hoje - dt) / (365 * 24 * 60 * 60 * 1000);
+        valor = anos >= 1 ? 'Sim' : 'Não';
+      }
+    }
+    valores.push([valor]);
+  }
+
+  if (valores.length > 0) {
+    sheet.getRange(2, 4, valores.length, 1).setValues(valores);
+  }
+}
+
+/**
+ * Recalcula as colunas PODE_SIMULAR_NOVO (col F) e TAXA_NOVA (col G) da aba
+ * Inicial inteiramente no backend, sem usar fórmulas nas células.
+ *
+ * Equivalência com as fórmulas que estavam nas células:
+ *   Col F: =IFERROR(VLOOKUP(B,PodeSimular!A:D,4,FALSE), D)
+ *   Col G: =IFERROR(VLOOKUP(B,TaxaNova!A:C,3,FALSE), "")
+ *
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
+ */
+function atualizarColunasInicial(ss) {
+  var inicialSheet = ss.getSheetByName(CONFIG.SHEET_INICIAL);
+  if (!inicialSheet || inicialSheet.getLastRow() < 2) return;
+
+  // Mapa ID → PODE_SIMULAR (col D) da aba PodeSimular
+  var podeSimMap = {};
+  var psSheet = ss.getSheetByName(CONFIG.SHEET_PODE_SIM);
+  if (psSheet && psSheet.getLastRow() >= 2) {
+    var psData = psSheet.getDataRange().getValues();
+    for (var p = 1; p < psData.length; p++) {
+      var psId = String(psData[p][0] || '').trim();
+      if (psId) podeSimMap[psId] = String(psData[p][3] || '').trim();
+    }
+  }
+
+  // Mapa ID → TAXA_NOVA (col C, decimal) da aba TaxaNova
+  var taxaNovaMap = {};
+  var tnSheet = ss.getSheetByName(CONFIG.SHEET_TAXA_NOVA);
+  if (tnSheet && tnSheet.getLastRow() >= 2) {
+    var tnData = tnSheet.getDataRange().getValues();
+    for (var t = 1; t < tnData.length; t++) {
+      var tnId = String(tnData[t][0] || '').trim();
+      if (tnId) taxaNovaMap[tnId] = tnData[t][2];
+    }
+  }
+
+  var inicialData = inicialSheet.getDataRange().getValues();
+  var fgValues = [];
+  for (var i = 1; i < inicialData.length; i++) {
+    var fundId       = String(inicialData[i][1] || '').trim(); // col B: ID_FUNDO
+    var podeSimAtual = String(inicialData[i][3] || '').trim(); // col D: fallback
+
+    // Col F: PODE_SIMULAR_NOVO — lookup em PodeSimular; fallback: col D desta aba
+    var podeSimNovo = podeSimMap.hasOwnProperty(fundId) ? podeSimMap[fundId] : podeSimAtual;
+
+    // Col G: TAXA_NOVA — lookup em TaxaNova; fallback: vazio (obterDadosFundos usa col E)
+    var taxaNova = taxaNovaMap.hasOwnProperty(fundId) ? taxaNovaMap[fundId] : '';
+
+    fgValues.push([podeSimNovo, taxaNova]);
+  }
+
+  if (fgValues.length > 0) {
+    inicialSheet.getRange(2, 6, fgValues.length, 2).setValues(fgValues);
+  }
+}
+
+/**
+ * Recalcula todos os valores derivados das abas auxiliares no backend.
+ * Deve ser chamada antes de ler dados (em gerarEEnviar) e ao configurar a planilha.
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
+ */
+function sincronizarValoresDerivados(ss) {
+  atualizarColunaPodeSimular(ss);
+  atualizarColunasInicial(ss);
+}
+
+// ============================================================
 // LEITURA DE DADOS DAS ABAS
 // ============================================================
 
@@ -319,7 +432,7 @@ function computeHash(str) {
  * Obtém a lista de fundos lendo as abas da planilha.
  *
  * Fonte primária: aba "Inicial" (colunas B=id, C=nome, F=podeSimularNovo, G=taxaNova).
- * Os valores de F e G já são os resultados calculados das fórmulas PROCV/SE.
+ * Os valores de F e G são resultados calculados pelo backend via sincronizarValoresDerivados.
  *
  * Dados estáticos (tipo, risco, CVM, ANBIMA, FNDCD) vêm de FUND_DATA.
  * Dados de rentabilidade (diária/mensal/anual) vêm da aba "Fundos" se existir.
@@ -537,6 +650,9 @@ function configurarPlanilha() {
     }
   });
 
+  // Recalcula valores derivados no backend (PodeSimular col D, Inicial cols F e G)
+  sincronizarValoresDerivados(ss);
+
   var msg = '';
   if (criadas.length > 0) {
     msg += '✅ Abas criadas: ' + criadas.join(', ') + '.\n\n';
@@ -576,8 +692,9 @@ function _criarAbaCoafi(ss) {
 
 /**
  * Cria a aba PodeSimular com todos os 26 fundos de FUND_DATA.
- * Coluna D (PODE_SIMULAR): fórmula automática — "Sim" se o fundo tiver ≥ 1 ano
- * de operação (DATA_INICIO preenchida), "Sim" como padrão enquanto não houver data.
+ * Coluna D (PODE_SIMULAR): calculada pelo backend a partir de DATA_INICIO —
+ * "Sim" se o fundo tiver ≥ 1 ano de operação, "Sim" como padrão enquanto
+ * DATA_INICIO não estiver preenchida.
  */
 function _criarAbaPodeSimular(ss) {
   var headers = ['ID_FUNDO', 'NOME_FUNDO', 'DATA_INICIO', 'PODE_SIMULAR'];
@@ -618,13 +735,8 @@ function _criarAbaPodeSimular(ss) {
   sheet.getRange(2, 1, staticRows.length, 3).setValues(staticRows);
   sheet.getRange(2, 3, staticRows.length, 1).setNumberFormat('dd/MM/yyyy');
 
-  // Coluna D: "Sim" se DATA_INICIO estiver preenchida e fundo tiver ≥ 1 ano; "Sim" por padrão
-  for (var i = 0; i < staticRows.length; i++) {
-    var r = i + 2;
-    sheet.getRange(r, 4).setFormula(
-      '=IF(C' + r + '<>"",IF((TODAY()-C' + r + ')/365>=1,"Sim","Não"),"Sim")'
-    );
-  }
+  // Coluna D: calculada pelo backend (sem fórmulas na célula)
+  atualizarColunaPodeSimular(ss);
 
   sheet.setFrozenRows(1);
   sheet.autoResizeColumns(1, headers.length);
@@ -685,8 +797,8 @@ function _criarAbaTaxaNova(ss) {
  *   A (#) | B (ID_FUNDO) | C (NOME_FUNDO) | D (PODE_SIMULAR_ATUAL) |
  *   E (TAXA_ATUAL_%) | F (PODE_SIMULAR_NOVO) | G (TAXA_NOVA)
  *
- * Colunas F e G contêm fórmulas VLOOKUP que buscam automaticamente os
- * valores das abas PodeSimular e TaxaNova respectivamente.
+ * Colunas F e G são preenchidas pelo backend via atualizarColunasInicial(),
+ * buscando os valores calculados das abas PodeSimular e TaxaNova.
  */
 function _criarAbaInicial(ss) {
   var headers = ['#', 'ID_FUNDO', 'NOME_FUNDO', 'PODE_SIMULAR_ATUAL', 'TAXA_ATUAL_%', 'PODE_SIMULAR_NOVO', 'TAXA_NOVA'];
@@ -729,18 +841,8 @@ function _criarAbaInicial(ss) {
   // Escreve colunas A–E
   sheet.getRange(2, 1, staticData.length, 5).setValues(staticData);
 
-  // Colunas F e G: fórmulas VLOOKUP nas abas PodeSimular e TaxaNova
-  for (var i = 0; i < staticData.length; i++) {
-    var r = i + 2;
-    // F: PODE_SIMULAR_NOVO — busca em PodeSimular col D; fallback: valor da col D desta aba
-    sheet.getRange(r, 6).setFormula(
-      '=IFERROR(VLOOKUP(B' + r + ',PodeSimular!A:D,4,FALSE),D' + r + ')'
-    );
-    // G: TAXA_NOVA — busca em TaxaNova col C (decimal); fallback: vazio (obterDadosFundos usa col E)
-    sheet.getRange(r, 7).setFormula(
-      '=IFERROR(VLOOKUP(B' + r + ',TaxaNova!A:C,3,FALSE),"")'
-    );
-  }
+  // Colunas F e G: calculadas pelo backend (sem fórmulas nas células)
+  atualizarColunasInicial(ss);
 
   // Estilo alternado nas linhas de dados
   for (var row = 2; row <= staticData.length + 1; row++) {
@@ -1121,6 +1223,12 @@ function registrarInfoLog(mensagem) {
  */
 function gerarEEnviar() {
   try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    // Recalcula valores derivados no backend antes de ler os dados,
+    // garantindo que as células F e G da aba Inicial e col D da aba
+    // PodeSimular reflitam os dados mais recentes sem fórmulas nas células.
+    sincronizarValoresDerivados(ss);
+
     var fundos = obterDadosFundos();
     if (fundos.length === 0) {
       throw new Error('Nenhum fundo encontrado. Verifique as abas "Inicial" ou "Fundos" na planilha.');
