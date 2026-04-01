@@ -219,6 +219,8 @@ var FUND_DATA = {
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('🏦 Gerenciador Fundos')
+    .addItem('🗂️ Configurar Abas da Planilha', 'configurarPlanilha')
+    .addSeparator()
     .addItem('📋 Abrir Painel de Log', 'abrirPainel')
     .addSeparator()
     .addItem('🔄 Gerar e Enviar Agora', 'gerarEEnviar')
@@ -494,6 +496,256 @@ function criarAbaDadosFundos(ss) {
   sheet.getRange(2, 10, rows.length, 3).setNumberFormat('0.0000');
   for (var r = 2; r <= rows.length + 1; r++) {
     sheet.getRange(r, 1, 1, headers.length).setBackground(r % 2 === 0 ? '#f0f4f8' : '#ffffff');
+  }
+  sheet.setFrozenRows(1);
+  sheet.autoResizeColumns(1, headers.length);
+  return sheet;
+}
+
+// ============================================================
+// CONFIGURAÇÃO INICIAL DA PLANILHA
+// ============================================================
+
+/**
+ * Cria e popula todas as abas necessárias na planilha:
+ *   COAFI (placeholder), PodeSimular, TaxaNova, Inicial, Log_Envios e Fundos.
+ *
+ * Execute esta função uma única vez — via menu 🏦 Gerenciador Fundos →
+ * "🗂️ Configurar Abas da Planilha" — antes de usar gerarEEnviar() ou
+ * testarEnvioEmail(). Abas já existentes não são modificadas.
+ */
+function configurarPlanilha() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var criadas    = [];
+  var existentes = [];
+
+  var abas = [
+    { nome: CONFIG.SHEET_COAFI,     fn: _criarAbaCoafi      },
+    { nome: CONFIG.SHEET_PODE_SIM,  fn: _criarAbaPodeSimular },
+    { nome: CONFIG.SHEET_TAXA_NOVA, fn: _criarAbaTaxaNova    },
+    { nome: CONFIG.SHEET_INICIAL,   fn: _criarAbaInicial     },
+    { nome: CONFIG.SHEET_LOG,       fn: garantirAbaLog       },
+    { nome: CONFIG.SHEET_FUNDS,     fn: criarAbaDadosFundos  },
+  ];
+
+  abas.forEach(function (aba) {
+    if (!ss.getSheetByName(aba.nome)) {
+      aba.fn(ss);
+      criadas.push(aba.nome);
+    } else {
+      existentes.push(aba.nome);
+    }
+  });
+
+  var msg = '';
+  if (criadas.length > 0) {
+    msg += '✅ Abas criadas: ' + criadas.join(', ') + '.\n\n';
+  }
+  if (existentes.length > 0) {
+    msg += 'ℹ️ Já existentes (não modificadas): ' + existentes.join(', ') + '.\n\n';
+  }
+  msg += 'Próximos passos:\n'
+    + '1. Na aba ' + CONFIG.SHEET_COAFI + ', substitua a linha 2 pelo =IMPORTRANGE(...) do GEART.\n'
+    + '2. Atualize as datas na aba ' + CONFIG.SHEET_PODE_SIM + ' para recalcular "Pode Simular".\n'
+    + '3. Execute "🔄 Gerar e Enviar Agora" ou "🧪 Testar Envio de E-mail".';
+
+  Logger.log('configurarPlanilha concluído. Criadas: [' + criadas.join(', ') + ']');
+  try {
+    SpreadsheetApp.getUi().alert('🏦 Planilha Configurada!', msg, SpreadsheetApp.getUi().ButtonSet.OK);
+  } catch (e) {}
+}
+
+/**
+ * Cria a aba COAFI com estrutura placeholder.
+ * Na produção, substitua a linha 2 pelo =IMPORTRANGE(...) do GEART para que
+ * os dados reais de DATA_INICIO e taxa sejam importados automaticamente.
+ */
+function _criarAbaCoafi(ss) {
+  var headers = ['ID_FUNDO', 'NOME_FUNDO', 'DATA_INICIO', 'TAXA_ATUAL', 'AR_TAXA_NOVA'];
+  var sheet   = ss.insertSheet(CONFIG.SHEET_COAFI);
+  var hRange  = sheet.getRange(1, 1, 1, headers.length);
+  hRange.setValues([headers])
+    .setBackground('#1a3c5e').setFontColor('#ffffff').setFontWeight('bold').setFontSize(10);
+  sheet.getRange(2, 1).setValue(
+    '⚠️ Configure =IMPORTRANGE(...) aqui para importar dados do GEART.'
+  );
+  sheet.setFrozenRows(1);
+  sheet.autoResizeColumns(1, headers.length);
+  return sheet;
+}
+
+/**
+ * Cria a aba PodeSimular com todos os 26 fundos de FUND_DATA.
+ * Coluna D (PODE_SIMULAR): fórmula automática — "Sim" se o fundo tiver ≥ 1 ano
+ * de operação (DATA_INICIO preenchida), "Sim" como padrão enquanto não houver data.
+ */
+function _criarAbaPodeSimular(ss) {
+  var headers = ['ID_FUNDO', 'NOME_FUNDO', 'DATA_INICIO', 'PODE_SIMULAR'];
+  var staticRows = [
+    ['banestes_tesouro_fi_renda_fixa_referenciado_di', 'BANESTES TESOURO',             ''],
+    ['invest-estrategia',                              'BANESTES ESTRATEGIA',           ''],
+    ['invest-valores',                                 'BANESTES VALORES',              ''],
+    ['invest-vitoria-500',                             'BANESTES VITORIA 500',          ''],
+    ['invest_btg_pactual_absoluto',                    'BANESTES BTG PACTUAL ABSOLUTO', ''],
+    ['invest_cred_corp',                               'BANESTES CRED CORP',            ''],
+    ['invest_debentures',                              'BANESTES INCENTIVADO RF',        ''],
+    ['invest_dividendos',                              'BANESTES DIVIDENDOS',            ''],
+    ['invest_facil',                                   'BANESTES INVEST FACIL',         ''],
+    ['invest_fundo_reserva_climatica',                 'BANESTES RESERVA CLIMATICA',    ''],
+    ['invest_funses',                                  'BANESTES FUNSES',               ''],
+    ['invest_ima-b5',                                  'BANESTES IMA-B 5',              ''],
+    ['invest_institucional',                           'BANESTES INSTITUCIONAL',        ''],
+    ['invest_investidor',                              'BANESTES INVESTIDOR',           ''],
+    ['invest_investmoney',                             'BANESTES INVEST MONEY',         ''],
+    ['invest_investpublic',                            'BANESTES INVEST PUBLIC',        ''],
+    ['invest_liquidez_referenciado',                   'BANESTES LIQUIDEZ',             ''],
+    ['invest_multiestrategia',                         'BANESTES MULTIESTRATEGIA',      ''],
+    ['invest_previdenciario',                          'BANESTES IMA-B',                ''],
+    ['invest_referencial',                             'BANESTES IRF-M 1',              ''],
+    ['invest_selection',                               'BANESTES SELECTION',            ''],
+    ['invest_soberano',                                'BANESTES SOBERANO',             ''],
+    ['invest_solidez',                                 'BANESTES SOLIDEZ',              ''],
+    ['invest_Synergy',                                 'BANESTES SYNERGY',              ''],
+    ['invest_tenax',                                   'BANESTES TENAX',                ''],
+    ['invest_vipdi',                                   'BANESTES VIP DI',               ''],
+  ];
+
+  var sheet  = ss.insertSheet(CONFIG.SHEET_PODE_SIM);
+  var hRange = sheet.getRange(1, 1, 1, headers.length);
+  hRange.setValues([headers])
+    .setBackground('#1a3c5e').setFontColor('#ffffff').setFontWeight('bold').setFontSize(10);
+
+  sheet.getRange(2, 1, staticRows.length, 3).setValues(staticRows);
+  sheet.getRange(2, 3, staticRows.length, 1).setNumberFormat('dd/MM/yyyy');
+
+  // Coluna D: "Sim" se DATA_INICIO estiver preenchida e fundo tiver ≥ 1 ano; "Sim" por padrão
+  for (var i = 0; i < staticRows.length; i++) {
+    var r = i + 2;
+    sheet.getRange(r, 4).setFormula(
+      '=IF(C' + r + '<>"",IF((TODAY()-C' + r + ')/365>=1,"Sim","Não"),"Sim")'
+    );
+  }
+
+  sheet.setFrozenRows(1);
+  sheet.autoResizeColumns(1, headers.length);
+  return sheet;
+}
+
+/**
+ * Cria a aba TaxaNova com todos os 26 fundos de FUND_DATA e suas taxas de
+ * simulação padrão (decimais). Atualize a coluna C via PROCV no COAFI (coluna AR)
+ * quando os dados reais do GEART estiverem disponíveis.
+ */
+function _criarAbaTaxaNova(ss) {
+  var headers = ['ID_FUNDO', 'NOME_FUNDO', 'TAXA_NOVA'];
+  var rows = [
+    ['banestes_tesouro_fi_renda_fixa_referenciado_di', 'BANESTES TESOURO',             0      ],
+    ['invest-estrategia',                              'BANESTES ESTRATEGIA',           0.1406 ],
+    ['invest-valores',                                 'BANESTES VALORES',              0.1414 ],
+    ['invest-vitoria-500',                             'BANESTES VITORIA 500',          0.1275 ],
+    ['invest_btg_pactual_absoluto',                    'BANESTES BTG PACTUAL ABSOLUTO', 0.3580 ],
+    ['invest_cred_corp',                               'BANESTES CRED CORP',            0.1442 ],
+    ['invest_debentures',                              'BANESTES INCENTIVADO RF',        0.1318 ],
+    ['invest_dividendos',                              'BANESTES DIVIDENDOS',            0.4441 ],
+    ['invest_facil',                                   'BANESTES INVEST FACIL',         0.1318 ],
+    ['invest_fundo_reserva_climatica',                 'BANESTES RESERVA CLIMATICA',    0      ],
+    ['invest_funses',                                  'BANESTES FUNSES',               0      ],
+    ['invest_ima-b5',                                  'BANESTES IMA-B 5',              0.1138 ],
+    ['invest_institucional',                           'BANESTES INSTITUCIONAL',        0.1456 ],
+    ['invest_investidor',                              'BANESTES INVESTIDOR',           0      ],
+    ['invest_investmoney',                             'BANESTES INVEST MONEY',         0.1338 ],
+    ['invest_investpublic',                            'BANESTES INVEST PUBLIC',        0      ],
+    ['invest_liquidez_referenciado',                   'BANESTES LIQUIDEZ',             0.1452 ],
+    ['invest_multiestrategia',                         'BANESTES MULTIESTRATEGIA',      0.1421 ],
+    ['invest_previdenciario',                          'BANESTES IMA-B',                0      ],
+    ['invest_referencial',                             'BANESTES IRF-M 1',              0      ],
+    ['invest_selection',                               'BANESTES SELECTION',            0.1433 ],
+    ['invest_soberano',                                'BANESTES SOBERANO',             0      ],
+    ['invest_solidez',                                 'BANESTES SOLIDEZ',              0      ],
+    ['invest_Synergy',                                 'BANESTES SYNERGY',              0      ],
+    ['invest_tenax',                                   'BANESTES TENAX',                0      ],
+    ['invest_vipdi',                                   'BANESTES VIP DI',               0.1420 ],
+  ];
+
+  var sheet  = ss.insertSheet(CONFIG.SHEET_TAXA_NOVA);
+  var hRange = sheet.getRange(1, 1, 1, headers.length);
+  hRange.setValues([headers])
+    .setBackground('#1a3c5e').setFontColor('#ffffff').setFontWeight('bold').setFontSize(10);
+  sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
+  sheet.getRange(2, 3, rows.length, 1).setNumberFormat('0.0000');
+  sheet.setFrozenRows(1);
+  sheet.autoResizeColumns(1, headers.length);
+  return sheet;
+}
+
+/**
+ * Cria e popula a aba "Inicial" com dados dos 26 fundos de FUND_DATA.
+ *
+ * Estrutura de colunas (lida por obterDadosFundos()):
+ *   A (#) | B (ID_FUNDO) | C (NOME_FUNDO) | D (PODE_SIMULAR_ATUAL) |
+ *   E (TAXA_ATUAL_%) | F (PODE_SIMULAR_NOVO) | G (TAXA_NOVA)
+ *
+ * Colunas F e G contêm fórmulas VLOOKUP que buscam automaticamente os
+ * valores das abas PodeSimular e TaxaNova respectivamente.
+ */
+function _criarAbaInicial(ss) {
+  var headers = ['#', 'ID_FUNDO', 'NOME_FUNDO', 'PODE_SIMULAR_ATUAL', 'TAXA_ATUAL_%', 'PODE_SIMULAR_NOVO', 'TAXA_NOVA'];
+
+  // Colunas A–E: dados estáticos (A=seq, B=ID, C=nome, D=podeSimular atual, E=taxa atual)
+  var staticData = [
+    [1,  'banestes_tesouro_fi_renda_fixa_referenciado_di', 'BANESTES TESOURO',             'Não', '0,00%' ],
+    [2,  'invest-estrategia',                              'BANESTES ESTRATEGIA',           'Sim', '14,06%'],
+    [3,  'invest-valores',                                 'BANESTES VALORES',              'Sim', '14,14%'],
+    [4,  'invest-vitoria-500',                             'BANESTES VITORIA 500',          'Sim', '12,75%'],
+    [5,  'invest_btg_pactual_absoluto',                    'BANESTES BTG PACTUAL ABSOLUTO', 'Sim', '35,80%'],
+    [6,  'invest_cred_corp',                               'BANESTES CRED CORP',            'Sim', '14,42%'],
+    [7,  'invest_debentures',                              'BANESTES INCENTIVADO RF',        'Sim', '13,18%'],
+    [8,  'invest_dividendos',                              'BANESTES DIVIDENDOS',            'Sim', '44,41%'],
+    [9,  'invest_facil',                                   'BANESTES INVEST FACIL',         'Sim', '13,18%'],
+    [10, 'invest_fundo_reserva_climatica',                 'BANESTES RESERVA CLIMATICA',    'Não', '0,00%' ],
+    [11, 'invest_funses',                                  'BANESTES FUNSES',               'Não', '0,00%' ],
+    [12, 'invest_ima-b5',                                  'BANESTES IMA-B 5',              'Sim', '11,38%'],
+    [13, 'invest_institucional',                           'BANESTES INSTITUCIONAL',        'Sim', '14,56%'],
+    [14, 'invest_investidor',                              'BANESTES INVESTIDOR',           'Não', '0,00%' ],
+    [15, 'invest_investmoney',                             'BANESTES INVEST MONEY',         'Sim', '13,38%'],
+    [16, 'invest_investpublic',                            'BANESTES INVEST PUBLIC',        'Não', '0,00%' ],
+    [17, 'invest_liquidez_referenciado',                   'BANESTES LIQUIDEZ',             'Sim', '14,52%'],
+    [18, 'invest_multiestrategia',                         'BANESTES MULTIESTRATEGIA',      'Sim', '14,21%'],
+    [19, 'invest_previdenciario',                          'BANESTES IMA-B',                'Não', '0,00%' ],
+    [20, 'invest_referencial',                             'BANESTES IRF-M 1',              'Não', '0,00%' ],
+    [21, 'invest_selection',                               'BANESTES SELECTION',            'Sim', '14,33%'],
+    [22, 'invest_soberano',                                'BANESTES SOBERANO',             'Não', '0,00%' ],
+    [23, 'invest_solidez',                                 'BANESTES SOLIDEZ',              'Não', '0,00%' ],
+    [24, 'invest_Synergy',                                 'BANESTES SYNERGY',              'Não', '0,00%' ],
+    [25, 'invest_tenax',                                   'BANESTES TENAX',                'Não', '0,00%' ],
+    [26, 'invest_vipdi',                                   'BANESTES VIP DI',               'Sim', '14,20%'],
+  ];
+
+  var sheet  = ss.insertSheet(CONFIG.SHEET_INICIAL);
+  var hRange = sheet.getRange(1, 1, 1, headers.length);
+  hRange.setValues([headers])
+    .setBackground('#1a3c5e').setFontColor('#ffffff').setFontWeight('bold').setFontSize(10);
+
+  // Escreve colunas A–E
+  sheet.getRange(2, 1, staticData.length, 5).setValues(staticData);
+
+  // Colunas F e G: fórmulas VLOOKUP nas abas PodeSimular e TaxaNova
+  for (var i = 0; i < staticData.length; i++) {
+    var r = i + 2;
+    // F: PODE_SIMULAR_NOVO — busca em PodeSimular col D; fallback: valor da col D desta aba
+    sheet.getRange(r, 6).setFormula(
+      '=IFERROR(VLOOKUP(B' + r + ',PodeSimular!A:D,4,FALSE),D' + r + ')'
+    );
+    // G: TAXA_NOVA — busca em TaxaNova col C (decimal); fallback: vazio (obterDadosFundos usa col E)
+    sheet.getRange(r, 7).setFormula(
+      '=IFERROR(VLOOKUP(B' + r + ',TaxaNova!A:C,3,FALSE),"")'
+    );
+  }
+
+  // Estilo alternado nas linhas de dados
+  for (var row = 2; row <= staticData.length + 1; row++) {
+    sheet.getRange(row, 1, 1, headers.length)
+      .setBackground(row % 2 === 0 ? '#f0f4f8' : '#ffffff');
   }
   sheet.setFrozenRows(1);
   sheet.autoResizeColumns(1, headers.length);
