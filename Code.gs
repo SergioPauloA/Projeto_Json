@@ -1563,18 +1563,6 @@ function buildEmailHTML(dataStr, total, fundos, nomeJson, nomeSql) {
  * @returns {Object} Resultado do envio.
  */
 function enviarEmail(jsonStr, sqlStr, fundos) {
-  // Permite chamar a função diretamente do editor do Apps Script sem argumentos.
-  if (!fundos) {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    sincronizarValoresDerivados(ss);
-    fundos = obterDadosFundos();
-    if (fundos.length === 0) {
-      throw new Error('Nenhum fundo encontrado. Verifique as abas "Inicial" ou "Fundos" na planilha.');
-    }
-  }
-  if (!jsonStr) { jsonStr = gerarJSON(fundos); }
-  if (!sqlStr)  { sqlStr  = gerarSQL(fundos);  }
-
   var agora = new Date();
   var dataStr = Utilities.formatDate(agora, Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm');
   var sufixo  = Utilities.formatDate(agora, Session.getScriptTimeZone(), 'yyyyMMdd_HHmmss');
@@ -1766,7 +1754,7 @@ function gerarEEnviar() {
 // ============================================================
 
 /**
- * Envia um e-mail de validação para o e-mail do desenvolvedor.
+ * Envia um e-mail de validação para todos os destinatários (developer + analistas).
  * Use esta função diretamente no editor do Apps Script para validar o envio
  * sem depender de triggers ou alterações na planilha.
  *
@@ -1801,14 +1789,18 @@ function testarEnvioEmail() {
 
     var corpoEmail = buildEmailHTML(dataStr, fundos.length, fundos, nomeJson, nomeSql);
 
-    MailApp.sendEmail({
-      to: CONFIG.DEVELOPER_EMAIL,
-      subject: '🏦 Banestes — Validação de Envio — ' + dataStr,
-      htmlBody: corpoEmail,
-      attachments: [jsonBlob, sqlBlob],
+    var destinatarios = [CONFIG.DEVELOPER_EMAIL].concat(CONFIG.ANALYST_EMAILS || []);
+
+    destinatarios.forEach(function (dest) {
+      MailApp.sendEmail({
+        to: dest,
+        subject: '🏦 Banestes — Validação de Envio — ' + dataStr,
+        htmlBody: corpoEmail,
+        attachments: [jsonBlob, sqlBlob],
+      });
     });
 
-    Logger.log('E-mail de validação enviado para: ' + CONFIG.DEVELOPER_EMAIL);
+    Logger.log('E-mail de validação enviado para: ' + destinatarios.join(', '));
 
   } catch (e) {
     Logger.log('ERRO em testarEnvioEmail: ' + e.message);
