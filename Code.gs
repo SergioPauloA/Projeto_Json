@@ -48,6 +48,11 @@ var RISCO_CODIGO = {
   'Alto':        3,
 };
 
+// Índice (0-based) das colunas relevantes na aba COAFI (= RENTABILIDADE!A:AR)
+var COL_B_NOME      = 1;   // col B  = nome do fundo (chave de lookup)
+var COL_E_INICIO    = 4;   // col E  = "Início das atividades" (seção INFORMAÇÕES)
+var COL_AR_12MESES  = 43;  // col AR = rentabilidade acumulada 12 meses
+
 // Fundos que NUNCA simulam, independentemente da data de início.
 // Corresponde às células com "Não" fixo na col D da aba PodeSimular do sistema original.
 var FUNDO_SEMPRE_NAO = {
@@ -512,32 +517,35 @@ function atualizarColunasInicial(ss) {
  *   • Aba TaxaNova col C (TAXA_NOVA) — equivalente à fórmula original
  *       =TEXTO(PROCV(B; COAFI!B:AR; 43; FALSO); "0.00")
  *
- * Estrutura esperada da aba COAFI (dados do GEART/RENTABILIDADE!A:AR):
- *   Col B (índice 1)  = nome do fundo (chave de lookup)
- *   Col E (índice 4)  = DATA_INICIO
- *   Col AR (índice 43) = TAXA_NOVA (valor percentual numérico, ex: 14.20)
+ * Estrutura da aba COAFI (dados do GEART/RENTABILIDADE!A:AR):
+ *   Col B (índice 1)   = nome do fundo (chave de lookup)
+ *   Col E (índice 4)   = DATA_INICIO   (seção "INFORMAÇÕES COMPLEMENTARES")
+ *   Col AR (índice 43) = TAXA_NOVA "12 meses" (seção de rentabilidade)
  *
  * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
  */
 function atualizarDadosDeCoafi(ss) {
   var coafiSheet = ss.getSheetByName(CONFIG.SHEET_COAFI);
-  if (!coafiSheet || coafiSheet.getLastRow() < 2) {
+  if (!coafiSheet || coafiSheet.getLastRow() < 1) {
     Logger.log('Aba COAFI vazia ou não encontrada — DATA_INICIO e TAXA_NOVA não atualizados.');
     return;
   }
 
   var coafiData = coafiSheet.getDataRange().getValues();
 
-  // Constrói mapas: nome (col B) → DATA_INICIO (col E) e → TAXA_NOVA (col AR)
-  // A linha 0 é o cabeçalho da planilha importada — ignorar.
+  // Constrói mapas: nome (col B) → DATA_INICIO (col E) e → TAXA_NOVA (col AR).
+  // Começa em i=0 porque o IMPORTRANGE preenche a partir da linha 1 da aba
+  // (não há linha de cabeçalho separada a pular).
   var mapaInicio = {};
   var mapaTaxa   = {};
-  for (var i = 1; i < coafiData.length; i++) {
+  for (var i = 0; i < coafiData.length; i++) {
     var row  = coafiData[i];
-    var nome = String(row[1] || '').trim();  // col B (índice 1)
+    var nome = String(row[COL_B_NOME] || '').trim();  // col B
     if (!nome) continue;
-    mapaInicio[nome] = row[4];   // col E (índice 4) = DATA_INICIO
-    mapaTaxa[nome]   = row[43];  // col AR (índice 43) = TAXA_NOVA
+    // col E = DATA_INICIO na seção INFORMAÇÕES COMPLEMENTARES
+    mapaInicio[nome] = row[COL_E_INICIO];
+    // col AR = "12 meses" acumulado na seção de rentabilidade
+    mapaTaxa[nome]   = row.length > COL_AR_12MESES ? row[COL_AR_12MESES] : undefined;
   }
 
   // ── Atualiza PodeSimular col C (DATA_INICIO) ──────────────────────────────
@@ -545,7 +553,7 @@ function atualizarDadosDeCoafi(ss) {
   if (psSheet && psSheet.getLastRow() >= 2) {
     var psData = psSheet.getDataRange().getValues();
     for (var p = 1; p < psData.length; p++) {
-      var fundId   = String(psData[p][0] || '').trim();
+      var fundId    = String(psData[p][0] || '').trim();
       var coafiNome = FUND_ID_TO_COAFI_INICIO[fundId];
       if (!coafiNome || !mapaInicio.hasOwnProperty(coafiNome)) continue;
       var dataVal = mapaInicio[coafiNome];
@@ -560,7 +568,7 @@ function atualizarDadosDeCoafi(ss) {
   if (tnSheet && tnSheet.getLastRow() >= 2) {
     var tnData = tnSheet.getDataRange().getValues();
     for (var t = 1; t < tnData.length; t++) {
-      var fId      = String(tnData[t][0] || '').trim();
+      var fId           = String(tnData[t][0] || '').trim();
       var coafiNomeTaxa = FUND_ID_TO_COAFI_TAXA[fId];
       if (!coafiNomeTaxa || !mapaTaxa.hasOwnProperty(coafiNomeTaxa)) continue;
       var taxaVal = mapaTaxa[coafiNomeTaxa];
@@ -574,15 +582,47 @@ function atualizarDadosDeCoafi(ss) {
 }
 
 /**
+ * Verifica se a aba COAFI existe e possui a fórmula IMPORTRANGE configurada.
+ * Se não tiver (aba ausente ou com estrutura placeholder do código antigo),
+ * recria automaticamente a aba com a fórmula correta — sem nenhuma interação
+ * manual. O sistema se autocorrige na primeira execução do trigger.
+ *
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
+ */
+function garantirImportRangeCoafi(ss) {
+  var sheet = ss.getSheetByName(CONFIG.SHEET_COAFI);
+
+  if (!sheet) {
+    Logger.log('garantirImportRangeCoafi: aba COAFI não existe — criando com IMPORTRANGE.');
+    _criarAbaCoafi(ss);
+    return;
+  }
+
+  try {
+    var formula = sheet.getRange('A1').getFormula();
+    if (!formula || formula.toUpperCase().indexOf('IMPORTRANGE') < 0) {
+      // A aba existe mas tem a estrutura antiga (placeholder sem IMPORTRANGE)
+      Logger.log('garantirImportRangeCoafi: aba COAFI tem estrutura antiga — recriando com IMPORTRANGE.');
+      ss.deleteSheet(sheet);
+      _criarAbaCoafi(ss);
+    }
+  } catch (e) {
+    Logger.log('Aviso em garantirImportRangeCoafi: ' + e.message);
+  }
+}
+
+/**
  * Recalcula todos os valores derivados das abas auxiliares no backend.
  * Deve ser chamada antes de ler dados (em gerarEEnviar) e ao configurar a planilha.
  * Ordem:
- *   1. atualizarDadosDeCoafi  — popula DATA_INICIO (PodeSimular col C) e TAXA_NOVA (TaxaNova col C) a partir do COAFI
- *   2. atualizarColunaPodeSimular — recalcula PODE_SIMULAR (PodeSimular col D) com base na DATA_INICIO
- *   3. atualizarColunasInicial — propaga PODE_SIMULAR_NOVO e TAXA_NOVA para Inicial cols F e G
+ *   1. garantirImportRangeCoafi   — autocorrige a aba COAFI se tiver estrutura antiga
+ *   2. atualizarDadosDeCoafi      — popula DATA_INICIO e TAXA_NOVA a partir do COAFI
+ *   3. atualizarColunaPodeSimular — recalcula PODE_SIMULAR com base na DATA_INICIO
+ *   4. atualizarColunasInicial    — propaga PODE_SIMULAR_NOVO e TAXA_NOVA para Inicial
  * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
  */
 function sincronizarValoresDerivados(ss) {
+  garantirImportRangeCoafi(ss);
   atualizarDadosDeCoafi(ss);
   atualizarColunaPodeSimular(ss);
   atualizarColunasInicial(ss);
