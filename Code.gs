@@ -220,6 +220,7 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('🏦 Gerenciador Fundos')
     .addItem('🗂️ Configurar Abas da Planilha', 'configurarPlanilha')
+    .addItem('♻️ Reconfigurar Abas (Excluir e Recriar)', 'reconfigurarPlanilha')
     .addSeparator()
     .addItem('📋 Abrir Painel de Log', 'abrirPainel')
     .addSeparator()
@@ -292,13 +293,15 @@ function parseTaxaPercent(val) {
 }
 
 /**
- * Converte "35.80" ou "35,80%" (valor percentual como número ou texto) para 0.3580.
- * Retorna 0 se inválido ou vazio.
- * Aceita tanto o valor numérico 35.80 quanto a string "35,80%" da coluna G da aba Inicial.
+ * Converte um valor percentual (número ou string) para decimal. Retorna 0 se inválido ou vazio.
+ * Exemplos de entrada aceitos:
+ *   - número:  35.80  →  0.3580
+ *   - string: "35,80%"  →  0.3580
+ *   - string: "35.80"   →  0.3580
  */
 function parseTaxaDecimal(val) {
   if (!val || val === '') return 0;
-  var str = String(val).replace(',', '.').trim();
+  var str = String(val).replace('%', '').replace(',', '.').trim();
   var num = parseFloat(str);
   return isNaN(num) ? 0 : num / 100;
 }
@@ -401,10 +404,11 @@ function atualizarColunasInicial(ss) {
     // Col G: TAXA_NOVA — equivalente à fórmula original:
     //   =SE(F2="Sim";CONCATENAR(PROCV(C2;TaxaNova!A:C;3;FALSO);"%");"")
     // Formata como "XX,XX%" quando podeSimNovo="Sim" e o valor for válido; caso contrário, vazio.
+    // A aba TaxaNova armazena o valor como número percentual (ex: 35.80 para 35,80%).
     var taxaNovaRaw = taxaNovaMap.hasOwnProperty(fundId) ? taxaNovaMap[fundId] : '';
     var taxaNovaFormatada = '';
     if (podeSimNovo === 'Sim') {
-      var taxaNum = parseFloat(String(taxaNovaRaw).replace(/,/g, '.'));
+      var taxaNum = Number(taxaNovaRaw);
       if (!isNaN(taxaNum) && taxaNum > 0) {
         taxaNovaFormatada = taxaNum.toFixed(2).replace('.', ',') + '%';
       }
@@ -673,6 +677,95 @@ function configurarPlanilha() {
   try {
     SpreadsheetApp.getUi().alert('🏦 Planilha Configurada!', msg, SpreadsheetApp.getUi().ButtonSet.OK);
   } catch (e) {}
+}
+
+/**
+ * Exclui todas as abas gerenciadas pelo sistema e as recria do zero com os
+ * dados corretos. Útil para corrigir inconsistências ou após atualização dos
+ * dados estáticos em FUND_DATA / nas funções _criar*.
+ *
+ * ⚠️ ATENÇÃO: todos os dados presentes nas abas gerenciadas serão perdidos.
+ * Dados importados via =IMPORTRANGE(...) na aba COAFI precisarão ser
+ * reconfigurados após a execução desta função.
+ *
+ * Execute via menu 🏦 Gerenciador Fundos → "♻️ Reconfigurar Abas (Excluir e Recriar)".
+ */
+function reconfigurarPlanilha() {
+  var ui = SpreadsheetApp.getUi();
+
+  // Confirmação obrigatória antes de excluir qualquer dado
+  var resposta = ui.alert(
+    '♻️ Reconfigurar Planilha',
+    'Esta ação irá EXCLUIR e RECRIAR as seguintes abas:\n\n' +
+      '• ' + CONFIG.SHEET_COAFI     + '\n' +
+      '• ' + CONFIG.SHEET_PODE_SIM  + '\n' +
+      '• ' + CONFIG.SHEET_TAXA_NOVA + '\n' +
+      '• ' + CONFIG.SHEET_INICIAL   + '\n' +
+      '• ' + CONFIG.SHEET_LOG       + '\n' +
+      '• ' + CONFIG.SHEET_FUNDS     + '\n\n' +
+    '⚠️ Todos os dados atuais nessas abas serão PERDIDOS.\n' +
+    'O =IMPORTRANGE(...) da aba COAFI precisará ser reconfigurado.\n\n' +
+    'Deseja continuar?',
+    ui.ButtonSet.YES_NO
+  );
+
+  if (resposta !== ui.Button.YES) {
+    ui.alert('Operação cancelada.', 'Nenhuma aba foi modificada.', ui.ButtonSet.OK);
+    return;
+  }
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  // Lista de abas gerenciadas a excluir e recriar (ordem de exclusão)
+  var abasGerenciadas = [
+    CONFIG.SHEET_COAFI,
+    CONFIG.SHEET_PODE_SIM,
+    CONFIG.SHEET_TAXA_NOVA,
+    CONFIG.SHEET_INICIAL,
+    CONFIG.SHEET_LOG,
+    CONFIG.SHEET_FUNDS,
+  ];
+
+  // Para evitar a restrição "a planilha precisa ter ao menos uma aba",
+  // criamos uma aba temporária antes de excluir as demais.
+  var tempSheet = ss.insertSheet('_tmp_reconfigurar_');
+
+  // Excluir todas as abas gerenciadas que existirem
+  var excluidas = [];
+  abasGerenciadas.forEach(function (nome) {
+    var sheet = ss.getSheetByName(nome);
+    if (sheet) {
+      ss.deleteSheet(sheet);
+      excluidas.push(nome);
+    }
+  });
+
+  // Recriar todas as abas na ordem correta
+  _criarAbaCoafi(ss);
+  _criarAbaPodeSimular(ss);
+  _criarAbaTaxaNova(ss);
+  _criarAbaInicial(ss);
+  garantirAbaLog(ss);
+  criarAbaDadosFundos(ss);
+
+  // Recalcula valores derivados (PodeSimular col D, Inicial cols F e G)
+  sincronizarValoresDerivados(ss);
+
+  // Remove a aba temporária usando a referência já armazenada
+  ss.deleteSheet(tempSheet);
+
+  Logger.log('reconfigurarPlanilha concluído. Excluídas e recriadas: [' + excluidas.join(', ') + ']');
+
+  ui.alert(
+    '✅ Planilha Reconfigurada!',
+    'As seguintes abas foram excluídas e recriadas com sucesso:\n\n' +
+      '• ' + excluidas.join('\n• ') + '\n\n' +
+    'Próximos passos:\n' +
+    '1. Na aba ' + CONFIG.SHEET_COAFI + ', substitua a linha 2 pelo =IMPORTRANGE(...) do GEART.\n' +
+    '2. Atualize as datas na aba ' + CONFIG.SHEET_PODE_SIM + ' para recalcular "Pode Simular".\n' +
+    '3. Execute "🔄 Gerar e Enviar Agora" ou "🧪 Testar Envio de E-mail".',
+    ui.ButtonSet.OK
+  );
 }
 
 /**
