@@ -16,8 +16,7 @@
 var CONFIG = {
   DEVELOPER_EMAIL: 'spandrade@banestes.com.br',
 
-  // Analistas — descomentar após validação:
-  // ANALYST_EMAILS: ['iodutra@banestes.com.br', 'jcrepossi@banestes.com.br'],
+  ANALYST_EMAILS: ['iodutra@banestes.com.br', 'jcrepossi@banestes.com.br'],
 
   // Abas da planilha
   SHEET_INICIAL:   'Inicial',
@@ -1569,8 +1568,7 @@ function enviarEmail(jsonStr, sqlStr, fundos) {
   var sufixo  = Utilities.formatDate(agora, Session.getScriptTimeZone(), 'yyyyMMdd_HHmmss');
 
   var destinatarios = [CONFIG.DEVELOPER_EMAIL];
-  // Descomentar após validação:
-  // destinatarios = destinatarios.concat(CONFIG.ANALYST_EMAILS || []);
+  destinatarios = destinatarios.concat(CONFIG.ANALYST_EMAILS || []);
 
   var nomeJson = 'fundos_banestes_' + sufixo + '.json';
   var nomeSql  = 'script_mainframe_' + sufixo + '.sql';

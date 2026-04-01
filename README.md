@@ -149,8 +149,8 @@ GEART ──IMPORTRANGE──▶ COAFI ──PROCV──▶ PodeSimular ──PR
 | E-mail | Função | Status |
 |---|---|---|
 | `spandrade@banestes.com.br` | Desenvolvedor | ✅ **Ativo** |
-| `iodutra@banestes.com.br` | Igor Dutra | 💤 Comentado — descomentar em `CONFIG.ANALYST_EMAILS` |
-| `jcrepossi@banestes.com.br` | Juliana Crepossi | 💤 Comentado — descomentar em `CONFIG.ANALYST_EMAILS` |
+| `iodutra@banestes.com.br` | Igor Dutra | ✅ **Ativo** |
+| `jcrepossi@banestes.com.br` | Juliana Crepossi | ✅ **Ativo** |
 
 ---
 
