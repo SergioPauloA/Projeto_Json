@@ -54,18 +54,19 @@ var COL_E_INICIO    = 4;   // col E  = "Início das atividades" (seção INFORMA
 var COL_AR_12MESES  = 43;  // col AR = rentabilidade acumulada 12 meses
 
 // Fundos que NUNCA simulam, independentemente da data de início.
-// Corresponde às células com "Não" fixo na col D da aba PodeSimular do sistema original.
-var FUNDO_SEMPRE_NAO = {
-  'invest_investpublic':                            true,
-  'invest_investidor':                              true,
-  'invest_previdenciario':                          true,
-  'banestes_tesouro_fi_renda_fixa_referenciado_di': true,
-  'invest_solidez':                                 true,
-  'invest_referencial':                             true,
-  'invest_funses':                                  true,
-  'invest_soberano':                                true,
-  'invest_tenax':                                   true,
-  'invest_Synergy':                                 true,
+// Chaveado pelo nome do fundo (NOME_SITE / col A da aba PodeSimular),
+// exatamente como o sistema original fixava "Não" em células específicas da col D.
+var NOME_SITE_SEMPRE_NAO = {
+  'Banestes Invest Public Automático FIF CP RL':                              true,
+  'Banestes Investidor Automático FIF Renda Fixa CP RL':                      true,
+  'Banestes IMA-B Títulos Públicos FIF Renda Fixa RL':                        true,
+  'Banestes Tesouro FIF Renda Fixa Referenciado DI RL':                       true,
+  'Banestes Solidez Automático FIF Renda Fixa CP RL':                         true,
+  'Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL':                      true,
+  'Banestes FUNSES Multimercado RL':                                           true,
+  'Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL': true,
+  'Banestes Tenax Ações FIF em Cotas de FIA RL':                              true,
+  'Banestes Synergy Long Only FIF em Cotas de FIA RL':                        true,
 };
 
 // Mapeamento: ID do fundo → nome exato na col B da aba COAFI (para buscar DATA_INICIO)
@@ -529,11 +530,11 @@ function computeHash(str) {
  * Recalcula a coluna PODE_SIMULAR (col D) da aba PodeSimular inteiramente
  * no backend, sem usar fórmulas na célula.
  *
- * Regra (equivalente ao IF que estava na célula):
- *   • Fundo em FUNDO_SEMPRE_NAO → preserva 'Não' fixo (nunca recalcula)
+ * Equivalência exata com a lógica original da planilha:
+ *   • Fundo em NOME_SITE_SEMPRE_NAO → "Não" fixo (igual às células sem fórmula)
  *   • DATA_INICIO vazia → preserva valor existente em col D
- *   • DATA_INICIO preenchida e fundo com ≥ 1 ano de operação → "Sim"
- *   • DATA_INICIO preenchida e fundo com < 1 ano de operação → "Não"
+ *   • DATA_INICIO preenchida → =SE(DATADIF(C;HOJE();"Y")>0;"Sim";"Não")
+ *     Conta anos calendario completos: > 0 = pelo menos 1 ano completo = "Sim"
  *
  * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
  */
@@ -545,25 +546,30 @@ function atualizarColunaPodeSimular(ss) {
   var hoje = new Date();
 
   for (var i = 1; i < data.length; i++) {
-    var fundId = String(data[i][0] || '').trim(); // col A: ID_FUNDO
+    var nomeSite = String(data[i][0] || '').trim(); // col A: NOME_SITE
     // Fundos que nunca podem simular: manter 'Não' fixo, independente da data
-    if (FUNDO_SEMPRE_NAO[fundId]) {
+    if (NOME_SITE_SEMPRE_NAO[nomeSite]) {
       sheet.getRange(i + 1, 4).setValue('Não');
       continue;
     }
 
     var dataInicio = data[i][2]; // col C: DATA_INICIO
-    // When no date is set, preserve whatever value is already in col D
-    // (allows initial 'Sim' entries to be kept until COAFI data arrives).
+    // Sem data preenchida: preserva o valor já existente em col D
     if (!dataInicio) continue;
 
     var dt = (dataInicio instanceof Date) ? dataInicio : new Date(dataInicio);
-    // Guard against invalid dates (e.g. unexpected text in column C)
+    // Proteção contra datas inválidas (ex: texto inesperado na coluna C)
     if (isNaN(dt.getTime())) continue;
 
-    // Use 365 days to match the behaviour of the original DATADIF formula
-    var anos = (hoje - dt) / (365 * 24 * 60 * 60 * 1000);
-    sheet.getRange(i + 1, 4).setValue(anos >= 1 ? 'Sim' : 'Não');
+    // Equivalente exato a =SE(DATADIF(C;HOJE();"Y")>0;"Sim";"Não")
+    // Conta anos calendario completos entre DATA_INICIO e HOJE.
+    var startYear  = dt.getFullYear(),  startMonth  = dt.getMonth(),  startDay  = dt.getDate();
+    var todayYear  = hoje.getFullYear(), todayMonth  = hoje.getMonth(), todayDay  = hoje.getDate();
+    var anosCompletos = todayYear - startYear;
+    if (todayMonth < startMonth || (todayMonth === startMonth && todayDay < startDay)) {
+      anosCompletos--;
+    }
+    sheet.getRange(i + 1, 4).setValue(anosCompletos > 0 ? 'Sim' : 'Não');
   }
 }
 
@@ -571,11 +577,13 @@ function atualizarColunaPodeSimular(ss) {
  * Recalcula as colunas PODE_SIMULAR_NOVO (col F) e TAXA_NOVA (col G) da aba
  * Inicial inteiramente no backend, sem usar fórmulas nas células.
  *
- * Equivalência com as fórmulas que estavam nas células:
- *   Col F: =IFERROR(VLOOKUP(B,PodeSimular!A:D,4,FALSE), D)
- *   Col G: =SE(F="Sim";CONCATENAR(PROCV(B;TaxaNova!A:C;3;FALSO);"%");"")
- *          Produz "XX,XX%" quando podeSimNovo="Sim" e taxa > 0; vazio caso contrário.
- *          A aba TaxaNova armazena os valores como número percentual (ex: 35.80 para 35,80%).
+ * Equivalência exata com as fórmulas originais:
+ *   Col F: =PROCV(C; PodeSimular!A:D; 4; 0)
+ *           Busca o NOME_FUNDO (col C) na col A (NOME_SITE) de PodeSimular,
+ *           retorna col D (PODE_SIMULAR). Fallback: valor atual de col D desta aba.
+ *   Col G: =SE(F="Sim"; CONCATENAR(PROCV(C; TaxaNova!A:C; 3; FALSO); "%"); "")
+ *           Busca o NOME_FUNDO (col C) na col A (NOME_SITE) de TaxaNova,
+ *           retorna col C (TAXA_NOVA) formatado como "XX,XX%".
  *
  * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
  */
@@ -583,42 +591,42 @@ function atualizarColunasInicial(ss) {
   var inicialSheet = ss.getSheetByName(CONFIG.SHEET_INICIAL);
   if (!inicialSheet || inicialSheet.getLastRow() < 2) return;
 
-  // Mapa ID → PODE_SIMULAR (col D) da aba PodeSimular
+  // Mapa NOME_SITE → PODE_SIMULAR (col D) da aba PodeSimular
+  // Chave = col A (NOME_SITE), equivalente à busca PROCV(C; PodeSimular!A:D; 4; 0)
   var podeSimMap = {};
   var psSheet = ss.getSheetByName(CONFIG.SHEET_PODE_SIM);
   if (psSheet && psSheet.getLastRow() >= 2) {
     var psData = psSheet.getDataRange().getValues();
     for (var p = 1; p < psData.length; p++) {
-      var psId = String(psData[p][0] || '').trim();
-      if (psId) podeSimMap[psId] = String(psData[p][3] || '').trim();
+      var psNome = String(psData[p][0] || '').trim(); // col A: NOME_SITE
+      if (psNome) podeSimMap[psNome] = String(psData[p][3] || '').trim(); // col D
     }
   }
 
-  // Mapa ID → TAXA_NOVA (col C, percentual numérico como 35.80) da aba TaxaNova
+  // Mapa NOME_SITE → TAXA_NOVA (col C, número percentual como 35.80) da aba TaxaNova
+  // Chave = col A (NOME_SITE), equivalente à busca PROCV(C; TaxaNova!A:C; 3; FALSO)
   var taxaNovaMap = {};
   var tnSheet = ss.getSheetByName(CONFIG.SHEET_TAXA_NOVA);
   if (tnSheet && tnSheet.getLastRow() >= 2) {
     var tnData = tnSheet.getDataRange().getValues();
     for (var t = 1; t < tnData.length; t++) {
-      var tnId = String(tnData[t][0] || '').trim();
-      if (tnId) taxaNovaMap[tnId] = tnData[t][2];
+      var tnNome = String(tnData[t][0] || '').trim(); // col A: NOME_SITE
+      if (tnNome) taxaNovaMap[tnNome] = tnData[t][2]; // col C
     }
   }
 
   var inicialData = inicialSheet.getDataRange().getValues();
   var fgValues = [];
   for (var i = 1; i < inicialData.length; i++) {
-    var fundId       = String(inicialData[i][1] || '').trim(); // col B: ID_FUNDO
+    var nomeSite     = String(inicialData[i][2] || '').trim(); // col C: NOME_FUNDO (nome_site)
     var podeSimAtual = String(inicialData[i][3] || '').trim(); // col D: fallback
 
-    // Col F: PODE_SIMULAR_NOVO — lookup em PodeSimular; fallback: col D desta aba
-    var podeSimNovo = podeSimMap.hasOwnProperty(fundId) ? podeSimMap[fundId] : podeSimAtual;
+    // Col F: =PROCV(C; PodeSimular!A:D; 4; 0) — busca por nome_site
+    var podeSimNovo = podeSimMap.hasOwnProperty(nomeSite) ? podeSimMap[nomeSite] : podeSimAtual;
 
-    // Col G: TAXA_NOVA — equivalente à fórmula original:
-    //   =SE(F2="Sim";CONCATENAR(PROCV(C2;TaxaNova!A:C;3;FALSO);"%");"")
-    // Formata como "XX,XX%" quando podeSimNovo="Sim" e o valor for válido; caso contrário, vazio.
-    // A aba TaxaNova armazena o valor como número percentual (ex: 35.80 para 35,80%).
-    var taxaNovaRaw = taxaNovaMap.hasOwnProperty(fundId) ? taxaNovaMap[fundId] : '';
+    // Col G: =SE(F="Sim"; CONCATENAR(PROCV(C; TaxaNova!A:C; 3; FALSO); "%"); "")
+    // Busca por nome_site; formata como "XX,XX%" quando podeSimNovo="Sim".
+    var taxaNovaRaw = taxaNovaMap.hasOwnProperty(nomeSite) ? taxaNovaMap[nomeSite] : '';
     var taxaNovaFormatada = '';
     if (podeSimNovo === 'Sim') {
       var taxaNum = Number(taxaNovaRaw);
@@ -639,13 +647,15 @@ function atualizarColunasInicial(ss) {
  * Lê a aba COAFI (importada via IMPORTRANGE do GEART/RENTABILIDADE) e atualiza:
  *   • Aba PodeSimular col C (DATA_INICIO) — equivalente à fórmula original
  *       =PROCV(B; COAFI!B:E; 4; FALSO)
+ *       onde col B de PodeSimular = "Nome Planilha COAFI" (nome completo na col B do COAFI)
  *   • Aba TaxaNova col C (TAXA_NOVA) — equivalente à fórmula original
  *       =TEXTO(PROCV(B; COAFI!B:AR; 43; FALSO); "0.00")
+ *       onde col B de TaxaNova = "Nome Planilha COAFI" (nome curto na col B do COAFI)
  *
  * Estrutura da aba COAFI (dados do GEART/RENTABILIDADE!A:AR):
  *   Col B (índice 1)   = nome do fundo (chave de lookup)
  *   Col E (índice 4)   = DATA_INICIO   (seção "INFORMAÇÕES COMPLEMENTARES")
- *   Col AR (índice 43) = TAXA_NOVA "12 meses" (seção de rentabilidade)
+ *   Col AR (índice 43) = rentabilidade acumulada "12 meses"
  *
  * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
  */
@@ -667,19 +677,17 @@ function atualizarDadosDeCoafi(ss) {
     var row  = coafiData[i];
     var nome = String(row[COL_B_NOME] || '').trim();  // col B
     if (!nome) continue;
-    // col E = DATA_INICIO na seção INFORMAÇÕES COMPLEMENTARES
     mapaInicio[nome] = row[COL_E_INICIO];
-    // col AR = "12 meses" acumulado na seção de rentabilidade
     mapaTaxa[nome]   = row.length > COL_AR_12MESES ? row[COL_AR_12MESES] : undefined;
   }
 
   // ── Atualiza PodeSimular col C (DATA_INICIO) ──────────────────────────────
+  // Equivalente a =PROCV(B; COAFI!B:E; 4; FALSO) onde B = col B de PodeSimular (NOME_COAFI)
   var psSheet = ss.getSheetByName(CONFIG.SHEET_PODE_SIM);
   if (psSheet && psSheet.getLastRow() >= 2) {
     var psData = psSheet.getDataRange().getValues();
     for (var p = 1; p < psData.length; p++) {
-      var fundId    = String(psData[p][0] || '').trim();
-      var coafiNome = FUND_ID_TO_COAFI_INICIO[fundId];
+      var coafiNome = String(psData[p][1] || '').trim(); // col B: NOME_COAFI
       if (!coafiNome || !mapaInicio.hasOwnProperty(coafiNome)) continue;
       var dataVal = mapaInicio[coafiNome];
       if (dataVal != null && dataVal !== '') {
@@ -689,12 +697,12 @@ function atualizarDadosDeCoafi(ss) {
   }
 
   // ── Atualiza TaxaNova col C (TAXA_NOVA) ───────────────────────────────────
+  // Equivalente a =TEXTO(PROCV(B; COAFI!B:AR; 43; FALSO); "0.00") onde B = col B de TaxaNova
   var tnSheet = ss.getSheetByName(CONFIG.SHEET_TAXA_NOVA);
   if (tnSheet && tnSheet.getLastRow() >= 2) {
     var tnData = tnSheet.getDataRange().getValues();
     for (var t = 1; t < tnData.length; t++) {
-      var fId           = String(tnData[t][0] || '').trim();
-      var coafiNomeTaxa = FUND_ID_TO_COAFI_TAXA[fId];
+      var coafiNomeTaxa = String(tnData[t][1] || '').trim(); // col B: NOME_COAFI (nome curto)
       if (!coafiNomeTaxa || !mapaTaxa.hasOwnProperty(coafiNomeTaxa)) continue;
       var taxaVal = mapaTaxa[coafiNomeTaxa];
       if (taxaVal != null && taxaVal !== '') {
@@ -1085,45 +1093,45 @@ function _criarAbaCoafi(ss) {
 }
 
 /**
- * Cria a aba PodeSimular com todos os 26 fundos de FUND_DATA.
- * Coluna D (PODE_SIMULAR): calculada pelo backend a partir de DATA_INICIO —
- * "Sim" se o fundo tiver ≥ 1 ano de operação, "Sim" como padrão enquanto
- * DATA_INICIO não estiver preenchida.
+ * Cria a aba PodeSimular com todos os 26 fundos.
+ * Estrutura idêntica à planilha original:
+ *   Col A (NOME_SITE):    nome completo do fundo como exibido no site
+ *   Col B (NOME_COAFI):   nome do fundo na planilha COAFI (col B do GEART) — chave do PROCV de DATA_INICIO
+ *   Col C (DATA_INICIO):  preenchida por atualizarDadosDeCoafi() via lookup na aba COAFI
+ *   Col D (PODE_SIMULAR): "Não" fixo para fundos em NOME_SITE_SEMPRE_NAO;
+ *                         para os demais, calculado por atualizarColunaPodeSimular()
+ *                         via DATADIF(C; HOJE(); "Y") > 0
  */
 function _criarAbaPodeSimular(ss) {
-  var headers = ['ID_FUNDO', 'NOME_FUNDO', 'DATA_INICIO', 'PODE_SIMULAR'];
-  // Order matches the original "PodeSimular" spreadsheet tab (A2:A27).
-  // Column 4 (PODE_SIMULAR) contains the correct initial value:
-  //   'Não' — hardcoded funds that must never simulate regardless of age.
-  //   'Sim' — funds whose eligibility is determined by their start date;
-  //            atualizarColunaPodeSimular() will recalculate when DATA_INICIO is filled.
+  var headers = ['NOME_SITE', 'NOME_COAFI', 'DATA_INICIO', 'PODE_SIMULAR'];
+  // Ordem igual à aba original: col A = "Nome site", col B = "Nome Planilha COAFI"
   var staticRows = [
-    ['invest_investpublic',                            'Banestes Invest Public Automático FIF CP RL',                                       '', 'Não'],
-    ['invest_investmoney',                             'Banestes Invest Money FIF Renda Fixa RL',                                           '', 'Sim'],
-    ['invest_investidor',                              'Banestes Investidor Automático FIF Renda Fixa CP RL',                               '', 'Não'],
-    ['invest-vitoria-500',                             'Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',                     '', 'Sim'],
-    ['invest_vipdi',                                   'Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                          '', 'Sim'],
-    ['invest_institucional',                           'Banestes Institucional FIF Renda Fixa RL',                                          '', 'Sim'],
-    ['invest_previdenciario',                          'Banestes IMA-B Títulos Públicos FIF Renda Fixa RL',                                 '', 'Não'],
-    ['banestes_tesouro_fi_renda_fixa_referenciado_di', 'Banestes Tesouro FIF Renda Fixa Referenciado DI RL',                                '', 'Não'],
-    ['invest_solidez',                                 'Banestes Solidez Automático FIF Renda Fixa CP RL',                                  '', 'Não'],
-    ['invest_btg_pactual_absoluto',                    'Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',               '', 'Sim'],
-    ['invest-valores',                                 'Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',                '', 'Sim'],
-    ['invest_liquidez_referenciado',                   'Banestes Liquidez FIF Renda Fixa Referenciado DI RL',                               '', 'Sim'],
-    ['invest_referencial',                             'Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL',                               '', 'Não'],
-    ['invest_debentures',                              'Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',        '', 'Sim'],
-    ['invest-estrategia',                              'Banestes Estratégia FIC de FIF Renda Fixa RL',                                      '', 'Sim'],
-    ['invest_dividendos',                              'Banestes Dividendos FIC de FIF de Ações RL',                                        '', 'Sim'],
-    ['invest_funses',                                  'Banestes FUNSES Multimercado RL',                                                   '', 'Não'],
-    ['invest_facil',                                   'Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',                 '', 'Sim'],
-    ['invest_cred_corp',                               'Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',                 '', 'Sim'],
-    ['invest_ima-b5',                                  'Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',                             '', 'Sim'],
-    ['invest_multiestrategia',                         'Banestes Multiestratégia FIC de FIF Multimercado RL',                               '', 'Sim'],
-    ['invest_selection',                               'Banestes Selection FI Renda Fixa CP RL',                                            '', 'Sim'],
-    ['invest_fundo_reserva_climatica',                 'Banestes Reserva Climática FIF RF Referenciado DI RL',                              '', 'Sim'],
-    ['invest_soberano',                                'Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL',           '', 'Não'],
-    ['invest_tenax',                                   'Banestes Tenax Ações FIF em Cotas de FIA RL',                                       '', 'Não'],
-    ['invest_Synergy',                                 'Banestes Synergy Long Only FIF em Cotas de FIA RL',                                 '', 'Não'],
+    ['Banestes Invest Public Automático FIF CP RL',                                      'Banestes Invest Public Automático FI',                                                                                      '', 'Não'],
+    ['Banestes Invest Money FIF Renda Fixa RL',                                          'Banestes Invest Money FI RF',                                                                                               '', 'Sim'],
+    ['Banestes Investidor Automático FIF Renda Fixa CP RL',                              'Banestes Investidor Automático FI',                                                                                         '', 'Não'],
+    ['Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',                    'Banestes Vitória 500 FIC RF DI',                                                                                            '', 'Sim'],
+    ['Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                         'Banestes Vip Di FIC RF DI',                                                                                                 '', 'Sim'],
+    ['Banestes Institucional FIF Renda Fixa RL',                                         'Banestes Institucional FI RF',                                                                                              '', 'Sim'],
+    ['Banestes IMA-B Títulos Públicos FIF Renda Fixa RL',                                'Banestes IMA-B Títulos Públicos FI RF',                                                                                     '', 'Não'],
+    ['Banestes Tesouro FIF Renda Fixa Referenciado DI RL',                               'Banestes Tesouro FI RF DI',                                                                                                 '', 'Não'],
+    ['Banestes Solidez Automático FIF Renda Fixa CP RL',                                 'Banestes Solidez Automático FI',                                                                                            '', 'Não'],
+    ['Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',              'Banestes BTG Pactual Inst. Absoluto',                                                                                        '', 'Sim'],
+    ['Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',               'Banestes Valores FIC RF DI',                                                                                                '', 'Sim'],
+    ['Banestes Liquidez FIF Renda Fixa Referenciado DI RL',                              'Banestes Liquidez FI RF REF DI',                                                                                            '', 'Sim'],
+    ['Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL',                              'Banestes IRF-M 1Títulos Públicos RF',                                                                                       '', 'Não'],
+    ['Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',       'Banestes Infraestrutura FIC RF Cred Priv',                                                                                  '', 'Sim'],
+    ['Banestes Estratégia FIC de FIF Renda Fixa RL',                                     'Banestes Estratégia FI RF',                                                                                                 '', 'Sim'],
+    ['Banestes Dividendos FIC de FIF de Ações RL',                                       'Banestes Dividendos FIC de FI',                                                                                             '', 'Sim'],
+    ['Banestes FUNSES Multimercado RL',                                                   'Banestes Funses FI',                                                                                                        '', 'Não'],
+    ['Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',                'Banestes Invest Fácil FI RF Simples',                                                                                       '', 'Sim'],
+    ['Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',                'Banestes Credito Corporativo I FIC RF Cred Priv LP',                                                                       '', 'Sim'],
+    ['Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',                            'Banestes IMA-B5 Títulos Públicos FI RF LP',                                                                                 '', 'Sim'],
+    ['Banestes Multiestratégia FIC de FIF Multimercado RL',                              'Banestes Multiestrategia FIC Multimercado',                                                                                  '', 'Sim'],
+    ['Banestes Selection FI Renda Fixa CP RL',                                           'Banestes Selection FI RF Cred Priv',                                                                                        '', 'Sim'],
+    ['Banestes Reserva Climática FIF RF Referenciado DI RL',                             'Banestes Reserva Climática FIF RF DI Resp. Ltda.',                                                                          '', 'Sim'],
+    ['Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL',          'Banestes Soberano FIF RF Simples Resp. Ltda.',                                                                              '', 'Não'],
+    ['Banestes Tenax Ações FIF em Cotas de FIA RL',                                      'Banestes Tenax Ações FIF Em Cotas De Fundo de Investimento Em Ações Resp. Ltda.',                                         '', 'Não'],
+    ['Banestes Synergy Long Only FIF em Cotas de FIA RL',                                'BANESTES SYNERGY LONG ONLY FIF EM COTAS DE FUNDOS DE INVESTIMENTO EM AÇÕES RESP. Ltda.',                                   '', 'Não'],
   ];
 
   var sheet  = ss.insertSheet(CONFIG.SHEET_PODE_SIM);
@@ -1131,12 +1139,12 @@ function _criarAbaPodeSimular(ss) {
   hRange.setValues([headers])
     .setBackground('#1a3c5e').setFontColor('#ffffff').setFontWeight('bold').setFontSize(10);
 
-  // Write all 4 columns (ID, NOME, DATA_INICIO, PODE_SIMULAR) at once
+  // Escreve as 4 colunas (NOME_SITE, NOME_COAFI, DATA_INICIO, PODE_SIMULAR) de uma vez
   sheet.getRange(2, 1, staticRows.length, 4).setValues(staticRows);
   sheet.getRange(2, 3, staticRows.length, 1).setNumberFormat('dd/MM/yyyy');
 
-  // atualizarColunaPodeSimular is NOT called here because DATA_INICIO is empty;
-  // it will only recalculate PODE_SIMULAR once real dates are filled in.
+  // atualizarColunaPodeSimular não é chamada aqui porque DATA_INICIO está vazia;
+  // ela recalculará PODE_SIMULAR somente quando as datas reais forem preenchidas pelo COAFI.
 
   sheet.setFrozenRows(1);
   sheet.autoResizeColumns(1, headers.length);
@@ -1144,43 +1152,43 @@ function _criarAbaPodeSimular(ss) {
 }
 
 /**
- * Cria a aba TaxaNova com todos os 26 fundos de FUND_DATA e suas taxas de
- * simulação padrão em formato percentual (ex: 35.80 representa 35,80%).
- * Atualize a coluna C via PROCV no COAFI (coluna AR) quando os dados reais
- * do GEART estiverem disponíveis.
+ * Cria a aba TaxaNova com todos os 26 fundos.
+ * Estrutura idêntica à planilha original:
+ *   Col A (NOME_SITE):  nome completo do fundo como exibido no site
+ *   Col B (NOME_COAFI): nome curto do fundo na planilha COAFI (col B do GEART) — chave do PROCV de TAXA_NOVA
+ *   Col C (TAXA_NOVA):  preenchida por atualizarDadosDeCoafi() via =TEXTO(PROCV(B;COAFI!B:AR;43;FALSO);"0.00")
+ *                       Armazenado como número percentual (ex: 35.80 para 35,80%).
  */
 function _criarAbaTaxaNova(ss) {
-  var headers = ['ID_FUNDO', 'NOME_FUNDO', 'TAXA_NOVA'];
-  // Order matches the original "TaxaNova" spreadsheet tab (alphabetical by fund full name).
-  // Column C stores the rate as a percentage NUMBER (e.g. 35.80 for 35,80%),
-  // matching the original =TEXTO(PROCV(B;COAFI!B:AR;43;FALSO);"0.00") formula output.
+  var headers = ['NOME_SITE', 'NOME_COAFI', 'TAXA_NOVA'];
+  // Ordem igual à aba original: col A = "Nome site", col B = "Nome Planilha COAFI" (nome curto)
   var rows = [
-    ['invest_btg_pactual_absoluto',                    'Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',               35.80 ],
-    ['invest_cred_corp',                               'Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',                 14.42 ],
-    ['invest_dividendos',                              'Banestes Dividendos FIC de FIF de Ações RL',                                        44.41 ],
-    ['invest-estrategia',                              'Banestes Estratégia FIC de FIF Renda Fixa RL',                                      14.06 ],
-    ['invest_debentures',                              'Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',        13.18 ],
-    ['invest_funses',                                  'Banestes FUNSES Multimercado RL',                                                   0     ],
-    ['invest_ima-b5',                                  'Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',                             11.38 ],
-    ['invest_previdenciario',                          'Banestes IMA-B Títulos Públicos FIF Renda Fixa RL',                                 0     ],
-    ['invest_institucional',                           'Banestes Institucional FIF Renda Fixa RL',                                          14.56 ],
-    ['invest_facil',                                   'Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',                 13.18 ],
-    ['invest_investmoney',                             'Banestes Invest Money FIF Renda Fixa RL',                                           13.38 ],
-    ['invest_investpublic',                            'Banestes Invest Public Automático FIF CP RL',                                       0     ],
-    ['invest_investidor',                              'Banestes Investidor Automático FIF Renda Fixa CP RL',                               0     ],
-    ['invest_liquidez_referenciado',                   'Banestes Liquidez FIF Renda Fixa Referenciado DI RL',                               14.52 ],
-    ['invest_multiestrategia',                         'Banestes Multiestratégia FIC de FIF Multimercado RL',                               14.21 ],
-    ['invest_referencial',                             'Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL',                               0     ],
-    ['invest_fundo_reserva_climatica',                 'Banestes Reserva Climática FIF RF Referenciado DI RL',                              14.34 ],
-    ['invest_selection',                               'Banestes Selection FI Renda Fixa CP RL',                                            14.33 ],
-    ['invest_soberano',                                'Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL',           0     ],
-    ['invest_solidez',                                 'Banestes Solidez Automático FIF Renda Fixa CP RL',                                  0     ],
-    ['invest_Synergy',                                 'Banestes Synergy Long Only FIF em Cotas de FIA RL',                                 0     ],
-    ['invest_tenax',                                   'Banestes Tenax Ações FIF em Cotas de FIA RL',                                       0     ],
-    ['banestes_tesouro_fi_renda_fixa_referenciado_di', 'Banestes Tesouro FIF Renda Fixa Referenciado DI RL',                                0     ],
-    ['invest_vipdi',                                   'Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                          14.20 ],
-    ['invest-valores',                                 'Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',                14.14 ],
-    ['invest-vitoria-500',                             'Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',                     12.75 ],
+    ['Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',              'Absoluto',               35.80 ],
+    ['Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',                'Credito Corporativo I',  14.42 ],
+    ['Banestes Dividendos FIC de FIF de Ações RL',                                       'Dividendos',             44.41 ],
+    ['Banestes Estratégia FIC de FIF Renda Fixa RL',                                     'Estratégia',             14.06 ],
+    ['Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',       'Infraestrutura',         13.18 ],
+    ['Banestes FUNSES Multimercado RL',                                                   'Funses',                 0     ],
+    ['Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',                            'IMA-B5 Títulos Públicos',11.38 ],
+    ['Banestes IMA-B Títulos Públicos FIF Renda Fixa RL',                                'IMA-B Títulos Públicos', 0     ],
+    ['Banestes Institucional FIF Renda Fixa RL',                                         'Institucional',          14.56 ],
+    ['Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',                'Fácil',                  13.18 ],
+    ['Banestes Invest Money FIF Renda Fixa RL',                                          'Money',                  13.38 ],
+    ['Banestes Invest Public Automático FIF CP RL',                                      'Public',                 0     ],
+    ['Banestes Investidor Automático FIF Renda Fixa CP RL',                              'Investidor',             0     ],
+    ['Banestes Liquidez FIF Renda Fixa Referenciado DI RL',                              'Liquidez',               14.52 ],
+    ['Banestes Multiestratégia FIC de FIF Multimercado RL',                              'Multiestrategia',        14.21 ],
+    ['Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL',                              'IRF-M 1 Títulos Públicos',0     ],
+    ['Banestes Reserva Climática FIF RF Referenciado DI RL',                             'Reserva',                14.34 ],
+    ['Banestes Selection FI Renda Fixa CP RL',                                           'Selection',              14.33 ],
+    ['Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL',          'Soberano',               0     ],
+    ['Banestes Solidez Automático FIF Renda Fixa CP RL',                                 'Solidez',                0     ],
+    ['Banestes Synergy Long Only FIF em Cotas de FIA RL',                                'Synergy',                0     ],
+    ['Banestes Tenax Ações FIF em Cotas de FIA RL',                                      'Tenax',                  0     ],
+    ['Banestes Tesouro FIF Renda Fixa Referenciado DI RL',                               'Tesouro',                0     ],
+    ['Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                         'Vip Di',                 14.20 ],
+    ['Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',               'Valores',                14.14 ],
+    ['Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',                    'Vitória 500',            12.75 ],
   ];
 
   var sheet  = ss.insertSheet(CONFIG.SHEET_TAXA_NOVA);
