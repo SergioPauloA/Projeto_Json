@@ -292,7 +292,9 @@ function parseTaxaPercent(val) {
 }
 
 /**
- * Converte "35.80" (saída de TEXTO(...;"0.00")) para 0.3580. Retorna 0 se inválido.
+ * Converte "35.80" ou "35,80%" (valor percentual como número ou texto) para 0.3580.
+ * Retorna 0 se inválido ou vazio.
+ * Aceita tanto o valor numérico 35.80 quanto a string "35,80%" da coluna G da aba Inicial.
  */
 function parseTaxaDecimal(val) {
   if (!val || val === '') return 0;
@@ -355,7 +357,9 @@ function atualizarColunaPodeSimular(ss) {
  *
  * Equivalência com as fórmulas que estavam nas células:
  *   Col F: =IFERROR(VLOOKUP(B,PodeSimular!A:D,4,FALSE), D)
- *   Col G: =IFERROR(VLOOKUP(B,TaxaNova!A:C,3,FALSE), "")
+ *   Col G: =SE(F="Sim";CONCATENAR(PROCV(B;TaxaNova!A:C;3;FALSO);"%");"")
+ *          Produz "XX,XX%" quando podeSimNovo="Sim" e taxa > 0; vazio caso contrário.
+ *          A aba TaxaNova armazena os valores como número percentual (ex: 35.80 para 35,80%).
  *
  * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
  */
@@ -374,7 +378,7 @@ function atualizarColunasInicial(ss) {
     }
   }
 
-  // Mapa ID → TAXA_NOVA (col C, decimal) da aba TaxaNova
+  // Mapa ID → TAXA_NOVA (col C, percentual numérico como 35.80) da aba TaxaNova
   var taxaNovaMap = {};
   var tnSheet = ss.getSheetByName(CONFIG.SHEET_TAXA_NOVA);
   if (tnSheet && tnSheet.getLastRow() >= 2) {
@@ -394,10 +398,19 @@ function atualizarColunasInicial(ss) {
     // Col F: PODE_SIMULAR_NOVO — lookup em PodeSimular; fallback: col D desta aba
     var podeSimNovo = podeSimMap.hasOwnProperty(fundId) ? podeSimMap[fundId] : podeSimAtual;
 
-    // Col G: TAXA_NOVA — lookup em TaxaNova; fallback: vazio (obterDadosFundos usa col E)
-    var taxaNova = taxaNovaMap.hasOwnProperty(fundId) ? taxaNovaMap[fundId] : '';
+    // Col G: TAXA_NOVA — equivalente à fórmula original:
+    //   =SE(F2="Sim";CONCATENAR(PROCV(C2;TaxaNova!A:C;3;FALSO);"%");"")
+    // Formata como "XX,XX%" quando podeSimNovo="Sim" e o valor for válido; caso contrário, vazio.
+    var taxaNovaRaw = taxaNovaMap.hasOwnProperty(fundId) ? taxaNovaMap[fundId] : '';
+    var taxaNovaFormatada = '';
+    if (podeSimNovo === 'Sim') {
+      var taxaNum = parseFloat(String(taxaNovaRaw).replace(/,/g, '.'));
+      if (!isNaN(taxaNum) && taxaNum > 0) {
+        taxaNovaFormatada = taxaNum.toFixed(2).replace('.', ',') + '%';
+      }
+    }
 
-    fgValues.push([podeSimNovo, taxaNova]);
+    fgValues.push([podeSimNovo, taxaNovaFormatada]);
   }
 
   if (fgValues.length > 0) {
@@ -742,39 +755,42 @@ function _criarAbaPodeSimular(ss) {
 
 /**
  * Cria a aba TaxaNova com todos os 26 fundos de FUND_DATA e suas taxas de
- * simulação padrão (decimais). Atualize a coluna C via PROCV no COAFI (coluna AR)
- * quando os dados reais do GEART estiverem disponíveis.
+ * simulação padrão em formato percentual (ex: 35.80 representa 35,80%).
+ * Atualize a coluna C via PROCV no COAFI (coluna AR) quando os dados reais
+ * do GEART estiverem disponíveis.
  */
 function _criarAbaTaxaNova(ss) {
   var headers = ['ID_FUNDO', 'NOME_FUNDO', 'TAXA_NOVA'];
   // Order matches the original "TaxaNova" spreadsheet tab (alphabetical by fund full name).
+  // Column C stores the rate as a percentage NUMBER (e.g. 35.80 for 35,80%),
+  // matching the original =TEXTO(PROCV(B;COAFI!B:AR;43;FALSO);"0.00") formula output.
   var rows = [
-    ['invest_btg_pactual_absoluto',                    'Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',               0.3580 ],
-    ['invest_cred_corp',                               'Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',                 0.1442 ],
-    ['invest_dividendos',                              'Banestes Dividendos FIC de FIF de Ações RL',                                        0.4441 ],
-    ['invest-estrategia',                              'Banestes Estratégia FIC de FIF Renda Fixa RL',                                      0.1406 ],
-    ['invest_debentures',                              'Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',        0.1318 ],
-    ['invest_funses',                                  'Banestes FUNSES Multimercado RL',                                                   0      ],
-    ['invest_ima-b5',                                  'Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',                             0.1138 ],
-    ['invest_previdenciario',                          'Banestes IMA-B Títulos Públicos FIF Renda Fixa RL',                                 0      ],
-    ['invest_institucional',                           'Banestes Institucional FIF Renda Fixa RL',                                          0.1456 ],
-    ['invest_facil',                                   'Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',                 0.1318 ],
-    ['invest_investmoney',                             'Banestes Invest Money FIF Renda Fixa RL',                                           0.1338 ],
-    ['invest_investpublic',                            'Banestes Invest Public Automático FIF CP RL',                                       0      ],
-    ['invest_investidor',                              'Banestes Investidor Automático FIF Renda Fixa CP RL',                               0      ],
-    ['invest_liquidez_referenciado',                   'Banestes Liquidez FIF Renda Fixa Referenciado DI RL',                               0.1452 ],
-    ['invest_multiestrategia',                         'Banestes Multiestratégia FIC de FIF Multimercado RL',                               0.1421 ],
-    ['invest_referencial',                             'Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL',                               0      ],
-    ['invest_fundo_reserva_climatica',                 'Banestes Reserva Climática FIF RF Referenciado DI RL',                              0.1434 ],
-    ['invest_selection',                               'Banestes Selection FI Renda Fixa CP RL',                                            0.1433 ],
-    ['invest_soberano',                                'Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL',           0      ],
-    ['invest_solidez',                                 'Banestes Solidez Automático FIF Renda Fixa CP RL',                                  0      ],
-    ['invest_Synergy',                                 'Banestes Synergy Long Only FIF em Cotas de FIA RL',                                 0      ],
-    ['invest_tenax',                                   'Banestes Tenax Ações FIF em Cotas de FIA RL',                                       0      ],
-    ['banestes_tesouro_fi_renda_fixa_referenciado_di', 'Banestes Tesouro FIF Renda Fixa Referenciado DI RL',                                0      ],
-    ['invest_vipdi',                                   'Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                          0.1420 ],
-    ['invest-valores',                                 'Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',                0.1414 ],
-    ['invest-vitoria-500',                             'Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',                     0.1275 ],
+    ['invest_btg_pactual_absoluto',                    'Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',               35.80 ],
+    ['invest_cred_corp',                               'Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',                 14.42 ],
+    ['invest_dividendos',                              'Banestes Dividendos FIC de FIF de Ações RL',                                        44.41 ],
+    ['invest-estrategia',                              'Banestes Estratégia FIC de FIF Renda Fixa RL',                                      14.06 ],
+    ['invest_debentures',                              'Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',        13.18 ],
+    ['invest_funses',                                  'Banestes FUNSES Multimercado RL',                                                   0     ],
+    ['invest_ima-b5',                                  'Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',                             11.38 ],
+    ['invest_previdenciario',                          'Banestes IMA-B Títulos Públicos FIF Renda Fixa RL',                                 0     ],
+    ['invest_institucional',                           'Banestes Institucional FIF Renda Fixa RL',                                          14.56 ],
+    ['invest_facil',                                   'Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',                 13.18 ],
+    ['invest_investmoney',                             'Banestes Invest Money FIF Renda Fixa RL',                                           13.38 ],
+    ['invest_investpublic',                            'Banestes Invest Public Automático FIF CP RL',                                       0     ],
+    ['invest_investidor',                              'Banestes Investidor Automático FIF Renda Fixa CP RL',                               0     ],
+    ['invest_liquidez_referenciado',                   'Banestes Liquidez FIF Renda Fixa Referenciado DI RL',                               14.52 ],
+    ['invest_multiestrategia',                         'Banestes Multiestratégia FIC de FIF Multimercado RL',                               14.21 ],
+    ['invest_referencial',                             'Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL',                               0     ],
+    ['invest_fundo_reserva_climatica',                 'Banestes Reserva Climática FIF RF Referenciado DI RL',                              14.34 ],
+    ['invest_selection',                               'Banestes Selection FI Renda Fixa CP RL',                                            14.33 ],
+    ['invest_soberano',                                'Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL',           0     ],
+    ['invest_solidez',                                 'Banestes Solidez Automático FIF Renda Fixa CP RL',                                  0     ],
+    ['invest_Synergy',                                 'Banestes Synergy Long Only FIF em Cotas de FIA RL',                                 0     ],
+    ['invest_tenax',                                   'Banestes Tenax Ações FIF em Cotas de FIA RL',                                       0     ],
+    ['banestes_tesouro_fi_renda_fixa_referenciado_di', 'Banestes Tesouro FIF Renda Fixa Referenciado DI RL',                                0     ],
+    ['invest_vipdi',                                   'Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                          14.20 ],
+    ['invest-valores',                                 'Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',                14.14 ],
+    ['invest-vitoria-500',                             'Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',                     12.75 ],
   ];
 
   var sheet  = ss.insertSheet(CONFIG.SHEET_TAXA_NOVA);
@@ -782,7 +798,7 @@ function _criarAbaTaxaNova(ss) {
   hRange.setValues([headers])
     .setBackground('#1a3c5e').setFontColor('#ffffff').setFontWeight('bold').setFontSize(10);
   sheet.getRange(2, 1, rows.length, headers.length).setValues(rows);
-  sheet.getRange(2, 3, rows.length, 1).setNumberFormat('0.0000');
+  sheet.getRange(2, 3, rows.length, 1).setNumberFormat('0.00');
   sheet.setFrozenRows(1);
   sheet.autoResizeColumns(1, headers.length);
   return sheet;
