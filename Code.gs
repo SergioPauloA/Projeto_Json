@@ -972,10 +972,10 @@ function reconfigurarPlanilha() {
  */
 function _criarAbaCoafi(ss) {
   var sheet = ss.insertSheet(CONFIG.SHEET_COAFI);
-  // Equivalente à fórmula original:
-  //   =importrange("1vXp4xGTacqXy7jTzhsBwAhNCgvT-9jmrvfetcvGBjhQ","RENTABILIDADE!A:AR")
+  // Equivalente à fórmula original (separador ponto-e-vírgula conforme locale pt-BR):
+  //   =importrange("1vXp4xGTacqXy7jTzhsBwAhNCgvT-9jmrvfetcvGBjhQ";"RENTABILIDADE!A:AR")
   sheet.getRange('A1').setFormula(
-    '=IMPORTRANGE("1vXp4xGTacqXy7jTzhsBwAhNCgvT-9jmrvfetcvGBjhQ","RENTABILIDADE!A:AR")'
+    '=IMPORTRANGE("1vXp4xGTacqXy7jTzhsBwAhNCgvT-9jmrvfetcvGBjhQ";"RENTABILIDADE!A:AR")'
   );
   return sheet;
 }
