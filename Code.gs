@@ -55,157 +55,157 @@ var RISCO_CODIGO = {
 // ============================================================
 var FUND_DATA = {
   'invest_btg_pactual_absoluto': {
-    FNDCD: 15, NOME: 'BANESTES BTG PACTUAL ABSOLUTO',
+    FNDCD: 15, NOME: 'Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',
     FNDCTFND: 'Ações', FNDCLSRISC: 'Alto',
     FNDCLSCVM: 'Ações', FNDSUBCVM: 'Não se aplica',
     FNDTOAMB: 'Ações Ativos Livre', FNDCOTDIAUTIL: 'N',
   },
   'invest_cred_corp': {
-    FNDCD: 32, NOME: 'BANESTES CRED CORP',
+    FNDCD: 32, NOME: 'Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Alto',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Crédito Privado Longo Prazo',
     FNDTOAMB: 'Renda Fixa Duração Livre Crédito Livre', FNDCOTDIAUTIL: 'N',
   },
   'invest_dividendos': {
-    FNDCD: 24, NOME: 'BANESTES DIVIDENDOS',
+    FNDCD: 24, NOME: 'Banestes Dividendos FIC de FIF de Ações RL',
     FNDCTFND: 'Ações', FNDCLSRISC: 'Alto',
     FNDCLSCVM: 'Ações', FNDSUBCVM: 'Não se aplica',
     FNDTOAMB: 'Ações Ativo Dividendos', FNDCOTDIAUTIL: 'S',
   },
   'invest-estrategia': {
-    FNDCD: 23, NOME: 'BANESTES ESTRATEGIA',
+    FNDCD: 23, NOME: 'Banestes Estratégia FIC de FIF Renda Fixa RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Médio',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Não se aplica',
     FNDTOAMB: 'Renda Fixa Duração Livre Grau de Investimento', FNDCOTDIAUTIL: 'S',
   },
   'invest_debentures': {
-    FNDCD: 22, NOME: 'BANESTES INCENTIVADO RF',
+    FNDCD: 22, NOME: 'Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',
     FNDCTFND: 'Renda Fixa (Fundo de Infraestrutura)', FNDCLSRISC: 'Alto',
     FNDCLSCVM: 'Renda Fixa (Fundo de Infraestrutura)', FNDSUBCVM: 'Crédito Privado',
     FNDTOAMB: 'Renda Fixa Duração Livre Crédito Livre', FNDCOTDIAUTIL: 'S',
   },
   'invest_funses': {
-    FNDCD: 0, NOME: 'BANESTES FUNSES',
+    FNDCD: 0, NOME: 'Banestes FUNSES Multimercado RL',
     FNDCTFND: 'Multimercado', FNDCLSRISC: 'Alto',
     FNDCLSCVM: 'Multimercado', FNDSUBCVM: 'Não se aplica',
     FNDTOAMB: 'Multimercado Estratégia Livre', FNDCOTDIAUTIL: 'N',
   },
   'invest_ima-b5': {
-    FNDCD: 31, NOME: 'BANESTES IMA-B 5',
+    FNDCD: 31, NOME: 'Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Médio',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Longo Prazo',
     FNDTOAMB: 'Renda Fixa Duração Livre Soberano', FNDCOTDIAUTIL: 'N',
   },
   'invest_previdenciario': {
-    FNDCD: 0, NOME: 'BANESTES IMA-B',
+    FNDCD: 0, NOME: 'Banestes IMA-B Títulos Públicos FIF Renda Fixa RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Médio',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Não se aplica',
     FNDTOAMB: 'Renda Fixa Duração Alta Grau de Investimento', FNDCOTDIAUTIL: 'N',
   },
   'invest_institucional': {
-    FNDCD: 8, NOME: 'BANESTES INSTITUCIONAL',
+    FNDCD: 8, NOME: 'Banestes Institucional FIF Renda Fixa RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Médio',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Não se aplica',
     FNDTOAMB: 'Renda Fixa Duração Alta Grau de Investimento', FNDCOTDIAUTIL: 'N',
   },
   'invest_facil': {
-    FNDCD: 28, NOME: 'BANESTES INVEST FACIL',
+    FNDCD: 28, NOME: 'Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',
     FNDCTFND: 'Renda Fixa Simples', FNDCLSRISC: 'Muito Baixo',
     FNDCLSCVM: 'Renda Fixa Simples', FNDSUBCVM: 'Renda Fixa Simples',
     FNDTOAMB: 'Renda Fixa Simples', FNDCOTDIAUTIL: 'N',
   },
   'invest_investmoney': {
-    FNDCD: 2, NOME: 'BANESTES INVEST MONEY',
+    FNDCD: 2, NOME: 'Banestes Invest Money FIF Renda Fixa RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Baixo',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Não se aplica',
     FNDTOAMB: 'Renda Fixa Duração Baixa Soberano', FNDCOTDIAUTIL: 'N',
   },
   'invest_investpublic': {
-    FNDCD: 0, NOME: 'BANESTES INVEST PUBLIC',
+    FNDCD: 0, NOME: 'Banestes Invest Public Automático FIF CP RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Alto',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Crédito Privado',
     FNDTOAMB: 'Renda Fixa Duração Livre Crédito Livre', FNDCOTDIAUTIL: 'N',
   },
   'invest_investidor': {
-    FNDCD: 0, NOME: 'BANESTES INVESTIDOR',
+    FNDCD: 0, NOME: 'Banestes Investidor Automático FIF Renda Fixa CP RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Baixo',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Crédito Privado',
     FNDTOAMB: 'Renda Fixa Duração Baixa Grau de Investimento', FNDCOTDIAUTIL: 'N',
   },
   'invest_liquidez_referenciado': {
-    FNDCD: 18, NOME: 'BANESTES LIQUIDEZ',
+    FNDCD: 18, NOME: 'Banestes Liquidez FIF Renda Fixa Referenciado DI RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Baixo',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Referenciado DI',
     FNDTOAMB: 'Renda Fixa Duração Baixa Grau de Investimento', FNDCOTDIAUTIL: 'N',
   },
   'invest_multiestrategia': {
-    FNDCD: 33, NOME: 'BANESTES MULTIESTRATEGIA',
+    FNDCD: 33, NOME: 'Banestes Multiestratégia FIC de FIF Multimercado RL',
     FNDCTFND: 'Multimercado', FNDCLSRISC: 'Alto',
     FNDCLSCVM: 'Multimercado', FNDSUBCVM: 'Não se aplica',
     FNDTOAMB: 'Multimercado Estratégia Livre', FNDCOTDIAUTIL: 'S',
   },
   'invest_referencial': {
-    FNDCD: 0, NOME: 'BANESTES IRF-M 1',
+    FNDCD: 0, NOME: 'Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Médio',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Não se aplica',
     FNDTOAMB: 'Renda Fixa Duração Alta Grau de Investimento', FNDCOTDIAUTIL: 'N',
   },
   'invest_fundo_reserva_climatica': {
-    FNDCD: 0, NOME: 'BANESTES RESERVA CLIMATICA',
+    FNDCD: 0, NOME: 'Banestes Reserva Climática FIF RF Referenciado DI RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Baixo',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Referenciado DI',
     FNDTOAMB: 'Renda Fixa Duração Baixa Grau de Investimento', FNDCOTDIAUTIL: 'N',
   },
   'invest_selection': {
-    FNDCD: 34, NOME: 'BANESTES SELECTION',
+    FNDCD: 34, NOME: 'Banestes Selection FI Renda Fixa CP RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Médio',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Crédito Privado',
     FNDTOAMB: 'Renda Fixa Duração Livre Grau de Investimento', FNDCOTDIAUTIL: 'N',
   },
   'invest_soberano': {
-    FNDCD: 0, NOME: 'BANESTES SOBERANO',
+    FNDCD: 0, NOME: 'Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL',
     FNDCTFND: 'Renda Fixa Simples', FNDCLSRISC: 'Muito Baixo',
     FNDCLSCVM: 'Renda Fixa Simples', FNDSUBCVM: 'Renda Fixa Simples',
     FNDTOAMB: 'Renda Fixa Simples', FNDCOTDIAUTIL: 'N',
   },
   'invest_solidez': {
-    FNDCD: 0, NOME: 'BANESTES SOLIDEZ',
+    FNDCD: 0, NOME: 'Banestes Solidez Automático FIF Renda Fixa CP RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Médio',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Crédito Privado',
     FNDTOAMB: 'Renda Fixa Duração Livre Grau de Investimento', FNDCOTDIAUTIL: 'N',
   },
   'invest_Synergy': {
-    FNDCD: 38, NOME: 'BANESTES SYNERGY',
+    FNDCD: 38, NOME: 'Banestes Synergy Long Only FIF em Cotas de FIA RL',
     FNDCTFND: 'Ações', FNDCLSRISC: 'Alto',
     FNDCLSCVM: 'Ações', FNDSUBCVM: 'Não se aplica',
     FNDTOAMB: 'Ações Ativos Livre', FNDCOTDIAUTIL: 'N',
   },
   'invest_tenax': {
-    FNDCD: 36, NOME: 'BANESTES TENAX',
+    FNDCD: 36, NOME: 'Banestes Tenax Ações FIF em Cotas de FIA RL',
     FNDCTFND: 'Ações', FNDCLSRISC: 'Alto',
     FNDCLSCVM: 'Ações', FNDSUBCVM: 'Não se aplica',
     FNDTOAMB: 'Ações Ativos Livre', FNDCOTDIAUTIL: 'N',
   },
   'banestes_tesouro_fi_renda_fixa_referenciado_di': {
-    FNDCD: 0, NOME: 'BANESTES TESOURO',
+    FNDCD: 0, NOME: 'Banestes Tesouro FIF Renda Fixa Referenciado DI RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Baixo',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Referenciado DI',
     FNDTOAMB: 'Renda Fixa Duração Baixa Grau de Investimento', FNDCOTDIAUTIL: 'N',
   },
   'invest_vipdi': {
-    FNDCD: 4, NOME: 'BANESTES VIP DI',
+    FNDCD: 4, NOME: 'Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Baixo',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Referenciado DI',
     FNDTOAMB: 'Renda Fixa Duração Baixa Grau de Investimento', FNDCOTDIAUTIL: 'N',
   },
   'invest-valores': {
-    FNDCD: 16, NOME: 'BANESTES VALORES',
+    FNDCD: 16, NOME: 'Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Baixo',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Referenciado DI',
     FNDTOAMB: 'Renda Fixa Duração Baixa Grau de Investimento', FNDCOTDIAUTIL: 'N',
   },
   'invest-vitoria-500': {
-    FNDCD: 6, NOME: 'BANESTES VITORIA 500',
+    FNDCD: 6, NOME: 'Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',
     FNDCTFND: 'Renda Fixa', FNDCLSRISC: 'Baixo',
     FNDCLSCVM: 'Renda Fixa', FNDSUBCVM: 'Referenciado DI',
     FNDTOAMB: 'Renda Fixa Duração Baixa Grau de Investimento', FNDCOTDIAUTIL: 'N',
@@ -330,31 +330,22 @@ function atualizarColunaPodeSimular(ss) {
   var sheet = ss.getSheetByName(CONFIG.SHEET_PODE_SIM);
   if (!sheet || sheet.getLastRow() < 2) return;
 
-  var data  = sheet.getDataRange().getValues();
-  var hoje  = new Date();
-  var valores = [];
+  var data = sheet.getDataRange().getValues();
+  var hoje = new Date();
 
   for (var i = 1; i < data.length; i++) {
     var dataInicio = data[i][2]; // col C: DATA_INICIO
-    var valor;
-    if (!dataInicio || dataInicio === '') {
-      valor = 'Sim';
-    } else {
-      var dt   = (dataInicio instanceof Date) ? dataInicio : new Date(dataInicio);
-      // Guarda contra datas inválidas (e.g. texto inesperado na coluna C)
-      if (isNaN(dt.getTime())) {
-        valor = 'Sim';
-      } else {
-        // Usa 365 dias (inteiros) para coincidir com o comportamento original da fórmula
-        var anos = (hoje - dt) / (365 * 24 * 60 * 60 * 1000);
-        valor = anos >= 1 ? 'Sim' : 'Não';
-      }
-    }
-    valores.push([valor]);
-  }
+    // When no date is set, preserve whatever value is already in col D
+    // (allows hardcoded 'Não' entries set during initial setup to be kept).
+    if (!dataInicio) continue;
 
-  if (valores.length > 0) {
-    sheet.getRange(2, 4, valores.length, 1).setValues(valores);
+    var dt = (dataInicio instanceof Date) ? dataInicio : new Date(dataInicio);
+    // Guard against invalid dates (e.g. unexpected text in column C)
+    if (isNaN(dt.getTime())) continue;
+
+    // Use 365 days to match the behaviour of the original DATADIF formula
+    var anos = (hoje - dt) / (365 * 24 * 60 * 60 * 1000);
+    sheet.getRange(i + 1, 4).setValue(anos >= 1 ? 'Sim' : 'Não');
   }
 }
 
@@ -581,23 +572,23 @@ function criarAbaDadosFundos(ss) {
     'RENT_DIARIA', 'RENT_MENSAL', 'RENT_ANUAL',
   ];
   var rows = [
-    [2,  'BANESTES INVEST MONEY',         'Renda Fixa',                         'Baixo',      'Renda Fixa',                         'Não se aplica',             'Renda Fixa Duração Baixa Soberano',                    0.1338,'N',0.0365,0.1123,0.1338],
-    [4,  'BANESTES VIP DI',               'Renda Fixa',                         'Baixo',      'Renda Fixa',                         'Referenciado DI',           'Renda Fixa Duração Baixa Grau de Investimento',        0.1420,'N',0.0388,0.1195,0.1420],
-    [6,  'BANESTES VITORIA 500',          'Renda Fixa',                         'Baixo',      'Renda Fixa',                         'Referenciado DI',           'Renda Fixa Duração Baixa Grau de Investimento',        0.1275,'N',0.0348,0.1073,0.1275],
-    [8,  'BANESTES INSTITUCIONAL',        'Renda Fixa',                         'Médio',      'Renda Fixa',                         'Não se aplica',             'Renda Fixa Duração Alta Grau de Investimento',         0.1456,'N',0.0398,0.1225,0.1456],
-    [15, 'BANESTES BTG PACTUAL ABSOLUTO', 'Ações',                              'Alto',       'Ações',                              'Não se aplica',             'Ações Ativos Livre',                                   0.3580,'N',0.0978,0.3012,0.3580],
-    [16, 'BANESTES VALORES',              'Renda Fixa',                         'Baixo',      'Renda Fixa',                         'Referenciado DI',           'Renda Fixa Duração Baixa Grau de Investimento',        0.1414,'N',0.0386,0.1189,0.1414],
-    [18, 'BANESTES LIQUIDEZ',             'Renda Fixa',                         'Baixo',      'Renda Fixa',                         'Referenciado DI',           'Renda Fixa Duração Baixa Grau de Investimento',        0.1452,'N',0.0397,0.1220,0.1452],
-    [22, 'BANESTES INCENTIVADO RF',       'Renda Fixa (Fundo de Infraestrutura)','Alto',      'Renda Fixa (Fundo de Infraestrutura)','Crédito Privado',          'Renda Fixa Duração Livre Crédito Livre',               0.1318,'S',0.0360,0.1108,0.1318],
-    [23, 'BANESTES ESTRATEGIA',           'Renda Fixa',                         'Médio',      'Renda Fixa',                         'Não se aplica',             'Renda Fixa Duração Livre Grau de Investimento',        0.1406,'S',0.0384,0.1181,0.1406],
-    [24, 'BANESTES DIVIDENDOS',           'Ações',                              'Alto',       'Ações',                              'Não se aplica',             'Ações Ativo Dividendos',                               0.4441,'S',0.1213,0.3734,0.4441],
-    [28, 'BANESTES INVEST FACIL',         'Renda Fixa Simples',                 'Muito Baixo','Renda Fixa Simples',                 'Renda Fixa Simples',        'Renda Fixa Simples',                                   0.1318,'N',0.0360,0.1108,0.1318],
-    [31, 'BANESTES IMA-B 5',              'Renda Fixa',                         'Médio',      'Renda Fixa',                         'Longo Prazo',               'Renda Fixa Duração Livre Soberano',                    0.1138,'N',0.0311,0.0957,0.1138],
-    [32, 'BANESTES CRED CORP',            'Renda Fixa',                         'Alto',       'Renda Fixa',                         'Crédito Privado Longo Prazo','Renda Fixa Duração Livre Crédito Livre',              0.1442,'N',0.0394,0.1212,0.1442],
-    [33, 'BANESTES MULTIESTRATEGIA',      'Multimercado',                       'Alto',       'Multimercado',                       'Não se aplica',             'Multimercado Estratégia Livre',                        0.1421,'S',0.0388,0.1195,0.1421],
-    [34, 'BANESTES SELECTION',            'Renda Fixa',                         'Médio',      'Renda Fixa',                         'Crédito Privado',           'Renda Fixa Duração Livre Grau de Investimento',        0.1433,'N',0.0391,0.1205,0.1433],
-    [36, 'BANESTES TENAX',                'Ações',                              'Alto',       'Ações',                              'Não se aplica',             'Ações Ativos Livre',                                   0,    'N',0,    0,    0    ],
-    [38, 'BANESTES SYNERGY',              'Ações',                              'Alto',       'Ações',                              'Não se aplica',             'Ações Ativos Livre',                                   0,    'N',0,    0,    0    ],
+    [2,  'Banestes Invest Money FIF Renda Fixa RL',                                           'Renda Fixa',                         'Baixo',      'Renda Fixa',                         'Não se aplica',             'Renda Fixa Duração Baixa Soberano',                    0.1338,'N',0.0365,0.1123,0.1338],
+    [4,  'Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                          'Renda Fixa',                         'Baixo',      'Renda Fixa',                         'Referenciado DI',           'Renda Fixa Duração Baixa Grau de Investimento',        0.1420,'N',0.0388,0.1195,0.1420],
+    [6,  'Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',                     'Renda Fixa',                         'Baixo',      'Renda Fixa',                         'Referenciado DI',           'Renda Fixa Duração Baixa Grau de Investimento',        0.1275,'N',0.0348,0.1073,0.1275],
+    [8,  'Banestes Institucional FIF Renda Fixa RL',                                          'Renda Fixa',                         'Médio',      'Renda Fixa',                         'Não se aplica',             'Renda Fixa Duração Alta Grau de Investimento',         0.1456,'N',0.0398,0.1225,0.1456],
+    [15, 'Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',               'Ações',                              'Alto',       'Ações',                              'Não se aplica',             'Ações Ativos Livre',                                   0.3580,'N',0.0978,0.3012,0.3580],
+    [16, 'Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',                'Renda Fixa',                         'Baixo',      'Renda Fixa',                         'Referenciado DI',           'Renda Fixa Duração Baixa Grau de Investimento',        0.1414,'N',0.0386,0.1189,0.1414],
+    [18, 'Banestes Liquidez FIF Renda Fixa Referenciado DI RL',                               'Renda Fixa',                         'Baixo',      'Renda Fixa',                         'Referenciado DI',           'Renda Fixa Duração Baixa Grau de Investimento',        0.1452,'N',0.0397,0.1220,0.1452],
+    [22, 'Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',       'Renda Fixa (Fundo de Infraestrutura)','Alto',      'Renda Fixa (Fundo de Infraestrutura)','Crédito Privado',          'Renda Fixa Duração Livre Crédito Livre',               0.1318,'S',0.0360,0.1108,0.1318],
+    [23, 'Banestes Estratégia FIC de FIF Renda Fixa RL',                                     'Renda Fixa',                         'Médio',      'Renda Fixa',                         'Não se aplica',             'Renda Fixa Duração Livre Grau de Investimento',        0.1406,'S',0.0384,0.1181,0.1406],
+    [24, 'Banestes Dividendos FIC de FIF de Ações RL',                                       'Ações',                              'Alto',       'Ações',                              'Não se aplica',             'Ações Ativo Dividendos',                               0.4441,'S',0.1213,0.3734,0.4441],
+    [28, 'Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',                'Renda Fixa Simples',                 'Muito Baixo','Renda Fixa Simples',                 'Renda Fixa Simples',        'Renda Fixa Simples',                                   0.1318,'N',0.0360,0.1108,0.1318],
+    [31, 'Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',                            'Renda Fixa',                         'Médio',      'Renda Fixa',                         'Longo Prazo',               'Renda Fixa Duração Livre Soberano',                    0.1138,'N',0.0311,0.0957,0.1138],
+    [32, 'Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',                'Renda Fixa',                         'Alto',       'Renda Fixa',                         'Crédito Privado Longo Prazo','Renda Fixa Duração Livre Crédito Livre',              0.1442,'N',0.0394,0.1212,0.1442],
+    [33, 'Banestes Multiestratégia FIC de FIF Multimercado RL',                              'Multimercado',                       'Alto',       'Multimercado',                       'Não se aplica',             'Multimercado Estratégia Livre',                        0.1421,'S',0.0388,0.1195,0.1421],
+    [34, 'Banestes Selection FI Renda Fixa CP RL',                                            'Renda Fixa',                         'Médio',      'Renda Fixa',                         'Crédito Privado',           'Renda Fixa Duração Livre Grau de Investimento',        0.1433,'N',0.0391,0.1205,0.1433],
+    [36, 'Banestes Tenax Ações FIF em Cotas de FIA RL',                                      'Ações',                              'Alto',       'Ações',                              'Não se aplica',             'Ações Ativos Livre',                                   0,    'N',0,    0,    0    ],
+    [38, 'Banestes Synergy Long Only FIF em Cotas de FIA RL',                                'Ações',                              'Alto',       'Ações',                              'Não se aplica',             'Ações Ativos Livre',                                   0,    'N',0,    0,    0    ],
   ];
 
   var sheet = ss.insertSheet(CONFIG.SHEET_FUNDS, 0);
@@ -698,33 +689,38 @@ function _criarAbaCoafi(ss) {
  */
 function _criarAbaPodeSimular(ss) {
   var headers = ['ID_FUNDO', 'NOME_FUNDO', 'DATA_INICIO', 'PODE_SIMULAR'];
+  // Order matches the original "PodeSimular" spreadsheet tab (A2:A27).
+  // Column 4 (PODE_SIMULAR) contains the correct initial value:
+  //   'Não' — hardcoded funds that must never simulate regardless of age.
+  //   'Sim' — funds whose eligibility is determined by their start date;
+  //            atualizarColunaPodeSimular() will recalculate when DATA_INICIO is filled.
   var staticRows = [
-    ['banestes_tesouro_fi_renda_fixa_referenciado_di', 'BANESTES TESOURO',             ''],
-    ['invest-estrategia',                              'BANESTES ESTRATEGIA',           ''],
-    ['invest-valores',                                 'BANESTES VALORES',              ''],
-    ['invest-vitoria-500',                             'BANESTES VITORIA 500',          ''],
-    ['invest_btg_pactual_absoluto',                    'BANESTES BTG PACTUAL ABSOLUTO', ''],
-    ['invest_cred_corp',                               'BANESTES CRED CORP',            ''],
-    ['invest_debentures',                              'BANESTES INCENTIVADO RF',        ''],
-    ['invest_dividendos',                              'BANESTES DIVIDENDOS',            ''],
-    ['invest_facil',                                   'BANESTES INVEST FACIL',         ''],
-    ['invest_fundo_reserva_climatica',                 'BANESTES RESERVA CLIMATICA',    ''],
-    ['invest_funses',                                  'BANESTES FUNSES',               ''],
-    ['invest_ima-b5',                                  'BANESTES IMA-B 5',              ''],
-    ['invest_institucional',                           'BANESTES INSTITUCIONAL',        ''],
-    ['invest_investidor',                              'BANESTES INVESTIDOR',           ''],
-    ['invest_investmoney',                             'BANESTES INVEST MONEY',         ''],
-    ['invest_investpublic',                            'BANESTES INVEST PUBLIC',        ''],
-    ['invest_liquidez_referenciado',                   'BANESTES LIQUIDEZ',             ''],
-    ['invest_multiestrategia',                         'BANESTES MULTIESTRATEGIA',      ''],
-    ['invest_previdenciario',                          'BANESTES IMA-B',                ''],
-    ['invest_referencial',                             'BANESTES IRF-M 1',              ''],
-    ['invest_selection',                               'BANESTES SELECTION',            ''],
-    ['invest_soberano',                                'BANESTES SOBERANO',             ''],
-    ['invest_solidez',                                 'BANESTES SOLIDEZ',              ''],
-    ['invest_Synergy',                                 'BANESTES SYNERGY',              ''],
-    ['invest_tenax',                                   'BANESTES TENAX',                ''],
-    ['invest_vipdi',                                   'BANESTES VIP DI',               ''],
+    ['invest_investpublic',                            'Banestes Invest Public Automático FIF CP RL',                                       '', 'Não'],
+    ['invest_investmoney',                             'Banestes Invest Money FIF Renda Fixa RL',                                           '', 'Sim'],
+    ['invest_investidor',                              'Banestes Investidor Automático FIF Renda Fixa CP RL',                               '', 'Não'],
+    ['invest-vitoria-500',                             'Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',                     '', 'Sim'],
+    ['invest_vipdi',                                   'Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                          '', 'Sim'],
+    ['invest_institucional',                           'Banestes Institucional FIF Renda Fixa RL',                                          '', 'Sim'],
+    ['invest_previdenciario',                          'Banestes IMA-B Títulos Públicos FIF Renda Fixa RL',                                 '', 'Não'],
+    ['banestes_tesouro_fi_renda_fixa_referenciado_di', 'Banestes Tesouro FIF Renda Fixa Referenciado DI RL',                                '', 'Não'],
+    ['invest_solidez',                                 'Banestes Solidez Automático FIF Renda Fixa CP RL',                                  '', 'Não'],
+    ['invest_btg_pactual_absoluto',                    'Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',               '', 'Sim'],
+    ['invest-valores',                                 'Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',                '', 'Sim'],
+    ['invest_liquidez_referenciado',                   'Banestes Liquidez FIF Renda Fixa Referenciado DI RL',                               '', 'Sim'],
+    ['invest_referencial',                             'Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL',                               '', 'Não'],
+    ['invest_debentures',                              'Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',        '', 'Sim'],
+    ['invest-estrategia',                              'Banestes Estratégia FIC de FIF Renda Fixa RL',                                      '', 'Sim'],
+    ['invest_dividendos',                              'Banestes Dividendos FIC de FIF de Ações RL',                                        '', 'Sim'],
+    ['invest_funses',                                  'Banestes FUNSES Multimercado RL',                                                   '', 'Não'],
+    ['invest_facil',                                   'Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',                 '', 'Sim'],
+    ['invest_cred_corp',                               'Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',                 '', 'Sim'],
+    ['invest_ima-b5',                                  'Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',                             '', 'Sim'],
+    ['invest_multiestrategia',                         'Banestes Multiestratégia FIC de FIF Multimercado RL',                               '', 'Sim'],
+    ['invest_selection',                               'Banestes Selection FI Renda Fixa CP RL',                                            '', 'Sim'],
+    ['invest_fundo_reserva_climatica',                 'Banestes Reserva Climática FIF RF Referenciado DI RL',                              '', 'Sim'],
+    ['invest_soberano',                                'Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL',           '', 'Não'],
+    ['invest_tenax',                                   'Banestes Tenax Ações FIF em Cotas de FIA RL',                                       '', 'Não'],
+    ['invest_Synergy',                                 'Banestes Synergy Long Only FIF em Cotas de FIA RL',                                 '', 'Não'],
   ];
 
   var sheet  = ss.insertSheet(CONFIG.SHEET_PODE_SIM);
@@ -732,11 +728,12 @@ function _criarAbaPodeSimular(ss) {
   hRange.setValues([headers])
     .setBackground('#1a3c5e').setFontColor('#ffffff').setFontWeight('bold').setFontSize(10);
 
-  sheet.getRange(2, 1, staticRows.length, 3).setValues(staticRows);
+  // Write all 4 columns (ID, NOME, DATA_INICIO, PODE_SIMULAR) at once
+  sheet.getRange(2, 1, staticRows.length, 4).setValues(staticRows);
   sheet.getRange(2, 3, staticRows.length, 1).setNumberFormat('dd/MM/yyyy');
 
-  // Coluna D: calculada pelo backend (sem fórmulas na célula)
-  atualizarColunaPodeSimular(ss);
+  // atualizarColunaPodeSimular is NOT called here because DATA_INICIO is empty;
+  // it will only recalculate PODE_SIMULAR once real dates are filled in.
 
   sheet.setFrozenRows(1);
   sheet.autoResizeColumns(1, headers.length);
@@ -750,33 +747,34 @@ function _criarAbaPodeSimular(ss) {
  */
 function _criarAbaTaxaNova(ss) {
   var headers = ['ID_FUNDO', 'NOME_FUNDO', 'TAXA_NOVA'];
+  // Order matches the original "TaxaNova" spreadsheet tab (alphabetical by fund full name).
   var rows = [
-    ['banestes_tesouro_fi_renda_fixa_referenciado_di', 'BANESTES TESOURO',             0      ],
-    ['invest-estrategia',                              'BANESTES ESTRATEGIA',           0.1406 ],
-    ['invest-valores',                                 'BANESTES VALORES',              0.1414 ],
-    ['invest-vitoria-500',                             'BANESTES VITORIA 500',          0.1275 ],
-    ['invest_btg_pactual_absoluto',                    'BANESTES BTG PACTUAL ABSOLUTO', 0.3580 ],
-    ['invest_cred_corp',                               'BANESTES CRED CORP',            0.1442 ],
-    ['invest_debentures',                              'BANESTES INCENTIVADO RF',        0.1318 ],
-    ['invest_dividendos',                              'BANESTES DIVIDENDOS',            0.4441 ],
-    ['invest_facil',                                   'BANESTES INVEST FACIL',         0.1318 ],
-    ['invest_fundo_reserva_climatica',                 'BANESTES RESERVA CLIMATICA',    0      ],
-    ['invest_funses',                                  'BANESTES FUNSES',               0      ],
-    ['invest_ima-b5',                                  'BANESTES IMA-B 5',              0.1138 ],
-    ['invest_institucional',                           'BANESTES INSTITUCIONAL',        0.1456 ],
-    ['invest_investidor',                              'BANESTES INVESTIDOR',           0      ],
-    ['invest_investmoney',                             'BANESTES INVEST MONEY',         0.1338 ],
-    ['invest_investpublic',                            'BANESTES INVEST PUBLIC',        0      ],
-    ['invest_liquidez_referenciado',                   'BANESTES LIQUIDEZ',             0.1452 ],
-    ['invest_multiestrategia',                         'BANESTES MULTIESTRATEGIA',      0.1421 ],
-    ['invest_previdenciario',                          'BANESTES IMA-B',                0      ],
-    ['invest_referencial',                             'BANESTES IRF-M 1',              0      ],
-    ['invest_selection',                               'BANESTES SELECTION',            0.1433 ],
-    ['invest_soberano',                                'BANESTES SOBERANO',             0      ],
-    ['invest_solidez',                                 'BANESTES SOLIDEZ',              0      ],
-    ['invest_Synergy',                                 'BANESTES SYNERGY',              0      ],
-    ['invest_tenax',                                   'BANESTES TENAX',                0      ],
-    ['invest_vipdi',                                   'BANESTES VIP DI',               0.1420 ],
+    ['invest_btg_pactual_absoluto',                    'Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',               0.3580 ],
+    ['invest_cred_corp',                               'Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',                 0.1442 ],
+    ['invest_dividendos',                              'Banestes Dividendos FIC de FIF de Ações RL',                                        0.4441 ],
+    ['invest-estrategia',                              'Banestes Estratégia FIC de FIF Renda Fixa RL',                                      0.1406 ],
+    ['invest_debentures',                              'Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',        0.1318 ],
+    ['invest_funses',                                  'Banestes FUNSES Multimercado RL',                                                   0      ],
+    ['invest_ima-b5',                                  'Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',                             0.1138 ],
+    ['invest_previdenciario',                          'Banestes IMA-B Títulos Públicos FIF Renda Fixa RL',                                 0      ],
+    ['invest_institucional',                           'Banestes Institucional FIF Renda Fixa RL',                                          0.1456 ],
+    ['invest_facil',                                   'Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',                 0.1318 ],
+    ['invest_investmoney',                             'Banestes Invest Money FIF Renda Fixa RL',                                           0.1338 ],
+    ['invest_investpublic',                            'Banestes Invest Public Automático FIF CP RL',                                       0      ],
+    ['invest_investidor',                              'Banestes Investidor Automático FIF Renda Fixa CP RL',                               0      ],
+    ['invest_liquidez_referenciado',                   'Banestes Liquidez FIF Renda Fixa Referenciado DI RL',                               0.1452 ],
+    ['invest_multiestrategia',                         'Banestes Multiestratégia FIC de FIF Multimercado RL',                               0.1421 ],
+    ['invest_referencial',                             'Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL',                               0      ],
+    ['invest_fundo_reserva_climatica',                 'Banestes Reserva Climática FIF RF Referenciado DI RL',                              0.1434 ],
+    ['invest_selection',                               'Banestes Selection FI Renda Fixa CP RL',                                            0.1433 ],
+    ['invest_soberano',                                'Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL',           0      ],
+    ['invest_solidez',                                 'Banestes Solidez Automático FIF Renda Fixa CP RL',                                  0      ],
+    ['invest_Synergy',                                 'Banestes Synergy Long Only FIF em Cotas de FIA RL',                                 0      ],
+    ['invest_tenax',                                   'Banestes Tenax Ações FIF em Cotas de FIA RL',                                       0      ],
+    ['banestes_tesouro_fi_renda_fixa_referenciado_di', 'Banestes Tesouro FIF Renda Fixa Referenciado DI RL',                                0      ],
+    ['invest_vipdi',                                   'Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                          0.1420 ],
+    ['invest-valores',                                 'Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',                0.1414 ],
+    ['invest-vitoria-500',                             'Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',                     0.1275 ],
   ];
 
   var sheet  = ss.insertSheet(CONFIG.SHEET_TAXA_NOVA);
@@ -804,33 +802,35 @@ function _criarAbaInicial(ss) {
   var headers = ['#', 'ID_FUNDO', 'NOME_FUNDO', 'PODE_SIMULAR_ATUAL', 'TAXA_ATUAL_%', 'PODE_SIMULAR_NOVO', 'TAXA_NOVA'];
 
   // Colunas A–E: dados estáticos (A=seq, B=ID, C=nome, D=podeSimular atual, E=taxa atual)
+  // Order and values match the original "Inicial" spreadsheet tab (B2:E27).
+  // Taxa vazia ('') means the fund reports NULL in the source — maps to 0 in parseTaxaPercent.
   var staticData = [
-    [1,  'banestes_tesouro_fi_renda_fixa_referenciado_di', 'BANESTES TESOURO',             'Não', '0,00%' ],
-    [2,  'invest-estrategia',                              'BANESTES ESTRATEGIA',           'Sim', '14,06%'],
-    [3,  'invest-valores',                                 'BANESTES VALORES',              'Sim', '14,14%'],
-    [4,  'invest-vitoria-500',                             'BANESTES VITORIA 500',          'Sim', '12,75%'],
-    [5,  'invest_btg_pactual_absoluto',                    'BANESTES BTG PACTUAL ABSOLUTO', 'Sim', '35,80%'],
-    [6,  'invest_cred_corp',                               'BANESTES CRED CORP',            'Sim', '14,42%'],
-    [7,  'invest_debentures',                              'BANESTES INCENTIVADO RF',        'Sim', '13,18%'],
-    [8,  'invest_dividendos',                              'BANESTES DIVIDENDOS',            'Sim', '44,41%'],
-    [9,  'invest_facil',                                   'BANESTES INVEST FACIL',         'Sim', '13,18%'],
-    [10, 'invest_fundo_reserva_climatica',                 'BANESTES RESERVA CLIMATICA',    'Não', '0,00%' ],
-    [11, 'invest_funses',                                  'BANESTES FUNSES',               'Não', '0,00%' ],
-    [12, 'invest_ima-b5',                                  'BANESTES IMA-B 5',              'Sim', '11,38%'],
-    [13, 'invest_institucional',                           'BANESTES INSTITUCIONAL',        'Sim', '14,56%'],
-    [14, 'invest_investidor',                              'BANESTES INVESTIDOR',           'Não', '0,00%' ],
-    [15, 'invest_investmoney',                             'BANESTES INVEST MONEY',         'Sim', '13,38%'],
-    [16, 'invest_investpublic',                            'BANESTES INVEST PUBLIC',        'Não', '0,00%' ],
-    [17, 'invest_liquidez_referenciado',                   'BANESTES LIQUIDEZ',             'Sim', '14,52%'],
-    [18, 'invest_multiestrategia',                         'BANESTES MULTIESTRATEGIA',      'Sim', '14,21%'],
-    [19, 'invest_previdenciario',                          'BANESTES IMA-B',                'Não', '0,00%' ],
-    [20, 'invest_referencial',                             'BANESTES IRF-M 1',              'Não', '0,00%' ],
-    [21, 'invest_selection',                               'BANESTES SELECTION',            'Sim', '14,33%'],
-    [22, 'invest_soberano',                                'BANESTES SOBERANO',             'Não', '0,00%' ],
-    [23, 'invest_solidez',                                 'BANESTES SOLIDEZ',              'Não', '0,00%' ],
-    [24, 'invest_Synergy',                                 'BANESTES SYNERGY',              'Não', '0,00%' ],
-    [25, 'invest_tenax',                                   'BANESTES TENAX',                'Não', '0,00%' ],
-    [26, 'invest_vipdi',                                   'BANESTES VIP DI',               'Sim', '14,20%'],
+    [1,  'invest_btg_pactual_absoluto',                    'Banestes BTG Pactual Absoluto Institucional FIC de FIF de Ações RL',               'Sim', '35,80%'],
+    [2,  'invest_cred_corp',                               'Banestes Crédito Corporativo I FIC de FI RF Crédito Privado LP RL',                 'Sim', '14,42%'],
+    [3,  'invest_dividendos',                              'Banestes Dividendos FIC de FIF de Ações RL',                                        'Sim', '44,41%'],
+    [4,  'invest-estrategia',                              'Banestes Estratégia FIC de FIF Renda Fixa RL',                                      'Sim', '14,06%'],
+    [5,  'invest_debentures',                              'Banestes FIC de FIF Incentivados de Investimento em Infraestrutura RF CP RL',        'Sim', '13,18%'],
+    [6,  'invest_funses',                                  'Banestes FUNSES Multimercado RL',                                                   'Não', ''      ],
+    [7,  'invest_ima-b5',                                  'Banestes IMA-B 5 Títulos Públicos FI Renda Fixa LP RL',                             'Sim', '11,38%'],
+    [8,  'invest_previdenciario',                          'Banestes IMA-B Títulos Públicos FIF Renda Fixa RL',                                 'Não', ''      ],
+    [9,  'invest_institucional',                           'Banestes Institucional FIF Renda Fixa RL',                                          'Sim', '14,56%'],
+    [10, 'invest_facil',                                   'Banestes Invest Fácil Fundo de Investimento Renda Fixa Simples RL',                 'Sim', '13,18%'],
+    [11, 'invest_investmoney',                             'Banestes Invest Money FIF Renda Fixa RL',                                           'Sim', '13,38%'],
+    [12, 'invest_investpublic',                            'Banestes Invest Public Automático FIF CP RL',                                       'Não', ''      ],
+    [13, 'invest_investidor',                              'Banestes Investidor Automático FIF Renda Fixa CP RL',                               'Não', ''      ],
+    [14, 'invest_liquidez_referenciado',                   'Banestes Liquidez FIF Renda Fixa Referenciado DI RL',                               'Sim', '14,52%'],
+    [15, 'invest_multiestrategia',                         'Banestes Multiestratégia FIC de FIF Multimercado RL',                               'Sim', '14,21%'],
+    [16, 'invest_referencial',                             'Banestes IRF-M 1 Títulos Públicos FIF Renda Fixa RL',                               'Não', ''      ],
+    [17, 'invest_fundo_reserva_climatica',                 'Banestes Reserva Climática FIF RF Referenciado DI RL',                              'Sim', '14,34%'],
+    [18, 'invest_selection',                               'Banestes Selection FI Renda Fixa CP RL',                                            'Sim', '14,33%'],
+    [19, 'invest_soberano',                                'Banestes Soberano Fundo de Investimento Financeiro Renda Fixa Simples RL',           'Não', ''      ],
+    [20, 'invest_solidez',                                 'Banestes Solidez Automático FIF Renda Fixa CP RL',                                  'Não', ''      ],
+    [21, 'invest_Synergy',                                 'Banestes Synergy Long Only FIF em Cotas de FIA RL',                                 'Não', ''      ],
+    [22, 'invest_tenax',                                   'Banestes Tenax Ações FIF em Cotas de FIA RL',                                       'Não', ''      ],
+    [23, 'banestes_tesouro_fi_renda_fixa_referenciado_di', 'Banestes Tesouro FIF Renda Fixa Referenciado DI RL',                                'Não', ''      ],
+    [24, 'invest_vipdi',                                   'Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                          'Sim', '14,20%'],
+    [25, 'invest-valores',                                 'Banestes Valores FIC em Cotas de FIF Renda Fixa Referenciado DI RL',                'Sim', '14,14%'],
+    [26, 'invest-vitoria-500',                             'Banestes Vitória 500 FIC de FIF Renda Fixa Referenciado DI RL',                     'Sim', '12,75%'],
   ];
 
   var sheet  = ss.insertSheet(CONFIG.SHEET_INICIAL);
@@ -1286,27 +1286,23 @@ function gerarEEnviar() {
  * Use esta função diretamente no editor do Apps Script para validar o envio
  * sem depender de triggers ou alterações na planilha.
  *
- * Usa dados reais da planilha se disponíveis; caso contrário usa dados de exemplo.
+ * Utiliza exclusivamente dados reais da planilha — mesma lógica de gerarEEnviar().
  * Os arquivos são prefixados com "TESTE_" para identificação fácil.
  */
 function testarEnvioEmail() {
   try {
+    var ss      = SpreadsheetApp.getActiveSpreadsheet();
     var agora   = new Date();
     var dataStr = Utilities.formatDate(agora, Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm');
     var sufixo  = Utilities.formatDate(agora, Session.getScriptTimeZone(), 'yyyyMMdd_HHmmss');
 
-    var fundos = [];
-    try { fundos = obterDadosFundos(); } catch (e) {
-      Logger.log('Aviso: não foi possível obter dados da planilha — usando dados de exemplo.');
-    }
+    // Recalcula valores derivados no backend antes de ler os dados,
+    // garantindo que cols F e G de Inicial e col D de PodeSimular estejam atualizadas.
+    sincronizarValoresDerivados(ss);
 
+    var fundos = obterDadosFundos();
     if (fundos.length === 0) {
-      fundos = [
-        { FNDCD:2,  NOME:'BANESTES INVEST MONEY',         FNDCTFND:'Renda Fixa', FNDCLSRISC:'Baixo',  FNDCLSCVM:'Renda Fixa', FNDSUBCVM:'Não se aplica', FNDTOAMB:'RF Duração Baixa Soberano',              FNDTXSIMU:0.1338, FNDCOTDIAUTIL:'N', PODE_SIMULAR:'Sim', RENT_DIARIA:0.0365, RENT_MENSAL:0.1123, RENT_ANUAL:0.1338 },
-        { FNDCD:4,  NOME:'BANESTES VIP DI',               FNDCTFND:'Renda Fixa', FNDCLSRISC:'Baixo',  FNDCLSCVM:'Renda Fixa', FNDSUBCVM:'Referenciado DI', FNDTOAMB:'RF Duração Baixa Grau de Investimento', FNDTXSIMU:0.1420, FNDCOTDIAUTIL:'N', PODE_SIMULAR:'Sim', RENT_DIARIA:0.0388, RENT_MENSAL:0.1195, RENT_ANUAL:0.1420 },
-        { FNDCD:24, NOME:'BANESTES DIVIDENDOS',           FNDCTFND:'Ações',      FNDCLSRISC:'Alto',   FNDCLSCVM:'Ações',      FNDSUBCVM:'Não se aplica', FNDTOAMB:'Ações Ativo Dividendos',                FNDTXSIMU:0.4441, FNDCOTDIAUTIL:'S', PODE_SIMULAR:'Sim', RENT_DIARIA:0.1213, RENT_MENSAL:0.3734, RENT_ANUAL:0.4441 },
-        { FNDCD:36, NOME:'BANESTES TENAX',                FNDCTFND:'Ações',      FNDCLSRISC:'Alto',   FNDCLSCVM:'Ações',      FNDSUBCVM:'Não se aplica', FNDTOAMB:'Ações Ativos Livre',                    FNDTXSIMU:0,      FNDCOTDIAUTIL:'N', PODE_SIMULAR:'Não', RENT_DIARIA:0,      RENT_MENSAL:0,      RENT_ANUAL:0      },
-      ];
+      throw new Error('Nenhum fundo encontrado. Verifique as abas "Inicial" ou "Fundos" na planilha.');
     }
 
     var jsonStr  = gerarJSON(fundos);
