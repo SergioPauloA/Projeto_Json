@@ -1274,59 +1274,105 @@ function _criarAbaInicial(ss) {
 
 /**
  * Gera o conteúdo JSON com os dados dos fundos no mesmo modelo da planilha original.
- * Campos estáticos (descrições, documentos, taxas, etc.) vêm de FUND_RICH_DATA.
- * Campos dinâmicos ("podeSimular?" e "taxaRentabilidade") vêm da planilha via planilha.
+ *
+ * Estratégia de dados:
+ *   1. Busca o JSON publicado em produção (dadosfundos.json) para preservar os dados ricos
+ *      (descrições, documentos, taxas, prestadores de serviços, tributação, comunicados, etc.)
+ *      que existem para todos os 26 fundos.
+ *   2. Usa FUND_RICH_DATA como fallback se o JSON publicado não estiver disponível.
+ *   3. Sobrescreve sempre "podeSimular?" e "taxaRentabilidade" com os valores calculados
+ *      dinamicamente pelas abas PodeSimular e TaxaNova da planilha.
+ *   4. Campos de "caracteristicas" (risco, CVM, ANBIMA) vêm sempre de FUND_DATA (hardcoded),
+ *      pois são os valores autoritativos mantidos pelo time de T.I.
+ *
  * @param {Array<Object>} fundos Lista de fundos.
  * @returns {string} JSON formatado.
  */
 function gerarJSON(fundos) {
+  // Busca o JSON publicado em produção para usar como base dos dados ricos.
+  // Captura todos os campos descritivos que existem para os 26 fundos e que
+  // não são mantidos no código (FUND_RICH_DATA é incompleto intencionalmente).
+  var liveMap = {};
+  try {
+    var resp = UrlFetchApp.fetch(
+      'https://banestes.com.br/site/asset/assets/data/dadosfundos.json',
+      { muteHttpExceptions: true }
+    );
+    if (resp.getResponseCode() === 200) {
+      var liveJson = JSON.parse(resp.getContentText());
+      if (liveJson && Array.isArray(liveJson.fundos)) {
+        liveJson.fundos.forEach(function (f) {
+          if (f && f.id) liveMap[f.id] = f;
+        });
+        Logger.log('gerarJSON: JSON publicado carregado — ' + liveJson.fundos.length + ' fundos encontrados.');
+      }
+    } else {
+      Logger.log('gerarJSON: JSON publicado retornou HTTP ' + resp.getResponseCode() + ' — usando FUND_RICH_DATA.');
+    }
+  } catch (e) {
+    Logger.log('gerarJSON: não foi possível buscar o JSON publicado — usando FUND_RICH_DATA. Detalhe: ' + e.message);
+  }
+
+  // Retorna o primeiro valor definido (não undefined) dentre os argumentos.
+  // Usado para mesclar dados de múltiplas fontes com prioridade explícita.
+  function primeiro(/* ...fontes */) {
+    for (var s = 0; s < arguments.length; s++) {
+      if (arguments[s] !== undefined) return arguments[s];
+    }
+    return null;
+  }
+
   var payload = {
     fundos: fundos.map(function (f) {
       var id          = String(f['FUND_ID'] || '');
-      var rich        = FUND_RICH_DATA[id] || {};
+      var rich        = FUND_RICH_DATA[id] || {};   // fallback local
+      var live        = liveMap[id] || {};           // fonte primária (JSON publicado)
       var podeSimular = String(f['PODE_SIMULAR'] || 'Não');
       var taxaRent    = String(f['TAXA_NOVA_FORMATADA'] || '');
 
-      // Condições comerciais: campos estáticos mesclados com os dinâmicos da planilha
-      var cc = rich.condicoesComerciais || {};
+      // Condições comerciais: campos estáticos vêm do JSON publicado (ou FUND_RICH_DATA como
+      // fallback); os dois campos dinâmicos são sempre sobrescritos pelo cálculo da planilha.
+      var liveCC = live.condicoesComerciais  || {};
+      var richCC = rich.condicoesComerciais  || {};
       var condicoesComerciais = {
-        aplicacaoInicial:            cc.aplicacaoInicial            !== undefined ? cc.aplicacaoInicial            : null,
-        investimentoAdicionalMinimo: cc.investimentoAdicionalMinimo !== undefined ? cc.investimentoAdicionalMinimo : null,
-        resgateMinimo:               cc.resgateMinimo               !== undefined ? cc.resgateMinimo               : null,
-        saldoMinimoPermanencia:      cc.saldoMinimoPermanencia      !== undefined ? cc.saldoMinimoPermanencia      : null,
-        tipoCota:                    cc.tipoCota                    !== undefined ? cc.tipoCota                    : null,
-        carencia:                    cc.carencia                    !== undefined ? cc.carencia                    : null,
-        cotaAplicacao:               cc.cotaAplicacao               !== undefined ? cc.cotaAplicacao               : null,
-        cotaResgate:                 cc.cotaResgate                 !== undefined ? cc.cotaResgate                 : null,
-        debitoContaCorrente:         cc.debitoContaCorrente         !== undefined ? cc.debitoContaCorrente         : null,
-        creditoContaCorrente:        cc.creditoContaCorrente        !== undefined ? cc.creditoContaCorrente        : null,
-        horarioLimite:               cc.horarioLimite               !== undefined ? cc.horarioLimite               : null,
-        'podeSimular?':              podeSimular,
-        taxaRentabilidade:           taxaRent,
-        pf:                          cc.pf                          !== undefined ? cc.pf                          : null,
-        pj:                          cc.pj                          !== undefined ? cc.pj                          : null,
+        aplicacaoInicial:            primeiro(liveCC.aplicacaoInicial,            richCC.aplicacaoInicial),
+        investimentoAdicionalMinimo: primeiro(liveCC.investimentoAdicionalMinimo, richCC.investimentoAdicionalMinimo),
+        resgateMinimo:               primeiro(liveCC.resgateMinimo,               richCC.resgateMinimo),
+        saldoMinimoPermanencia:      primeiro(liveCC.saldoMinimoPermanencia,      richCC.saldoMinimoPermanencia),
+        tipoCota:                    primeiro(liveCC.tipoCota,                    richCC.tipoCota),
+        carencia:                    primeiro(liveCC.carencia,                    richCC.carencia),
+        cotaAplicacao:               primeiro(liveCC.cotaAplicacao,               richCC.cotaAplicacao),
+        cotaResgate:                 primeiro(liveCC.cotaResgate,                 richCC.cotaResgate),
+        debitoContaCorrente:         primeiro(liveCC.debitoContaCorrente,         richCC.debitoContaCorrente),
+        creditoContaCorrente:        primeiro(liveCC.creditoContaCorrente,        richCC.creditoContaCorrente),
+        horarioLimite:               primeiro(liveCC.horarioLimite,              richCC.horarioLimite),
+        'podeSimular?':              podeSimular,   // sempre da planilha (dinâmico)
+        taxaRentabilidade:           taxaRent,      // sempre da planilha (dinâmico)
+        pf:                          primeiro(liveCC.pf,                          richCC.pf),
+        pj:                          primeiro(liveCC.pj,                          richCC.pj),
       };
 
       return {
-        id:                    id,
-        nomeCompleto:          String(f['NOME']),
-        descricaoCurta:        rich.descricaoCurta        !== undefined ? rich.descricaoCurta        : null,
-        publicoAlvo:           rich.publicoAlvo           !== undefined ? rich.publicoAlvo           : null,
-        objetivo:              rich.objetivo              !== undefined ? rich.objetivo              : null,
-        politicaInvestimento:  rich.politicaInvestimento  !== undefined ? rich.politicaInvestimento  : null,
+        id:                     id,
+        nomeCompleto:           String(f['NOME']),
+        descricaoCurta:         primeiro(live.descricaoCurta,         rich.descricaoCurta),
+        publicoAlvo:            primeiro(live.publicoAlvo,            rich.publicoAlvo),
+        objetivo:               primeiro(live.objetivo,               rich.objetivo),
+        politicaInvestimento:   primeiro(live.politicaInvestimento,   rich.politicaInvestimento),
+        // Sempre usa FUND_DATA: são os valores autoritativos mantidos pelo time de T.I.
         caracteristicas: {
           classificacaoRisco: String(f['FNDCLSRISC']),
           classificacaoCVM:   String(f['FNDCLSCVM']),
           subclasseCVM:       String(f['FNDSUBCVM']),
           tipoANBIMA:         String(f['FNDTOAMB']),
         },
-        condicoesComerciais:   condicoesComerciais,
-        taxas:                 rich.taxas                 !== undefined ? rich.taxas                 : null,
-        prestadoresServicos:   rich.prestadoresServicos   !== undefined ? rich.prestadoresServicos   : null,
-        tributacao:            rich.tributacao            !== undefined ? rich.tributacao            : null,
-        documentos:            rich.documentos            !== undefined ? rich.documentos            : null,
-        demonstracoesContabeis: rich.demonstracoesContabeis !== undefined ? rich.demonstracoesContabeis : null,
-        comunicados:           rich.comunicados           !== undefined ? rich.comunicados           : null,
+        condicoesComerciais:    condicoesComerciais,
+        taxas:                  primeiro(live.taxas,                  rich.taxas),
+        prestadoresServicos:    primeiro(live.prestadoresServicos,    rich.prestadoresServicos),
+        tributacao:             primeiro(live.tributacao,             rich.tributacao),
+        documentos:             primeiro(live.documentos,             rich.documentos),
+        demonstracoesContabeis: primeiro(live.demonstracoesContabeis, rich.demonstracoesContabeis),
+        comunicados:            primeiro(live.comunicados,            rich.comunicados),
       };
     }),
   };
