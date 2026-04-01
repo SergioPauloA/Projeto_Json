@@ -1754,7 +1754,7 @@ function gerarEEnviar() {
 // ============================================================
 
 /**
- * Envia um e-mail de validação para o e-mail do desenvolvedor.
+ * Envia um e-mail de validação para todos os destinatários (developer + analistas).
  * Use esta função diretamente no editor do Apps Script para validar o envio
  * sem depender de triggers ou alterações na planilha.
  *
@@ -1789,14 +1789,18 @@ function testarEnvioEmail() {
 
     var corpoEmail = buildEmailHTML(dataStr, fundos.length, fundos, nomeJson, nomeSql);
 
-    MailApp.sendEmail({
-      to: CONFIG.DEVELOPER_EMAIL,
-      subject: '🏦 Banestes — Validação de Envio — ' + dataStr,
-      htmlBody: corpoEmail,
-      attachments: [jsonBlob, sqlBlob],
+    var destinatarios = [CONFIG.DEVELOPER_EMAIL].concat(CONFIG.ANALYST_EMAILS || []);
+
+    destinatarios.forEach(function (dest) {
+      MailApp.sendEmail({
+        to: dest,
+        subject: '🏦 Banestes — Validação de Envio — ' + dataStr,
+        htmlBody: corpoEmail,
+        attachments: [jsonBlob, sqlBlob],
+      });
     });
 
-    Logger.log('E-mail de validação enviado para: ' + CONFIG.DEVELOPER_EMAIL);
+    Logger.log('E-mail de validação enviado para: ' + destinatarios.join(', '));
 
   } catch (e) {
     Logger.log('ERRO em testarEnvioEmail: ' + e.message);
