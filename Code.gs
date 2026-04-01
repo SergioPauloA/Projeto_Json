@@ -1286,27 +1286,23 @@ function gerarEEnviar() {
  * Use esta função diretamente no editor do Apps Script para validar o envio
  * sem depender de triggers ou alterações na planilha.
  *
- * Usa dados reais da planilha se disponíveis; caso contrário usa dados de exemplo.
+ * Utiliza exclusivamente dados reais da planilha — mesma lógica de gerarEEnviar().
  * Os arquivos são prefixados com "TESTE_" para identificação fácil.
  */
 function testarEnvioEmail() {
   try {
+    var ss      = SpreadsheetApp.getActiveSpreadsheet();
     var agora   = new Date();
     var dataStr = Utilities.formatDate(agora, Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm');
     var sufixo  = Utilities.formatDate(agora, Session.getScriptTimeZone(), 'yyyyMMdd_HHmmss');
 
-    var fundos = [];
-    try { fundos = obterDadosFundos(); } catch (e) {
-      Logger.log('Aviso: não foi possível obter dados da planilha — usando dados de exemplo.');
-    }
+    // Recalcula valores derivados no backend antes de ler os dados,
+    // garantindo que cols F e G de Inicial e col D de PodeSimular estejam atualizadas.
+    sincronizarValoresDerivados(ss);
 
+    var fundos = obterDadosFundos();
     if (fundos.length === 0) {
-      fundos = [
-        { FNDCD:2,  NOME:'Banestes Invest Money FIF Renda Fixa RL',                                  FNDCTFND:'Renda Fixa', FNDCLSRISC:'Baixo',  FNDCLSCVM:'Renda Fixa', FNDSUBCVM:'Não se aplica',   FNDTOAMB:'Renda Fixa Duração Baixa Soberano',                   FNDTXSIMU:0.1338, FNDCOTDIAUTIL:'N', PODE_SIMULAR:'Sim', RENT_DIARIA:0.0365, RENT_MENSAL:0.1123, RENT_ANUAL:0.1338 },
-        { FNDCD:4,  NOME:'Banestes VIP DI FIC de FIF Renda Fixa Referenciado DI RL',                 FNDCTFND:'Renda Fixa', FNDCLSRISC:'Baixo',  FNDCLSCVM:'Renda Fixa', FNDSUBCVM:'Referenciado DI', FNDTOAMB:'Renda Fixa Duração Baixa Grau de Investimento',       FNDTXSIMU:0.1420, FNDCOTDIAUTIL:'N', PODE_SIMULAR:'Sim', RENT_DIARIA:0.0388, RENT_MENSAL:0.1195, RENT_ANUAL:0.1420 },
-        { FNDCD:24, NOME:'Banestes Dividendos FIC de FIF de Ações RL',                               FNDCTFND:'Ações',      FNDCLSRISC:'Alto',   FNDCLSCVM:'Ações',      FNDSUBCVM:'Não se aplica',   FNDTOAMB:'Ações Ativo Dividendos',                              FNDTXSIMU:0.4441, FNDCOTDIAUTIL:'S', PODE_SIMULAR:'Sim', RENT_DIARIA:0.1213, RENT_MENSAL:0.3734, RENT_ANUAL:0.4441 },
-        { FNDCD:36, NOME:'Banestes Tenax Ações FIF em Cotas de FIA RL',                              FNDCTFND:'Ações',      FNDCLSRISC:'Alto',   FNDCLSCVM:'Ações',      FNDSUBCVM:'Não se aplica',   FNDTOAMB:'Ações Ativos Livre',                                  FNDTXSIMU:0,      FNDCOTDIAUTIL:'N', PODE_SIMULAR:'Não', RENT_DIARIA:0,      RENT_MENSAL:0,      RENT_ANUAL:0      },
-      ];
+      throw new Error('Nenhum fundo encontrado. Verifique as abas "Inicial" ou "Fundos" na planilha.');
     }
 
     var jsonStr  = gerarJSON(fundos);
