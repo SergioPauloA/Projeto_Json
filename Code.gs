@@ -48,6 +48,81 @@ var RISCO_CODIGO = {
   'Alto':        3,
 };
 
+// Fundos que NUNCA simulam, independentemente da data de início.
+// Corresponde às células com "Não" fixo na col D da aba PodeSimular do sistema original.
+var FUNDO_SEMPRE_NAO = {
+  'invest_investpublic':                            true,
+  'invest_investidor':                              true,
+  'invest_previdenciario':                          true,
+  'banestes_tesouro_fi_renda_fixa_referenciado_di': true,
+  'invest_solidez':                                 true,
+  'invest_referencial':                             true,
+  'invest_funses':                                  true,
+  'invest_soberano':                                true,
+  'invest_tenax':                                   true,
+  'invest_Synergy':                                 true,
+};
+
+// Mapeamento: ID do fundo → nome exato na col B da aba COAFI (para buscar DATA_INICIO)
+var FUND_ID_TO_COAFI_INICIO = {
+  'invest_investpublic':                            'Banestes Invest Public Automático FI',
+  'invest_investmoney':                             'Banestes Invest Money FI RF',
+  'invest_investidor':                              'Banestes Investidor Automático FI',
+  'invest-vitoria-500':                             'Banestes Vitória 500 FIC RF DI',
+  'invest_vipdi':                                   'Banestes Vip Di FIC RF DI',
+  'invest_institucional':                           'Banestes Institucional FI RF',
+  'invest_previdenciario':                          'Banestes IMA-B Títulos Públicos FI RF',
+  'banestes_tesouro_fi_renda_fixa_referenciado_di': 'Banestes Tesouro FI RF DI',
+  'invest_solidez':                                 'Banestes Solidez Automático FI',
+  'invest_btg_pactual_absoluto':                    'Banestes BTG Pactual Inst. Absoluto',
+  'invest-valores':                                 'Banestes Valores FIC RF DI',
+  'invest_liquidez_referenciado':                   'Banestes Liquidez FI RF REF DI',
+  'invest_referencial':                             'Banestes IRF-M 1Títulos Públicos RF',
+  'invest_debentures':                              'Banestes Infraestrutura FIC RF Cred Priv',
+  'invest-estrategia':                              'Banestes Estratégia FI RF',
+  'invest_dividendos':                              'Banestes Dividendos FIC de FI',
+  'invest_funses':                                  'Banestes Funses FI',
+  'invest_facil':                                   'Banestes Invest Fácil FI RF Simples',
+  'invest_cred_corp':                               'Banestes Credito Corporativo I FIC RF Cred Priv LP',
+  'invest_ima-b5':                                  'Banestes IMA-B5 Títulos Públicos FI RF LP',
+  'invest_multiestrategia':                         'Banestes Multiestrategia FIC Multimercado',
+  'invest_selection':                               'Banestes Selection FI RF Cred Priv',
+  'invest_fundo_reserva_climatica':                 'Banestes Reserva Climática FIF RF DI Resp. Ltda.',
+  'invest_soberano':                                'Banestes Soberano FIF RF Simples Resp. Ltda.',
+  'invest_tenax':                                   'Banestes Tenax Ações FIF Em Cotas De Fundo de Investimento Em Ações Resp. Ltda.',
+  'invest_Synergy':                                 'BANESTES SYNERGY LONG ONLY FIF EM COTAS DE FUNDOS DE INVESTIMENTO EM AÇÕES RESP. Ltda.',
+};
+
+// Mapeamento: ID do fundo → nome curto na col B da aba COAFI (para buscar TAXA_NOVA na col AR)
+var FUND_ID_TO_COAFI_TAXA = {
+  'invest_btg_pactual_absoluto':                    'Absoluto',
+  'invest_cred_corp':                               'Credito Corporativo I',
+  'invest_dividendos':                              'Dividendos',
+  'invest-estrategia':                              'Estratégia',
+  'invest_debentures':                              'Infraestrutura',
+  'invest_funses':                                  'Funses',
+  'invest_ima-b5':                                  'IMA-B5 Títulos Públicos',
+  'invest_previdenciario':                          'IMA-B Títulos Públicos',
+  'invest_institucional':                           'Institucional',
+  'invest_facil':                                   'Fácil',
+  'invest_investmoney':                             'Money',
+  'invest_investpublic':                            'Public',
+  'invest_investidor':                              'Investidor',
+  'invest_liquidez_referenciado':                   'Liquidez',
+  'invest_multiestrategia':                         'Multiestrategia',
+  'invest_referencial':                             'IRF-M 1 Títulos Públicos',
+  'invest_fundo_reserva_climatica':                 'Reserva',
+  'invest_selection':                               'Selection',
+  'invest_soberano':                                'Soberano',
+  'invest_solidez':                                 'Solidez',
+  'invest_Synergy':                                 'Synergy',
+  'invest_tenax':                                   'Tenax',
+  'banestes_tesouro_fi_renda_fixa_referenciado_di': 'Tesouro',
+  'invest_vipdi':                                   'Vip Di',
+  'invest-valores':                                 'Valores',
+  'invest-vitoria-500':                             'Vitória 500',
+};
+
 // ============================================================
 // DADOS ESTÁTICOS DOS FUNDOS
 // Chaveado pelo ID da Aba "Inicial" coluna B.
@@ -325,7 +400,8 @@ function computeHash(str) {
  * no backend, sem usar fórmulas na célula.
  *
  * Regra (equivalente ao IF que estava na célula):
- *   • DATA_INICIO vazia → "Sim" (padrão enquanto data não estiver preenchida)
+ *   • Fundo em FUNDO_SEMPRE_NAO → preserva 'Não' fixo (nunca recalcula)
+ *   • DATA_INICIO vazia → preserva valor existente em col D
  *   • DATA_INICIO preenchida e fundo com ≥ 1 ano de operação → "Sim"
  *   • DATA_INICIO preenchida e fundo com < 1 ano de operação → "Não"
  *
@@ -339,9 +415,16 @@ function atualizarColunaPodeSimular(ss) {
   var hoje = new Date();
 
   for (var i = 1; i < data.length; i++) {
+    var fundId = String(data[i][0] || '').trim(); // col A: ID_FUNDO
+    // Fundos que nunca podem simular: manter 'Não' fixo, independente da data
+    if (FUNDO_SEMPRE_NAO[fundId]) {
+      sheet.getRange(i + 1, 4).setValue('Não');
+      continue;
+    }
+
     var dataInicio = data[i][2]; // col C: DATA_INICIO
     // When no date is set, preserve whatever value is already in col D
-    // (allows hardcoded 'Não' entries set during initial setup to be kept).
+    // (allows initial 'Sim' entries to be kept until COAFI data arrives).
     if (!dataInicio) continue;
 
     var dt = (dataInicio instanceof Date) ? dataInicio : new Date(dataInicio);
@@ -423,11 +506,84 @@ function atualizarColunasInicial(ss) {
 }
 
 /**
+ * Lê a aba COAFI (importada via IMPORTRANGE do GEART/RENTABILIDADE) e atualiza:
+ *   • Aba PodeSimular col C (DATA_INICIO) — equivalente à fórmula original
+ *       =PROCV(B; COAFI!B:E; 4; FALSO)
+ *   • Aba TaxaNova col C (TAXA_NOVA) — equivalente à fórmula original
+ *       =TEXTO(PROCV(B; COAFI!B:AR; 43; FALSO); "0.00")
+ *
+ * Estrutura esperada da aba COAFI (dados do GEART/RENTABILIDADE!A:AR):
+ *   Col B (índice 1)  = nome do fundo (chave de lookup)
+ *   Col E (índice 4)  = DATA_INICIO
+ *   Col AR (índice 43) = TAXA_NOVA (valor percentual numérico, ex: 14.20)
+ *
+ * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
+ */
+function atualizarDadosDeCoafi(ss) {
+  var coafiSheet = ss.getSheetByName(CONFIG.SHEET_COAFI);
+  if (!coafiSheet || coafiSheet.getLastRow() < 2) {
+    Logger.log('Aba COAFI vazia ou não encontrada — DATA_INICIO e TAXA_NOVA não atualizados.');
+    return;
+  }
+
+  var coafiData = coafiSheet.getDataRange().getValues();
+
+  // Constrói mapas: nome (col B) → DATA_INICIO (col E) e → TAXA_NOVA (col AR)
+  // A linha 0 é o cabeçalho da planilha importada — ignorar.
+  var mapaInicio = {};
+  var mapaTaxa   = {};
+  for (var i = 1; i < coafiData.length; i++) {
+    var row  = coafiData[i];
+    var nome = String(row[1] || '').trim();  // col B (índice 1)
+    if (!nome) continue;
+    mapaInicio[nome] = row[4];   // col E (índice 4) = DATA_INICIO
+    mapaTaxa[nome]   = row[43];  // col AR (índice 43) = TAXA_NOVA
+  }
+
+  // ── Atualiza PodeSimular col C (DATA_INICIO) ──────────────────────────────
+  var psSheet = ss.getSheetByName(CONFIG.SHEET_PODE_SIM);
+  if (psSheet && psSheet.getLastRow() >= 2) {
+    var psData = psSheet.getDataRange().getValues();
+    for (var p = 1; p < psData.length; p++) {
+      var fundId   = String(psData[p][0] || '').trim();
+      var coafiNome = FUND_ID_TO_COAFI_INICIO[fundId];
+      if (!coafiNome || !mapaInicio.hasOwnProperty(coafiNome)) continue;
+      var dataVal = mapaInicio[coafiNome];
+      if (dataVal != null && dataVal !== '') {
+        psSheet.getRange(p + 1, 3).setValue(dataVal);
+      }
+    }
+  }
+
+  // ── Atualiza TaxaNova col C (TAXA_NOVA) ───────────────────────────────────
+  var tnSheet = ss.getSheetByName(CONFIG.SHEET_TAXA_NOVA);
+  if (tnSheet && tnSheet.getLastRow() >= 2) {
+    var tnData = tnSheet.getDataRange().getValues();
+    for (var t = 1; t < tnData.length; t++) {
+      var fId      = String(tnData[t][0] || '').trim();
+      var coafiNomeTaxa = FUND_ID_TO_COAFI_TAXA[fId];
+      if (!coafiNomeTaxa || !mapaTaxa.hasOwnProperty(coafiNomeTaxa)) continue;
+      var taxaVal = mapaTaxa[coafiNomeTaxa];
+      if (taxaVal != null && taxaVal !== '') {
+        tnSheet.getRange(t + 1, 3).setValue(taxaVal);
+      }
+    }
+  }
+
+  Logger.log('atualizarDadosDeCoafi concluído.');
+}
+
+/**
  * Recalcula todos os valores derivados das abas auxiliares no backend.
  * Deve ser chamada antes de ler dados (em gerarEEnviar) e ao configurar a planilha.
+ * Ordem:
+ *   1. atualizarDadosDeCoafi  — popula DATA_INICIO (PodeSimular col C) e TAXA_NOVA (TaxaNova col C) a partir do COAFI
+ *   2. atualizarColunaPodeSimular — recalcula PODE_SIMULAR (PodeSimular col D) com base na DATA_INICIO
+ *   3. atualizarColunasInicial — propaga PODE_SIMULAR_NOVO e TAXA_NOVA para Inicial cols F e G
  * @param {GoogleAppsScript.Spreadsheet.Spreadsheet} ss
  */
 function sincronizarValoresDerivados(ss) {
+  atualizarDadosDeCoafi(ss);
   atualizarColunaPodeSimular(ss);
   atualizarColunasInicial(ss);
 }
@@ -669,9 +825,8 @@ function configurarPlanilha() {
     msg += 'ℹ️ Já existentes (não modificadas): ' + existentes.join(', ') + '.\n\n';
   }
   msg += 'Próximos passos:\n'
-    + '1. Na aba ' + CONFIG.SHEET_COAFI + ', substitua a linha 2 pelo =IMPORTRANGE(...) do GEART.\n'
-    + '2. Atualize as datas na aba ' + CONFIG.SHEET_PODE_SIM + ' para recalcular "Pode Simular".\n'
-    + '3. Execute "🔄 Gerar e Enviar Agora" ou "🧪 Testar Envio de E-mail".';
+    + '1. Autorize o IMPORTRANGE na aba ' + CONFIG.SHEET_COAFI + ' (necessário apenas na primeira vez).\n'
+    + '2. Os triggers automáticos irão gerar e enviar os dados sem nenhuma interação manual.';
 
   Logger.log('configurarPlanilha concluído. Criadas: [' + criadas.join(', ') + ']');
   try {
@@ -761,29 +916,27 @@ function reconfigurarPlanilha() {
     'As seguintes abas foram excluídas e recriadas com sucesso:\n\n' +
       '• ' + excluidas.join('\n• ') + '\n\n' +
     'Próximos passos:\n' +
-    '1. Na aba ' + CONFIG.SHEET_COAFI + ', substitua a linha 2 pelo =IMPORTRANGE(...) do GEART.\n' +
-    '2. Atualize as datas na aba ' + CONFIG.SHEET_PODE_SIM + ' para recalcular "Pode Simular".\n' +
-    '3. Execute "🔄 Gerar e Enviar Agora" ou "🧪 Testar Envio de E-mail".',
+    '1. Autorize o IMPORTRANGE na aba ' + CONFIG.SHEET_COAFI + ' (necessário apenas na primeira vez).\n' +
+    '2. Os triggers automáticos irão gerar e enviar os dados sem nenhuma interação manual.',
     ui.ButtonSet.OK
   );
 }
 
 /**
- * Cria a aba COAFI com estrutura placeholder.
- * Na produção, substitua a linha 2 pelo =IMPORTRANGE(...) do GEART para que
- * os dados reais de DATA_INICIO e taxa sejam importados automaticamente.
+ * Cria a aba COAFI e configura a fórmula IMPORTRANGE que importa os dados do
+ * GEART (planilha RENTABILIDADE!A:AR) — idêntico ao sistema original.
+ *
+ * ⚠️ Na primeira execução, o Google Sheets pedirá autorização do IMPORTRANGE.
+ *    Basta acessar a planilha uma única vez e conceder permissão.
+ *    Após isso, os triggers automáticos funcionarão sem interação manual.
  */
 function _criarAbaCoafi(ss) {
-  var headers = ['ID_FUNDO', 'NOME_FUNDO', 'DATA_INICIO', 'TAXA_ATUAL', 'AR_TAXA_NOVA'];
-  var sheet   = ss.insertSheet(CONFIG.SHEET_COAFI);
-  var hRange  = sheet.getRange(1, 1, 1, headers.length);
-  hRange.setValues([headers])
-    .setBackground('#1a3c5e').setFontColor('#ffffff').setFontWeight('bold').setFontSize(10);
-  sheet.getRange(2, 1).setValue(
-    '⚠️ Configure =IMPORTRANGE(...) aqui para importar dados do GEART.'
+  var sheet = ss.insertSheet(CONFIG.SHEET_COAFI);
+  // Equivalente à fórmula original:
+  //   =importrange("1vXp4xGTacqXy7jTzhsBwAhNCgvT-9jmrvfetcvGBjhQ","RENTABILIDADE!A:AR")
+  sheet.getRange('A1').setFormula(
+    '=IMPORTRANGE("1vXp4xGTacqXy7jTzhsBwAhNCgvT-9jmrvfetcvGBjhQ","RENTABILIDADE!A:AR")'
   );
-  sheet.setFrozenRows(1);
-  sheet.autoResizeColumns(1, headers.length);
   return sheet;
 }
 
@@ -1424,7 +1577,7 @@ function testarEnvioEmail() {
     var sqlBlob  = Utilities.newBlob('').setDataFromString(sqlStr, 'UTF-8')
       .setName(nomeSql).setContentType('text/plain');
 
-    var corpoEmail = buildEmailHTML(dataStr + ' [TESTE]', fundos.length, fundos, nomeJson, nomeSql);
+    var corpoEmail = buildEmailHTML(dataStr, fundos.length, fundos, nomeJson, nomeSql);
 
     MailApp.sendEmail({
       to: CONFIG.DEVELOPER_EMAIL,
