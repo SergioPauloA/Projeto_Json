@@ -1702,9 +1702,24 @@ function registrarInfoLog(mensagem) {
 /**
  * Gera o JSON e o Script SQL e envia por e-mail.
  * Chamada pelo acionador automático (onChange / time-based) ou manualmente.
- * Possui verificação de hash para evitar envios duplicados.
+ * Possui verificação de hash para evitar envios duplicados e lock para evitar
+ * execuções simultâneas (race condition quando onChange dispara várias vezes).
  */
 function gerarEEnviar() {
+  // Garante que apenas uma instância execute por vez.
+  // Se dois acionadores onChange dispararem ao mesmo tempo, o segundo aguarda
+  // o primeiro terminar e então percebe que o hash já foi atualizado, evitando
+  // o envio duplicado de e-mail.
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000); // aguarda até 30 s para obter o lock
+  } catch (lockErr) {
+    var msg = 'Execução ignorada: outra instância de gerarEEnviar já está em andamento.';
+    Logger.log(msg);
+    registrarInfoLog('⏸ ' + msg);
+    return { success: false, reason: 'lock_unavailable' };
+  }
+
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     // Recalcula valores derivados no backend antes de ler os dados,
@@ -1746,6 +1761,8 @@ function gerarEEnviar() {
     Logger.log('ERRO em gerarEEnviar: ' + e.message);
     registrarErroLog(e);
     throw e;
+  } finally {
+    lock.releaseLock();
   }
 }
 
