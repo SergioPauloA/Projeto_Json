@@ -460,10 +460,22 @@ function doGet(e) {
 /**
  * Disparado automaticamente quando dados da planilha são alterados.
  * Instalado como acionador programático via configurarAcionador().
- * Possui debounce para evitar processamentos duplicados.
+ * Possui debounce e bloqueio de execução simultânea (LockService) para
+ * evitar envios duplicados causados por múltiplos disparos do acionador.
  */
 function aoAlterarPlanilha(e) {
+  var lock = LockService.getScriptLock();
+  var lockAcquired = false;
   try {
+    // Tenta adquirir o bloqueio de script imediatamente (0 ms de espera).
+    // Se outra instância já estiver em execução, descarta este evento.
+    lockAcquired = lock.tryLock(0);
+    if (!lockAcquired) {
+      var msgLock = 'Execução simultânea detectada — evento onChange descartado para evitar envio duplicado.';
+      Logger.log(msgLock);
+      registrarInfoLog('⏸ ' + msgLock);
+      return;
+    }
     var props = PropertiesService.getScriptProperties();
     var lastRun = props.getProperty(CONFIG.PROP_LAST_RUN);
     if (lastRun) {
@@ -480,6 +492,8 @@ function aoAlterarPlanilha(e) {
   } catch (err) {
     Logger.log('Erro em aoAlterarPlanilha: ' + err.message);
     registrarErroLog(err);
+  } finally {
+    if (lockAcquired) lock.releaseLock();
   }
 }
 
@@ -1705,7 +1719,19 @@ function registrarInfoLog(mensagem) {
  * Possui verificação de hash para evitar envios duplicados.
  */
 function gerarEEnviar() {
+  // Segunda barreira contra execuções simultâneas (ex: trigger semanal
+  // disparando junto com um onChange). Aguarda até 30 s pela liberação do bloqueio.
+  var lock = LockService.getScriptLock();
+  var lockAcquired = false;
   try {
+    lockAcquired = lock.tryLock(30000);
+    if (!lockAcquired) {
+      var msgLock = 'gerarEEnviar: não foi possível adquirir o bloqueio — outra execução está em andamento.';
+      Logger.log(msgLock);
+      registrarInfoLog('⏸ ' + msgLock);
+      return { success: false, reason: 'lock_timeout' };
+    }
+
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     // Recalcula valores derivados no backend antes de ler os dados,
     // garantindo que as células F e G da aba Inicial e col D da aba
@@ -1731,13 +1757,16 @@ function gerarEEnviar() {
       return { success: false, reason: 'no_change' };
     }
 
+    // Grava o hash ANTES de enviar para que execuções concorrentes que
+    // conseguirem o bloqueio logo em seguida detectem "sem alteração".
+    props.setProperty(CONFIG.PROP_LAST_HASH, jsonHash);
+
     var sqlStr   = gerarSQL(fundos);
     var resultado = enviarEmail(jsonStr, sqlStr, fundos);
     var agora    = new Date();
     registrarLog(agora, resultado, jsonStr, sqlStr);
 
-    props.setProperty(CONFIG.PROP_LAST_HASH, jsonHash);
-    props.setProperty(CONFIG.PROP_LAST_RUN,  agora.toISOString());
+    props.setProperty(CONFIG.PROP_LAST_RUN, agora.toISOString());
 
     Logger.log('Envio concluído: ' + resultado.dataEnvio + ' — ' + resultado.totalFundos + ' fundos.');
 
@@ -1746,6 +1775,8 @@ function gerarEEnviar() {
     Logger.log('ERRO em gerarEEnviar: ' + e.message);
     registrarErroLog(e);
     throw e;
+  } finally {
+    if (lockAcquired) lock.releaseLock();
   }
 }
 
