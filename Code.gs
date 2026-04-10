@@ -442,6 +442,18 @@ var FUND_RICH_DATA = {
       { data: '11.09.2015', titulo: 'Edital de Convocação - Assembleia Geral Extraordinária', url: '/investimentos/pdf/comunicados/btg-pactual-dividendos-age-150911.pdf' },
     ],
   },
+  'invest_referencial': {
+    condicoesComerciais: {
+      pf: false,
+      pj: true,
+    },
+  },
+  'banestes_tesouro_fi_renda_fixa_referenciado_di': {
+    condicoesComerciais: {
+      pf: false,
+      pj: true,
+    },
+  },
 };
 
 /**
@@ -1361,8 +1373,8 @@ function gerarJSON(fundos) {
         horarioLimite:               primeiro(liveCC.horarioLimite,              richCC.horarioLimite),
         'podeSimular?':              podeSimular,   // sempre da planilha (dinâmico)
         taxaRentabilidade:           taxaRent,      // sempre da planilha (dinâmico)
-        pf:                          primeiro(liveCC.pf,                          richCC.pf),
-        pj:                          primeiro(liveCC.pj,                          richCC.pj),
+        pf:                          primeiro(richCC.pf,                          liveCC.pf),
+        pj:                          primeiro(richCC.pj,                          liveCC.pj),
       };
 
       return {
