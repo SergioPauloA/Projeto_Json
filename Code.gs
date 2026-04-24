@@ -548,6 +548,42 @@ function computeHash(str) {
 }
 
 // ============================================================
+// DIAS ÚTEIS
+// ============================================================
+
+/**
+ * Retorna o número do dia útil (segunda a sexta) da data informada dentro
+ * do seu próprio mês. Retorna 0 caso a data caia em sábado ou domingo.
+ * Feriados nacionais não são descontados — apenas fins de semana.
+ * @param {Date} data
+ * @returns {number}
+ */
+function numeroDiaUtilNoMes(data) {
+  var diaSemana = data.getDay(); // 0 = Dom, 6 = Sáb
+  if (diaSemana === 0 || diaSemana === 6) return 0;
+
+  var count = 0;
+  var d = new Date(data.getFullYear(), data.getMonth(), 1);
+  var limite = new Date(data.getFullYear(), data.getMonth(), data.getDate());
+  while (d <= limite) {
+    var dow = d.getDay();
+    if (dow !== 0 && dow !== 6) count++;
+    d.setDate(d.getDate() + 1);
+  }
+  return count;
+}
+
+/**
+ * Verifica se a data informada é o 11º dia útil do seu mês.
+ * Considera apenas dias de semana (segunda a sexta); feriados não são excluídos.
+ * @param {Date} data
+ * @returns {boolean}
+ */
+function eDecimoPrimeiroDiaUtil(data) {
+  return numeroDiaUtilNoMes(data) === 11;
+}
+
+// ============================================================
 // CÁLCULO DE VALORES DERIVADOS (substitui fórmulas das células)
 // ============================================================
 
@@ -1729,9 +1765,17 @@ function registrarInfoLog(mensagem) {
  * Gera o JSON e o Script SQL e envia por e-mail.
  * Chamada pelo acionador automático (onChange / time-based) ou manualmente.
  * Possui verificação de hash para evitar envios duplicados.
+ *
+ * O e-mail só é enviado quando a execução ocorre no 11º dia útil do mês;
+ * nas demais datas o envio é bloqueado e o motivo registrado no log.
+ *
+ * @returns {{success: boolean, reason: string}} Razões possíveis de falha:
+ *   'lock_timeout'          – outra instância já detinha o bloqueio;
+ *   'not_11th_business_day' – data atual não é o 11º dia útil do mês;
+ *   'no_change'             – dados idênticos ao último envio.
  */
 function gerarEEnviar() {
-  // Segunda barreira contra execuções simultâneas (ex: trigger semanal
+  // Segunda barreira contra execuções simultâneas (ex: trigger diário
   // disparando junto com um onChange). Aguarda até 30 s pela liberação do bloqueio.
   var lock = LockService.getScriptLock();
   var lockAcquired = false;
@@ -1742,6 +1786,17 @@ function gerarEEnviar() {
       Logger.log(msgLock);
       registrarInfoLog('⏸ ' + msgLock);
       return { success: false, reason: 'lock_timeout' };
+    }
+
+    // Só envia e-mail no 11º dia útil do mês (prazo após o fechamento do 10º dia útil).
+    var hoje = new Date();
+    if (!eDecimoPrimeiroDiaUtil(hoje)) {
+      var msgDia = 'Envio bloqueado: hoje (' +
+        Utilities.formatDate(hoje, Session.getScriptTimeZone(), 'dd/MM/yyyy') +
+        ') não é o 11º dia útil do mês.';
+      Logger.log(msgDia);
+      registrarInfoLog('📅 ' + msgDia);
+      return { success: false, reason: 'not_11th_business_day' };
     }
 
     var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -1857,7 +1912,7 @@ function testarEnvioEmail() {
 
 /**
  * Configura os acionadores automáticos:
- *  1. Semanal (toda segunda-feira às 8h) → gerarEEnviar
+ *  1. Diário às 8h → gerarEEnviar (a função verifica internamente se é o 11º dia útil do mês)
  *  2. onChange → aoAlterarPlanilha (reage a alterações nos dados da planilha, incluindo IMPORTRANGE)
  */
 function configurarAcionador() {
@@ -1868,11 +1923,11 @@ function configurarAcionador() {
     }
   });
 
-  // Acionador semanal
+  // Acionador diário: dispara todos os dias às 8h; gerarEEnviar só envia e-mail
+  // quando a data for o 11º dia útil do mês (prazo após fechamento do 10º dia útil).
   ScriptApp.newTrigger('gerarEEnviar')
     .timeBased()
-    .everyWeeks(1)
-    .onWeekDay(ScriptApp.WeekDay.MONDAY)
+    .everyDays(1)
     .atHour(8)
     .create();
 
