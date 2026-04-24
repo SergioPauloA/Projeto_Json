@@ -10,8 +10,8 @@ Ferramenta de gestão de fundos de investimento do Banestes, desenvolvida em **G
 |---|---|---|
 | A planilha é aberta | O menu **🏦 Gerenciador Fundos** é criado | `onOpen()` |
 | **Primeira vez** | Todas as abas são criadas e populadas com dados e fórmulas | `configurarPlanilha()` |
-| Dados da planilha são alterados (inclui IMPORTRANGE/COAFI) | JSON + SQL gerados e enviados por e-mail automaticamente | `aoAlterarPlanilha()` → `gerarEEnviar()` |
-| Toda segunda-feira às 8h | Envio automático semanal garantido | `gerarEEnviar()` via trigger |
+| Dados da planilha são alterados (inclui IMPORTRANGE/COAFI) | JSON + SQL gerados e enviados por e-mail automaticamente (somente no 11º dia útil do mês) | `aoAlterarPlanilha()` → `gerarEEnviar()` |
+| Todos os dias às 8h | Verificação automática: envia e-mail apenas se for o 11º dia útil do mês | `gerarEEnviar()` via trigger |
 | A cada envio | Registro salvo na aba `Log_Envios` | `registrarLog()` |
 
 > **Não são necessários cliques nem botões.** Após configurar o acionador uma única vez, tudo ocorre automaticamente.
@@ -76,7 +76,7 @@ Use o menu: **🏦 Gerenciador Fundos → ⏰ Configurar Acionadores Automático
 
 Isso configura:
 - **onChange**: reage imediatamente a qualquer alteração na planilha (inclusive IMPORTRANGE).
-- **Semanal**: toda segunda-feira às 8h (garantia de execução mesmo sem alterações detectadas).
+- **Diário**: todos os dias às 8h — `gerarEEnviar()` verifica internamente se é o **11º dia útil do mês** antes de enviar.
 
 ### 4. Testar o envio de e-mail
 
@@ -95,7 +95,7 @@ Execute `testarEnvioEmail()` diretamente no editor do Apps Script (ou via menu *
 | `configurarPlanilha` | **Menu / Editor GAS** — execute **primeiro** | Cria todas as abas necessárias (COAFI, PodeSimular, TaxaNova, Inicial, Log_Envios, Fundos) com dados e fórmulas |
 | `gerarEEnviar` | Menu / Editor GAS | Gera JSON + SQL + envia e-mail + registra log |
 | `testarEnvioEmail` | **Editor GAS** | Envia e-mail de TESTE para o desenvolvedor (prefixo `TESTE_`) |
-| `configurarAcionador` | Menu / Editor GAS | Ativa acionadores automáticos (onChange + semanal) |
+| `configurarAcionador` | Menu / Editor GAS | Ativa acionadores automáticos (onChange + diário) |
 | `removerAcionador` | Menu / Editor GAS | Remove todos os acionadores automáticos |
 
 ### Funções internas (chamadas automaticamente)
